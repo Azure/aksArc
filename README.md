@@ -1,3 +1,7 @@
+# Welcome to the Azure Kubernetes Service on Azure Stack HCI repo
+This is where the AKS-HCI team will track features and issues with AKS-HCI. We will monitor this repo in order to engage with our community and discuss questions, customer scenarios, or feature requests.
+
+Checkout our projects tab to see the roadmap for AKS-HCI!
 
 # Contributing
 
