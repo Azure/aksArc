@@ -3,6 +3,9 @@ This is where the AKS-HCI team will track features and issues with AKS-HCI. We w
 
 Checkout our projects tab to see the roadmap for AKS-HCI!
 
+# Evaluating
+Do you want to try out AKS-HCI? Head over to our [Evaluation Guide](https://github.com/Azure/aks-hci/blob/main/Evalguide.md) to learn more
+
 # Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
