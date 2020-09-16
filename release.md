@@ -53,3 +53,6 @@ Azure Kubernetes Service includes a number of features to help secure your conta
 * Hypervisor-based isolation for worker nodes - Each Kubernetes cluster runs on its own dedicated and isolated set of virtual machines so tenants can share the same physical infrastructure.
 * Microsoft-maintained Linux and Windows images for worker nodes - Worker nodes run Linux and Windows virtual machine images created by Microsoft to adhere to security best * practices. Microsoft also refreshes these images monthly with the latest security updates.
 
+## More Information
+For more information check the the [Azure Kubernetes Service on Azure Stack HCI documentation](https://aka.ms/AKSonHCI-Docs)
+
