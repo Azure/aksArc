@@ -1,6 +1,5 @@
-# AKSHCI – Release notes
+# Azure Kubernetes Service on Azure Stack HCI – Release notes
 This document is for Azure Kubernetes Service on Azure Stack HCI Public Preview 1.
-
 
 ## What is Azure Kubernetes Service on Azure Stack HCI?
 Last updated: 09/21/2020
@@ -51,7 +50,8 @@ Azure Kubernetes Service creates the Linux and Windows VMs so that you don't hav
 Azure Kubernetes Service includes a number of features to help secure your container infrastructure:
 
 * Hypervisor-based isolation for worker nodes - Each Kubernetes cluster runs on its own dedicated and isolated set of virtual machines so tenants can share the same physical infrastructure.
-* Microsoft-maintained Linux and Windows images for worker nodes - Worker nodes run Linux and Windows virtual machine images created by Microsoft to adhere to security best * practices. Microsoft also refreshes these images monthly with the latest security updates.
+* Microsoft-maintained Linux and Windows images for worker nodes - Worker nodes run Linux and Windows virtual machine images created by Microsoft to adhere to security best practices. 
+* Microsoft also refreshes these images monthly with the latest security updates.
 
 ## More Information
 For more information check the the [Azure Kubernetes Service on Azure Stack HCI documentation](https://aka.ms/AKSonHCI-Docs)
