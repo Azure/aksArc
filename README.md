@@ -4,7 +4,11 @@ This is where the AKS-HCI team will track features and issues with AKS-HCI. We w
 Checkout our projects tab to see the roadmap for AKS-HCI!
 
 # Evaluating
-Do you want to try out AKS-HCI? Head over to our [Evaluation Guide](https://github.com/Azure/aks-hci/blob/main/Evalguide.md) to learn more
+Do you want to try out AKS-HCI? Head over to our [Evaluation Guide](https://github.com/Azure/aks-hci/blob/main/Evalguide.md) to learn more.
+
+# Release Notes
+Before getting started take a look at the [Release Notes](https://github.com/Azure/aks-hci/blob/main/release.md).
+
 
 # Contributing
 
