@@ -9,6 +9,9 @@ Do you want to try out AKS-HCI? Head over to our [Evaluation Guide](https://gith
 # Release Notes
 Before getting started take a look at the [Release Notes](https://github.com/Azure/aks-hci/blob/main/release.md).
 
+# Known Issues
+Here you can find [known issues](https://github.com/Azure/aks-hci/blob/main/known-issues.md) for the current release.
+
 
 # Contributing
 
