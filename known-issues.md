@@ -1,4 +1,4 @@
-# Known Issues for zure Kubernetes Service on Azure Stack HCI Public Preview
+# Known Issues for Azure Kubernetes Service on Azure Stack HCI Public Preview
 
 ## Deployment after running Remove-AKSHCI PowerShell command fails from Windows Admin Center
 If you are experiencing deployment issues or want to reset your deployment make sure you close all Windows Admin Center Instances
