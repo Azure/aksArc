@@ -4,8 +4,8 @@
 ## Recovering from a failed AKS on Azure Stack HCI deployment
 If you are experiencing deployment issues or want to reset your deployment make sure you close all Windows Admin Center instances connected to Azure Kubernetes Service on Azure Stack HCI before running Uninstall-AksHci from a PowerShell administrative window.
 
-## When using kubectl to delete a node, the associated VM might not be cleaned up correctly
-Steps to reproduce
+## When using kubectl to delete a node, the associated VM might not be deleted
+You will encounter this issue if you follow these steps:
 * Create a Kubernetes cluster
 * Scale the cluster to more than 2 nodes
 * Use kubectl delete node <node-name> to delete a node 
@@ -16,29 +16,29 @@ Steps to reproduce
 This leads to the system not recognizing the node is missing and a new node will not be spun up. 
 This will be fixed in a subsequent release
 
-## Time synchornization must be configured across all physical cluster nodes and in Hyper-V
+## Time synchronization must be configured across all physical cluster nodes and in Hyper-V
 To ensure gMSA and AD authentication works, ensure that the Azure Stack HCI cluster nodes are configured to synchronize their time with a domain controller or other
 time source and that Hyper-V is configured to synchronize time to any virtual machines.
 
 ## Special Active Directory permissions are needed for domain joined Azure Stack HCI nodes 
 Users deploying and configuring Azure Kubernetes Service on Azure Stack HCI need to have "Full Control" permission to create AD objects in the Active Directory container the server and service objects are created in. 
 
-## 2 CoreDNS pods are running in the management cluster
-When deploying the management cluster, it is deployed as a single node integrated appliance. The installation creates 2 redundant CoreDNS pods. 
-This issue will be fixed in a future release.
-
 ## Get-AksHciLogs command may fail
 With large clusters the Get-AksHciLogs command may throw an exception, fail to enumerate nodes or will not generate c:\wssd\wssdlogs.zip output file.
 This is because the PowerShell command to zip a file `Compress-Archive` has an output file size limit of 2GB. 
 This issue will be fixed in a later release.
 
-## Azure Kubernetes Service deployment does not check for available memory before creating a new target cluster
-Currently neither Windows Admin Center nor the Aks-Hci PowerShell commands validate the available memory on the host server before creating Kubernetes nodes. This can lead to memory exhaustion and virtual machines to not start. This failure is currently not handled gracefully and the deployment will hang with no clear error message.
+## Azure Kubernetes Service PowerShell deployment does not check for available memory before creating a new target cluster
+The Aks-Hci PowerShell commands does not validate the available memory on the host server before creating Kubernetes nodes. This can lead to memory exhaustion and virtual machines to not start. This failure is currently not handled gracefully and the deployment will hang with no clear error message.
 If you have a deployment that seems hung, open Eventviewer and check for Hyper-V related error messages indicating not enough memory to start the VM.
 This issue will be fixed in a future release
 
-## Azure Kubernetes Service deploy fails on an Azure Stack HCI configured with static IPs
-While deploying Azure Kubernetes Service on an Azure Stack HCI cluster that has static IP addresses assigned and a DHCP server in the same network, the deployment fails at error creation. This is because the deployment framework does not check for static addresses before the deployment starts. 
+## Azure Kubernetes Service deployment fails on an Azure Stack HCI configured with static IPs or VLANs or SDN or proxies.
+While deploying Azure Kubernetes Service on an Azure Stack HCI cluster that has any of the above networking features, the deployment fails at error creation. 
+This issue will be fixed in a future release.
+
+## Azure Kubernetes Service deployment fails on an Azure Stack HCI configured with VLANs
+While deploying Azure Kubernetes Service on an Azure Stack HCI cluster that has VLANs, the deployment fails at error creation. This is because the deployment framework does not check for static addresses before the deployment starts. 
 This issue will be fixed in a future release.
 
 ## IPv6 must be disabled in the hosting environment
@@ -60,3 +60,5 @@ This issue will be fixed in a future release.
 ## Cannot deploy Azure Kubernetes Service to an environment that has separate storage and compute clusters
 Windows Admin Center will not deploy Azure Kubernetes Service to an environment with separate storage and compute clusters as it expects the compute and storage resources to be provided by the same cluster. In most cases it will not find CSVs exposed by the compute cluster and will refuse to proceed with deployment.
 This issue will be fixed in a future release.
+
+
