@@ -27,7 +27,7 @@ objects are created in.
 
 ## Port forwarding for Prometheus and Grafana stops working
 When installing 10 or more Linux worker nodes port forwarding for monitoringstack-prometheus-grafana-access svc might stop working
-1. Deploy MsK8s Cluster on HCI and add ~10 linux worker nodes
+1. Deploy a Kubernetes cluster on Azure Stack HCI and add ~10 Linux worker nodes
 2. Install-WSSDAddOnMonitoring 
 3. C:\wssd\kubectl.exe port-forward svc/monitoringstack-prometheus-grafana-access 7000:3000 -n=addons
 To resolve this issue, close the port forwarding window and restart port forwarding from an administrative command prompt by typing 
