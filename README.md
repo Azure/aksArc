@@ -1,7 +1,11 @@
 # Welcome to the Azure Kubernetes Service on Azure Stack HCI repo
 This is where the AKS-HCI team will track features and issues with AKS-HCI. We will monitor this repo in order to engage with our community and discuss questions, customer scenarios, or feature requests.
 
-Checkout our projects tab to see the roadmap for AKS-HCI!
+This repository is offered for tracking features and issues with the Azure Kubernetes Service on Azure Stack HCI. This repository is monitored by the product team in order to engage with our community and discuss questions, customer scenarios, or feature requests.
+
+Support through issues on this repository is provided on a best-effort basis for issues that are reproducible outside of a specific cluster configuration.
+
+Do not file issues for AKS, AKS-Engine, Virtual-Kubelet, Azure Container Instances, or services on this repository unless it is related to that feature/service and functionality with Azure Kubernetes Service on Azure Stack HCI.
 
 # Evaluating
 Do you want to try out AKS-HCI? Head over to our [Evaluation Guide](https://github.com/Azure/aks-hci/blob/main/Evalguide.md) to learn more.
@@ -11,6 +15,12 @@ Before getting started take a look at the [Release Notes](https://github.com/Azu
 
 # Known Issues
 Here you can find [known issues](https://github.com/Azure/aks-hci/blob/main/known-issues.md) for the current release.
+
+# Important links
+* AKS-HCI Roadmap: http://aka.ms/aks-hci-roadmap
+* AKS Release Notes: https://aka.ms/aks/releasenotes
+* AKS Preview Features: https://aka.ms/aks/preview-features
+* AKS Public Office Hours: https://aka.ms/akspublicofficehours
 
 
 # Contributing
