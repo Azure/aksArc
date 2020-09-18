@@ -1,10 +1,12 @@
 ---
 name: Feature Request
-about: Suggest an new deature to the Azure Kubernetes Service on Azure Stack HCI
-labels: kind/feature
-project: projects/1
+about: Suggest an new feature to the Azure Kubernetes Service on Azure Stack HCI
+title: ''
+labels: enhancement
+assignees: ''
 
 ---
+
 <!-- Please only use this template for submitting feature requests -->
 
 **Title**:
