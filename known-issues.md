@@ -33,8 +33,8 @@ The Aks-Hci PowerShell commands does not validate the available memory on the ho
 If you have a deployment that seems hung, open Eventviewer and check for Hyper-V related error messages indicating not enough memory to start the VM.
 This issue will be fixed in a future release
 
-## Azure Kubernetes Service deployment fails on an Azure Stack HCI configured with static IPs or VLANs or SDN or proxies.
-While deploying Azure Kubernetes Service on an Azure Stack HCI cluster that has any of the above networking features, the deployment fails at error creation. 
+## Azure Kubernetes Service deployment fails on an Azure Stack HCI configured with static IPs, VLANs, SDN or proxies.
+While deploying Azure Kubernetes Service on an Azure Stack HCI cluster that has static IPs, VLANs, SDN or proxies, the deployment fails at cluster creation. 
 This issue will be fixed in a future release.
 
 ## Azure Kubernetes Service deployment fails on an Azure Stack HCI configured with VLANs
