@@ -42,20 +42,19 @@ While deploying Azure Kubernetes Service on an Azure Stack HCI cluster that has 
 This issue will be fixed in a future release.
 
 ## IPv6 must be disabled in the hosting environment
-If both IPv4 and IPv6 addresses are bound to the physical NIC the cloudagent service for failover clustering is using the IPv6 address for communication. Other components in the deployment framework use only IPv4. This will result in Windows Admin Center not being able to connect to the cluster and will report a remoting failure when trying to connect to the machine.
+If both IPv4 and IPv6 addresses are bound to the physical NIC, the cloudagent service for clustering uses the IPv6 address for communication. Other components in the deployment framework only use IPv4. This will result in Windows Admin Center unable to connect to the cluster and will report a remoting failure when trying to connect to the machine.
 Workaround: Disable IPv6 on the physical network adapters
 This issue will be fixed in a future release
 
-## Moving virtual machines between failover cluster nodes quickly leads to VM startup failures
-When using the cluster administration tool to move a VM from one node to another node in the failover cluster the VM may fail to start on the new node. 
-After moving the VM back to the original node it will fail to start there as well.
-Root cause: This issue happens because the VM moved from node A to node B, and then immediately came back to node A. The logic to cleanup the first migration runs asynchronously  after the VM was brought back to node A. As a result, Azure Kubernetes Service's "update VM location" logic found the VM on the original Hyper-V on node A, and deleted it instead of unregistering it.
-Workaround: Ensure the VM is starting successfully on the new node before moving it back to the original node.
+## Moving virtual machines between Azure Stack HCI cluster nodes quickly leads to VM startup failures
+When using the cluster administration tool to move a VM from one node (Node A) to another node (Node B) in the Azure Stack HCI cluster, the VM may fail to start on the new node. After moving the VM back to the original node it will fail to start there as well.
+This issue happens because the logic to cleanup the first migration runs asynchronously. As a result, Azure Kubernetes Service's "update VM location" logic finds the VM on the original Hyper-V on node A, and deletes it, instead of unregistering it.
+Workaround: Ensure the VM has started successfully on the new node before moving it back to the original node.
 This issue will be fixed in a future release
 
 ## Load balancer in Azure Kubernetes Service requires DHCP reservation
-The load balancing solution in Azure Kubernetes Service on Azure Stack HCI uses DHCP to assign IP addresses to service endpoints. If the IP address changes for the service endpoint due to a service restart, DHCP lease expires due to a short expiration time the service will become inaccessible because the IP address in the Kubernetes configuration is different from what it is on the end point. This can lead to the Kubernetes cluster becoming unavailable.
-Workaround: Use a MAC address pool for the load balanced service endpoints and reserve specific IP addresses for each MAC address in the pool
+The load balancing solution in Azure Kubernetes Service on Azure Stack HCI uses DHCP to assign IP addresses to service endpoints. If the IP address changes for the service endpoint due to a service restart, DHCP lease expires due to a short expiration time. The service will therefore become inaccessible because the IP address in the Kubernetes configuration is different from what it is on the end point. This can lead to the Kubernetes cluster becoming unavailable.
+To get around this issue, use a MAC address pool for the load balanced service endpoints and reserve specific IP addresses for each MAC address in the pool.
 This issue will be fixed in a future release.
 
 ## Cannot deploy Azure Kubernetes Service to an environment that has separate storage and compute clusters
