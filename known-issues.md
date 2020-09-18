@@ -1,7 +1,7 @@
 # Known Issues for Azure Kubernetes Service on Azure Stack HCI Public Preview
 
 
-## Resetting Aks-Hci after a failed Windows Admin Center deployment
+## Recovering from a failed AKS on Azure Stack HCI deployment
 If you are experiencing deployment issues or want to reset your deployment make sure you close all Windows Admin Center instances connected to Azure Kubernetes Service on Azure Stack HCI before running Uninstall-AksHci from a PowerShell administrative window.
 
 ## When using kubectl to delete a node, the associated VM might not be cleaned up correctly
