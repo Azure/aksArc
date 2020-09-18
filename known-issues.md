@@ -1,5 +1,15 @@
 # Known Issues for Azure Kubernetes Service on Azure Stack HCI Public Preview
 
+## Error occurs when trying to delete a Arc connected cluster
+If you connect a cluster to Arc and then run this command to delete a connected cluster:
+
+<az connectedk8s delete --name dkcluster5 --resource-group DkAzureArcTest5 --kube-config="C:\Users\<username>\Desktop\WACFI\kubeconfig_fix.xml"
+
+You might encounter an error.
+
+You can work around the failure by running the following command instead:
+helm delete azure-arc --no-hooks
+
 ## Deployment after running Remove-AKSHCI PowerShell command fails from Windows Admin Center
 If you are experiencing deployment issues or want to reset your deployment make sure you close all Windows Admin Center Instances
 connected to Azure Kubernetes Service on Azure Stack HCI before running Remove-AKSHCI from a PowerShell window.
