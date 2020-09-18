@@ -7,21 +7,11 @@ Support through issues on this repository is provided on a best-effort basis for
 
 Do not file issues for AKS, AKS-Engine, Virtual-Kubelet, Azure Container Instances, or services on this repository unless it is related to that feature/service and functionality with Azure Kubernetes Service on Azure Stack HCI.
 
-# Evaluating
-Do you want to try out AKS-HCI? Head over to our [Evaluation Guide](https://github.com/Azure/aks-hci/blob/main/Evalguide.md) to learn more.
-
-# Release Notes
-Before getting started take a look at the [Release Notes](https://github.com/Azure/aks-hci/blob/main/release.md).
-
-# Known Issues
-Here you can find [known issues](https://github.com/Azure/aks-hci/blob/main/known-issues.md) for the current release.
-
 # Important links
-* AKS-HCI Roadmap: http://aka.ms/aks-hci-roadmap
-* AKS Release Notes: https://aka.ms/aks/releasenotes
-* AKS Preview Features: https://aka.ms/aks/preview-features
-* AKS Public Office Hours: https://aka.ms/akspublicofficehours
-
+* AKS-HCI Roadmap: https://aka.ms/aks-hci/roadmap
+* AKS-HCI Release Notes: https://aka.ms/aks-hci/releasenotes
+* AKS-HCI Known Issues: https://aka.ms/aks-hci/issues
+* AKS-HCI Preview Documentaton: https://aka.ms/AKSonHCI-Docs
 
 # Contributing
 
