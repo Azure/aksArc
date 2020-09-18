@@ -37,10 +37,6 @@ This issue will be fixed in a future release
 While deploying Azure Kubernetes Service on an Azure Stack HCI cluster that has static IPs, VLANs, SDN or proxies, the deployment fails at cluster creation. 
 This issue will be fixed in a future release.
 
-## Azure Kubernetes Service deployment fails on an Azure Stack HCI configured with VLANs
-While deploying Azure Kubernetes Service on an Azure Stack HCI cluster that has VLANs, the deployment fails at error creation. This is because the deployment framework does not check for static addresses before the deployment starts. 
-This issue will be fixed in a future release.
-
 ## IPv6 must be disabled in the hosting environment
 If both IPv4 and IPv6 addresses are bound to the physical NIC, the cloudagent service for clustering uses the IPv6 address for communication. Other components in the deployment framework only use IPv4. This will result in Windows Admin Center unable to connect to the cluster and will report a remoting failure when trying to connect to the machine.
 Workaround: Disable IPv6 on the physical network adapters
