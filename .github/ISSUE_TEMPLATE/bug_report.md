@@ -35,4 +35,6 @@ Add any other context about the problem here.
 
 
 **Collect log files**
--	From a PowerShell Admin window run Collect-AKSHCILogs
+- From a PowerShell Admin window run **Collect-AksHciLogs**
+- If you are running into issues with the deployment wizard in Windows Admin Center, run 
+**Get-SMEUILogs.ps1** from the machine hosting Windows Admin Center.”
