@@ -4,7 +4,7 @@ about: Create a report to help us improve
 title: "[BUG] Please type a title"
 labels: bug
 assignees: ''
-
+project: Azure/aks-hci/1
 ---
 
 **Describe the bug**
