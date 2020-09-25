@@ -1,6 +1,10 @@
 # Known Issues for Azure Kubernetes Service on Azure Stack HCI Public Preview
 
 
+## Uninstall-AksHCI is not cleaning up cluster resources (ownergroup ca-`<GUID>`)
+Due to insufficient permissions in Active Directory `Uninstall-AksHci` could not remove cluster resource objects in AD. This can lead to failures in subsequent deployments.
+To remidate the problem ensure Active Directory permissions are set for the user executing the installation to have "Full Control" permission to create/modif/remove AD objects in the Active Directory container the server and service objects are created in. 
+  
 ## Recovering from a failed AKS on Azure Stack HCI deployment
 If you are experiencing deployment issues or want to reset your deployment make sure you close all Windows Admin Center instances connected to Azure Kubernetes Service on Azure Stack HCI before running Uninstall-AksHci from a PowerShell administrative window.
 
@@ -20,8 +24,7 @@ This will be fixed in a subsequent release
 To ensure gMSA and AD authentication works, ensure that the Azure Stack HCI cluster nodes are configured to synchronize their time with a domain controller or other
 time source and that Hyper-V is configured to synchronize time to any virtual machines.
 
-## Special Active Directory permissions are needed for domain joined Azure Stack HCI nodes 
-Users deploying and configuring Azure Kubernetes Service on Azure Stack HCI need to have "Full Control" permission to create AD objects in the Active Directory container the server and service objects are created in. 
+
 
 ## Get-AksHciLogs command may fail
 With large clusters the Get-AksHciLogs command may throw an exception, fail to enumerate nodes or will not generate c:\wssd\wssdlogs.zip output file.
