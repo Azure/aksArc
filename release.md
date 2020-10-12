@@ -29,7 +29,7 @@ Here's some of the functionality provided by Azure Kubernetes Service while in p
 ### Simplified setup of a Kubernetes cluster
 Azure Kubernetes Service simplifies the process of setting up Kubernetes on Azure Stack HCI and includes the following features:
 
-* A Windows Admin Center wizard for setting up Kubernetes and its dependencies (such as kubeadm, kubelet, kubectl, and a Pod network add-on)
+* A Windows Admin Center wizard for setting up Kubernetes and its dependencies (such as kubeadm, kubelet, kubectl, and a pod network add-on)
 * A Windows Admin Center wizard for creating Kubernetes clusters to run your containerized applications
 * PowerShell cmdlets for setting up Kubernetes and creating Kubernetes clusters, in case you'd rather script the host setup and Kubernetes cluster creation
 
