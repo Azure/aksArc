@@ -300,7 +300,7 @@
     },
     "variables": {
         "dataDisksCount": 8,
-        "dscUri": "https://github.com/Azure/aks-hci/main/eval/dsc/akshcihost.zip",
+        "dscUri": "https://github.com/Azure/aks-hci/blob/main/eval/dsc/akshcihost.zip",
         "artifactsLocation": "https://raw.githubusercontent.com/Azure/aks-hci/main/eval/",
         "randomGUID": "[substring(uniqueString(subscription().subscriptionId, resourceGroup().id, parameters('virtualMachineName')),0,6)]",
         "dnsNameForPublicIP": "[toLower(concat(parameters('virtualMachineName'), variables('randomGUID')))]",
