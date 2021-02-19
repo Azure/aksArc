@@ -2,7 +2,7 @@ Explore the AKS on Azure Stack HCI environment
 ==============
 Overview
 -----------
-With all key components deployed, including the platform services, along with target clusters, you can now begin to explore some of the additional capabilities within AKS on Azure Stack HCI. We'll list a few recommended activities below, to expose you to some of the key elements, but for the rest, we'll [direct you over to the official documentation](https://docs.microsoft.com/en-us/azure-stack/aks-hci/ "AKS on Azure Stack HCI documentation").
+With all key components deployed, including the management cluster, along with target clusters, you can now begin to explore some of the additional capabilities within AKS on Azure Stack HCI. We'll list a few recommended activities below, to expose you to some of the key elements, but for the rest, we'll [direct you over to the official documentation](https://docs.microsoft.com/en-us/azure-stack/aks-hci/ "AKS on Azure Stack HCI documentation").
 
 Contents
 -----------
@@ -180,7 +180,7 @@ Congratulations!
 You've reached the end of the evaluation guide.  In this guide you have:
 
 * Deployed/Configured a Windows Server 2019 Hyper-V host in Azure to run your nested sandbox environment
-* Deployed the key AKS on Azure Stack HCI platform services on your Windows Server 2019 Hyper-V environment
+* Deployed the AKS on Azure Stack HCI management cluster on your Windows Server 2019 Hyper-V environment
 * Deployed a target cluster to run applications and services
 * Optionally integrated with Azure Arc
 * Set the foundation for further learning!

@@ -2,7 +2,7 @@ Deploy your AKS-HCI infrastructure with PowerShell
 ==============
 Overview
 -----------
-With your Windows Server 2019 Hyper-V host up and running, it's now time to deploy AKS on Azure Stack HCI. You'll first download the necessary artifacts, then deploy the AKS platform services onto your Windows Server 2019 Hyper-V host, and finally, deploy a target cluster, onto which you can test deployment of a workload.
+With your Windows Server 2019 Hyper-V host up and running, it's now time to deploy AKS on Azure Stack HCI. You'll first download the necessary artifacts, then deploy the AKS management cluster onto your Windows Server 2019 Hyper-V host, and finally, deploy a target cluster, onto which you can test deployment of a workload.
 
 Contents
 -----------
@@ -12,7 +12,7 @@ Contents
 - [Prepare environment](#prepare-environment)
 - [Optional - Enable/Disable DHCP](#optional---enabledisable-dhcp)
 - [Download artifacts](#download-artifacts)
-- [Deploying AKS platform services (Management cluster)](#deploying-aks-platform-services-management-cluster)
+- [Deploying AKS on Azure Stack HCI management cluster](#deploying-aks-on-azure-stack-hci-management-cluster)
 - [Create a Kubernetes cluster (Target cluster)](#create-a-kubernetes-cluster-target-cluster)
 - [Next Steps](#next-steps)
 - [Product improvements](#product-improvements)
@@ -31,7 +31,7 @@ From an architecture perspective, as shown earlier, this graphic showcases the d
 
 You've already deployed the outer box , which represents the Azure Resource Group. Inside here, you've deployed the virtual machine itself, and accompaying network adapter, storage and so on. You've also completed some host configuration
 
-In this section, you'll first deploy the platform services, also known as a management cluster. This provides the the core orchestration mechanism and interface for deploying and managing one or more target clusters, which are shown on the right of the diagram. These target, or workload clusters contain worker nodes and are where application workloads run. These are managed by a management cluster. If you're interested in learning more about the building blocks of the Kubernetes infrastructure, you can [read more here](https://docs.microsoft.com/en-us/azure-stack/aks-hci/kubernetes-concepts "Kubernetes core concepts for Azure Kubernetes Service on Azure Stack HCI").
+In this section, you'll first deploy the management cluster. This provides the the core orchestration mechanism and interface for deploying and managing one or more target clusters, which are shown on the right of the diagram. These target, or workload clusters contain worker nodes and are where application workloads run. These are managed by a management cluster. If you're interested in learning more about the building blocks of the Kubernetes infrastructure, you can [read more here](https://docs.microsoft.com/en-us/azure-stack/aks-hci/kubernetes-concepts "Kubernetes core concepts for Azure Kubernetes Service on Azure Stack HCI").
 
 Prepare environment
 -----------
@@ -61,7 +61,7 @@ Exit
 
 Optional - Enable/Disable DHCP
 -----------
-With the January release of AKS on Azure Stack HCI, Static IP configurations are supported for deployment of the platform services and workload clusters. When you deployed your Azure VM, DHCP was installed and configured automatically for you, but you had the chance to control whether it was enabled or disabled on your Windows Server 2019 OS. If you want to adjust DHCP now, make changes to the **$dhcpState** below and run the following **PowerShell command as administrator**:
+With the February release of AKS on Azure Stack HCI, Static IP configurations are supported for deployment of the management cluster and workload clusters. When you deployed your Azure VM, DHCP was installed and configured automatically for you, but you had the chance to control whether it was enabled or disabled on your Windows Server 2019 OS. If you want to adjust DHCP now, make changes to the **$dhcpState** below and run the following **PowerShell command as administrator**:
 
 ```powershell
 # Check current DHCP state for Active/Inactive
@@ -95,11 +95,11 @@ Get-ChildItem -Path $path -Recurse | Unblock-File -Verbose
 
 9. Select all 4 folders, then **right-click** and **copy**, then navigate to **C:\Program Files\WindowsPowerShell\Modules** and **right-click**, and paste the 4 folders into their new location.
 
-With those steps completed, you're ready to deploy the AKS platform services, also known as the management cluster, onto your Windows Server 2019 Hyper-V host.
+With those steps completed, you're ready to deploy the AKS management cluster, onto your Windows Server 2019 Hyper-V host.
 
-Deploying AKS platform services (Management cluster)
+Deploying AKS on Azure Stack HCI management cluster
 -----------
-You're now ready to deploy the AKS platform services onto your Windows Server 2019 host.
+You're now ready to deploy the AKS on Azure Stack HCI management cluster onto your Windows Server 2019 host.
 
 1. Open **PowerShell as Administrator** and run the following command to import the new modules, and list their functions. If you receive an error while running these commands, ensure you **closed all PowerShell windows earlier** and run them in a fresh administrative PowerShell console.
 
@@ -120,7 +120,7 @@ Initialize-AksHciNode
 
 PowerShell remoting and WinRM will be configured, if they haven't been already, and the relevant roles and features are validated. Deployment of the Azure VM automatically installed Hyper-V and the RSAT clustering PowerShell tools so you should be good to proceed. If anything is missing, the process will install/configure the missing components, which may require you to reboot your Azure VM.
 
-Next, you'll configure your deployment by defining the configuration settings for the AKS platform services.
+Next, you'll configure your deployment by defining the configuration settings for the AKS management cluster.
 
 3. In your **administrative PowerShell** window, run the following commands to create some folders that will be used during the deployment process:
 
@@ -163,9 +163,9 @@ This command will take a few moments to complete, but once done, you should see 
 
 Now, if you make a mistake, simply run **Set-AksHciConfig** without any parameters, and that will reset your configuration.
 
-After you've configured your deployment, you're now ready to start the installation process, which will install the AKS on Azure Stack HCI agents/services, the Azure Kubernetes Service host and a management cluster.
+After you've configured your deployment, you're now ready to start the installation process, which will install the AKS on Azure Stack HCI management cluster.
 
-6. From your **administrative PowerShell** window, run the following command:
+1. From your **administrative PowerShell** window, run the following command:
 
 ```powershell
 Install-AksHci
@@ -201,7 +201,7 @@ To learn more about **updating**, **redeploying** or **uninstalling** AKS on Azu
 
 Create a Kubernetes cluster (Target cluster)
 -----------
-With the platform services and other key management components deployed successfully, you're ready to move on to deploying Kubernetes clusters that can host your workloads.  We'll then briefly walk through how to scale your Kubernetes cluster and upgrade the Kubernetes version of your cluster.
+With the management cluster deployed successfully, you're ready to move on to deploying Kubernetes clusters that can host your workloads.  We'll then briefly walk through how to scale your Kubernetes cluster and upgrade the Kubernetes version of your cluster.
 
 1. Open **PowerShell as Administrator** and run the following command to check the available versions of Kubernetes that are currently available:
 
@@ -239,11 +239,11 @@ The deployment of this Kubernetes workload cluster should take a few minutes, an
 Get-AksHciCluster
 ```
 
-Notice that this time, this command lists both the platform services management cluster, and also the new workload cluster.
+Notice that this time, this command lists both the management cluster and also the new workload cluster.
 
 ![Output of Get-AksHciCluster](/eval/media/get_akshcicluster_2.png "Output of Get-AksHciCluster")
 
-4. Next, you'll scale your Kubernetes cluster to **add a Windows worker node**. Note, this will trigger the download and extraction of a Windows container host image, which will take a few minutes, so please be patient.
+1. Next, you'll scale your Kubernetes cluster to **add a Windows worker node**. Note, this will trigger the download and extraction of a Windows container host image, which will take a few minutes, so please be patient.
 
 ```powershell
 Set-AksHciClusterNodeCount –Name akshciclus001 -linuxNodeCount 1 -windowsNodeCount 1
@@ -289,7 +289,7 @@ To learn more about **updating**, **redeploying** or **uninstalling** AKS on Azu
 
 Next Steps
 -----------
-In this step, you've successfully deployed the AKS on Azure Stack HCI platform services and management cluster, and subsequently, deployed and scaled a Kubernetes cluster that you can move forward with to the next stage, in which you can deploy your applications, and optionally, integrate with Azure Arc.
+In this step, you've successfully deployed the AKS on Azure Stack HCI management cluster, and subsequently, deployed and scaled a Kubernetes cluster that you can move forward with to the next stage, in which you can deploy your applications, and optionally, integrate with Azure Arc.
 
 * [**Part 3** - Explore AKS on Azure Stack HCI](/eval/steps/3_ExploreAKSHCI.md "Explore AKS on Azure Stack HCI")
 
