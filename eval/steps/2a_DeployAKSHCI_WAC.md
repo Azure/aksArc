@@ -2,7 +2,7 @@ Deploy your AKS-HCI infrastructure with Windows Admin Center
 ==============
 Overview
 -----------
-With your Windows Server 2019 Hyper-V host up and running, it's now time to deploy AKS on Azure Stack HCI. You'll first download the necessary artifacts, then use the Windows Admin Center to deploy the AKS platform services onto your Windows Server 2019 Hyper-V host, and finally, deploy a target cluster, onto which you can test deployment of a workload.
+With your Windows Server 2019 Hyper-V host up and running, it's now time to deploy AKS on Azure Stack HCI. You'll first download the necessary artifacts, then use the Windows Admin Center to deploy the AKS on Azure Stack HCI management cluster onto your Windows Server 2019 Hyper-V host, and finally, deploy a target cluster, onto which you can test deployment of a workload.
 
 Contents
 -----------
@@ -14,7 +14,7 @@ Contents
 - [Download artifacts](#download-artifacts)
 - [Configure Windows Admin Center](#configure-windows-admin-center)
 - [Optional - Enable/Disable DHCP](#optional---enabledisable-dhcp)
-- [Deploying AKS platform services (Management cluster)](#deploying-aks-platform-services-management-cluster)
+- [Deploying AKS on Azure Stack HCI management cluster](#deploying-aks-on-azure-stack-hci-management-cluster)
 - [Create a Kubernetes cluster (Target cluster)](#create-a-kubernetes-cluster-target-cluster)
 - [Scale your Kubernetes cluster (Target cluster)](#scale-your-kubernetes-cluster-target-cluster)
 - [Next Steps](#next-steps)
@@ -34,7 +34,7 @@ From an architecture perspective, as shown earlier, this graphic showcases the d
 
 You've already deployed the outer box , which represents the Azure Resource Group. Inside here, you've deployed the virtual machine itself, and accompaying network adapter, storage and so on. You've also completed some host configuration
 
-In this section, you'll first install and configure the Windows Admin Center. You'll use this to deploy the platform services, also known as a management cluster. This provides the the core orchestration mechanism and interface for deploying and managing one or more target clusters, which are shown on the right of the diagram. These target, or workload clusters contain worker nodes and are where application workloads run. These are managed by a management cluster. If you're interested in learning more about the building blocks of the Kubernetes infrastructure, you can [read more here](https://docs.microsoft.com/en-us/azure-stack/aks-hci/kubernetes-concepts "Kubernetes core concepts for Azure Kubernetes Service on Azure Stack HCI").
+In this section, you'll first install and configure the Windows Admin Center. You'll use this to deploy the management cluster, also known as a management cluster. This provides the the core orchestration mechanism and interface for deploying and managing one or more target clusters, which are shown on the right of the diagram. These target, or workload clusters contain worker nodes and are where application workloads run. These are managed by a management cluster. If you're interested in learning more about the building blocks of the Kubernetes infrastructure, you can [read more here](https://docs.microsoft.com/en-us/azure-stack/aks-hci/kubernetes-concepts "Kubernetes core concepts for Azure Kubernetes Service on Azure Stack HCI").
 
 Set Microsoft Edge as default browser
 -----------
@@ -121,13 +121,13 @@ With your extensions correctly deployed, in order to deploy AKS-HCI with Windows
 
 18. Click on **Windows Admin Center** in the top-left corner to return to the home page
 
-You'll notice that your AKSHCIHOST001 is already under management, so at this stage, you're ready to proceed to deploy the AKS platform services, also known as the management cluster, onto your Windows Server 2019 Hyper-V host.
+You'll notice that your AKSHCIHOST001 is already under management, so at this stage, you're ready to proceed to deploy the AKS on Azure Stack HCI management cluster onto your Windows Server 2019 Hyper-V host.
 
 ![AKSHCIHOST001 under management in Windows Admin Center](/eval/media/akshcihost_in_wac.png "AKSHCIHOST001 under management in Windows Admin Center")
 
 Optional - Enable/Disable DHCP
 -----------
-With the January release of AKS on Azure Stack HCI, Static IP configurations are supported for deployment of the platform services and workload clusters. When you deployed your Azure VM, DHCP was installed and configured automatically for you, but you had the chance to control whether it was enabled or disabled on your Windows Server 2019 OS. If you want to adjust DHCP now, make changes to the **$dhcpState** below and run the following **PowerShell command as administrator**:
+With the February release of AKS on Azure Stack HCI, Static IP configurations are supported for deployment of the management cluster and workload clusters. When you deployed your Azure VM, DHCP was installed and configured automatically for you, but you had the chance to control whether it was enabled or disabled on your Windows Server 2019 OS. If you want to adjust DHCP now, make changes to the **$dhcpState** below and run the following **PowerShell command as administrator**:
 
 ```powershell
 # Check current DHCP state for Active/Inactive
@@ -137,9 +137,9 @@ $dhcpState = "Active" # Or Inactive
 Set-DhcpServerv4Scope -ScopeId 192.168.0.0 -State $dhcpState -Verbose
 ```
 
-Deploying AKS platform services (Management cluster)
+Deploying AKS on Azure Stack HCI management cluster
 -----------
-The next section will walk through configuring the AKS platform services, or management cluster, on your single node Windows Server 2019 host.
+The next section will walk through configuring the AKS on Azure Stack HCI management cluster, on your single node Windows Server 2019 host.
 
 1. From the Windows Admin Center homepage, click on your **akshcihost001.akshci.local \[Gateway\]** machine.
 2. You'll be presented with a rich array of information about your akshcihost001 machine, of which you can feel free to explore the different options and metrics. When you're ready, on the left-hand side, scroll down and under **Extensions**, click **Azure Kubernetes Service**
@@ -184,17 +184,17 @@ You'll notice that Windows Admin Center will validate memory, storage, networkin
 ![AKS Azure Registration in Windows Admin Center](/eval/media/aks_azure_reg.png "AKS Azure Registration in Windows Admin Center")
 
 16. Once you've chosen your subscription, click **Next: Review + create**
-17. Review your choices and settings, then click **Next**. The deployment of the AKS platform services will begin.
+17. Review your choices and settings, then click **Next**. The deployment of the AKS management cluster will begin.
 
-![AKS platform services deployment started in Windows Admin Center](/eval/media/aks_deploy_started.png "AKS platform services deployment started in Windows Admin Center")
+![AKS on Azure Stack HCI management cluster deployment started in Windows Admin Center](/eval/media/aks_deploy_started.png "AKS on Azure Stack HCI management cluster deployment started in Windows Admin Center")
 
 **NOTE 1** - Do not close the Windows Admin Center browser at this time. Leave it open and wait for successful completion.
 
 **NOTE 2** - You may receive a WinRM error message stating "Downloading virtual machine images and binaries for the AKS host failed" - this can be ignored, so **do not close/refresh the browser**.
 
-18. Upon completion you can review the successful deployment. In this case, you can see deployment of the AKS platform services took just over 17 minutes.
+18. Upon completion you can review the successful deployment. In this case, you can see deployment of the AKS on Azure Stack HCI management cluster took just over 17 minutes.
 
-![AKS platform services deployment completed in Windows Admin Center](/eval/media/aks_deploy_success.png "AKS platform services deployment completed in Windows Admin Center")
+![AKS-HCI management cluster deployment completed in Windows Admin Center](/eval/media/aks_deploy_success.png "AKS-HCI management cluster deployment completed in Windows Admin Center")
 
 19. Once reviewed, click **Finish**. You will then be presented with a management dashboard where you can create and manage your Kubernetes clusters.
 
@@ -203,7 +203,7 @@ To learn more about **updating**, **redeploying** or **uninstalling** AKS on Azu
 
 Create a Kubernetes cluster (Target cluster)
 -----------
-With the platform services and other key management components deployed successfully, you're ready to move on to deploying Kubernetes clusters that can host your workloads.  We'll then briefly walk through how to scale your Kubernetes cluster and upgrade the Kubernetes version of your cluster.
+With the management cluster deployed successfully, you're ready to move on to deploying Kubernetes clusters that can host your workloads. We'll then briefly walk through how to scale your Kubernetes cluster and upgrade the Kubernetes version of your cluster.
 
 There are two ways to create a Kubernetes cluster in Windows Admin Center.
 
@@ -327,7 +327,7 @@ dir $env:USERPROFILE\.kube
 
 Next Steps
 -----------
-In this step, you've successfully deployed the AKS on Azure Stack HCI platform services and management cluster using Windows Admin Center, optionally integrated with Azure Arc, and subsequently, deployed and scaled a Kubernetes cluster that you can move forward with to the next stage, in which you can deploy your applications.
+In this step, you've successfully deployed the AKS on Azure Stack HCI management cluster using Windows Admin Center, optionally integrated with Azure Arc, and subsequently, deployed and scaled a Kubernetes cluster that you can move forward with to the next stage, in which you can deploy your applications.
 
 * [**Part 3** - Explore AKS on Azure Stack HCI](/eval/steps/3_ExploreAKSHCI.md "Explore AKS on Azure Stack HCI")
 
