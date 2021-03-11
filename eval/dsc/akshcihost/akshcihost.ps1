@@ -418,7 +418,7 @@ configuration AKSHCIHost
         if ($environment -eq "Workgroup") {
             NetConnectionProfile SetProfile
             {
-                InterfaceAlias  = 'Ethernet'
+                InterfaceAlias  = "$InterfaceAlias"
                 NetworkCategory = 'Private'
             }
         }
@@ -427,7 +427,7 @@ configuration AKSHCIHost
 
         NetAdapterBinding DisableIPv6Host
         {
-            InterfaceAlias = 'Ethernet'
+            InterfaceAlias = "$InterfaceAlias"
             ComponentId    = 'ms_tcpip6'
             State          = 'Disabled'
         }
@@ -523,7 +523,7 @@ configuration AKSHCIHost
 
             DnsConnectionSuffix AddSpecificSuffixHostNic
             {
-                InterfaceAlias           = 'Ethernet'
+                InterfaceAlias           = "$InterfaceAlias"
                 ConnectionSpecificSuffix = "$DomainName"
                 DependsOn                = "[xDnsServerPrimaryZone]SetPrimaryDNSZone"
             }
