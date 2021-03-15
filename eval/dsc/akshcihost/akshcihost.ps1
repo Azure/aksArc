@@ -12,8 +12,6 @@ configuration AKSHCIHost
         [string]$enableDHCP,
         [Parameter(Mandatory)]
         [string]$customRdpPort,
-        [Int]$RetryCount = 20,
-        [Int]$RetryIntervalSec = 30,
         [string]$vSwitchNameHost = "InternalNAT",
         [String]$targetDrive = "V",
         [String]$targetVMPath = "$targetDrive" + ":\VMs",
