@@ -12,8 +12,6 @@ configuration AKSHCIHost
         [string]$enableDHCP,
         [Parameter(Mandatory)]
         [string]$customRdpPort,
-        [Int]$RetryCount = 20,
-        [Int]$RetryIntervalSec = 30,
         [string]$vSwitchNameHost = "InternalNAT",
         [String]$targetDrive = "V",
         [String]$targetVMPath = "$targetDrive" + ":\VMs",
@@ -418,7 +416,7 @@ configuration AKSHCIHost
         if ($environment -eq "Workgroup") {
             NetConnectionProfile SetProfile
             {
-                InterfaceAlias  = 'Ethernet'
+                InterfaceAlias  = "$InterfaceAlias"
                 NetworkCategory = 'Private'
             }
         }
@@ -427,7 +425,7 @@ configuration AKSHCIHost
 
         NetAdapterBinding DisableIPv6Host
         {
-            InterfaceAlias = 'Ethernet'
+            InterfaceAlias = "$InterfaceAlias"
             ComponentId    = 'ms_tcpip6'
             State          = 'Disabled'
         }
@@ -523,7 +521,7 @@ configuration AKSHCIHost
 
             DnsConnectionSuffix AddSpecificSuffixHostNic
             {
-                InterfaceAlias           = 'Ethernet'
+                InterfaceAlias           = "$InterfaceAlias"
                 ConnectionSpecificSuffix = "$DomainName"
                 DependsOn                = "[xDnsServerPrimaryZone]SetPrimaryDNSZone"
             }
