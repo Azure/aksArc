@@ -127,7 +127,7 @@ You'll notice that your AKSHCIHOST001 is already under management, so at this st
 
 Optional - Enable/Disable DHCP
 -----------
-With the February release of AKS on Azure Stack HCI, Static IP configurations are supported for deployment of the management cluster and workload clusters. When you deployed your Azure VM, DHCP was installed and configured automatically for you, but you had the chance to control whether it was enabled or disabled on your Windows Server 2019 OS. If you want to adjust DHCP now, make changes to the **$dhcpState** below and run the following **PowerShell command as administrator**:
+Static IP configurations are supported for deployment of the management cluster and workload clusters. When you deployed your Azure VM, DHCP was installed and configured automatically for you, but you had the chance to control whether it was enabled or disabled on your Windows Server 2019 OS. If you want to adjust DHCP now, make changes to the **$dhcpState** below and run the following **PowerShell command as administrator**:
 
 ```powershell
 # Check current DHCP state for Active/Inactive
@@ -318,7 +318,7 @@ Get-AksHciCluster
 
 To access this **akshciclus001** cluster using **kubectl** (which was installed on your host as part of the overall installation process), you'll first need the **kubeconfig file**.
 
-6. To retrieve the kubeconfig file for the akshciclus001 cluster, you'll need to run the following command from your **administrative PowerShell**:
+5. To retrieve the kubeconfig file for the akshciclus001 cluster, you'll need to run the following command from your **administrative PowerShell**:
 
 ```powershell
 Get-AksHciCredential -Name akshciclus001
