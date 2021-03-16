@@ -226,7 +226,13 @@ In the next section, you'll be deploying target clusters to run workloads. Durin
 
 **NOTE** If you don't see Microsoft Graph listed in the API permissions, you can either manually add the **Microsoft Graph Appliation.ReadWrite.All** permission or [re-register Windows Admin Center at Step 14 here](#configure-windows-admin-center "re-register Windows Admin Center at Step 14 here") for the permissions to appear correctly.
 
-1. Click on **Grant admin consent for __________** and when prompted to confirm permissions, click **Yes**
+To manually add the permission:
+- Click **Add a permission**
+- Select **Microsoft Graph**, then **Delegated permissions**
+- Search for **Application.ReadWrite.All**, then expand **Application** dropdown
+- Select the **checkbox** and click **Add permissions**, then follow the next step
+
+5. Click on **Grant admin consent for __________** and when prompted to confirm permissions, click **Yes**
 
 ![Confirm Azure AD app permissions in Windows Admin Center](/eval/media/wac_azuread_confirm.png "Confirm Azure AD app permissions in Windows Admin Center")
 
