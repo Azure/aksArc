@@ -224,7 +224,9 @@ In the next section, you'll be deploying target clusters to run workloads. Durin
 
 ![Your Azure AD app permissions in Windows Admin Center](/eval/media/wac_azuread_grant.png "Your Azure AD app permissions in Windows Admin Center")
 
-5. Click on **Grant admin consent for __________** and when prompted to confirm permissions, click **Yes**
+**NOTE** If you don't see Microsoft Graph listed in the API permissions, you can either manually add the **Microsoft Graph Appliation.ReadWrite.All** permission or [re-register Windows Admin Center at Step 14 here](#configure-windows-admin-center "re-register Windows Admin Center at Step 14 here") for the permissions to appear correctly.
+
+1. Click on **Grant admin consent for __________** and when prompted to confirm permissions, click **Yes**
 
 ![Confirm Azure AD app permissions in Windows Admin Center](/eval/media/wac_azuread_confirm.png "Confirm Azure AD app permissions in Windows Admin Center")
 
