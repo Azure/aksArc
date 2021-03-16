@@ -15,6 +15,7 @@ Contents
 - [Configure Windows Admin Center](#configure-windows-admin-center)
 - [Optional - Enable/Disable DHCP](#optional---enabledisable-dhcp)
 - [Deploying AKS on Azure Stack HCI management cluster](#deploying-aks-on-azure-stack-hci-management-cluster)
+- [Enable Azure Arc integration (Optional)](#enable-azure-arc-integration-optional)
 - [Create a Kubernetes cluster (Target cluster)](#create-a-kubernetes-cluster-target-cluster)
 - [Scale your Kubernetes cluster (Target cluster)](#scale-your-kubernetes-cluster-target-cluster)
 - [Next Steps](#next-steps)
@@ -157,16 +158,20 @@ You'll notice the terminology used refers to the **Azure Kubernetes Service Runt
 
 You'll notice that Windows Admin Center will validate memory, storage, networking, roles and features and more. If you've followed the guide correctly, you'll find you'll pass all the checks and can proceed.
 
-7. Once validated, click **Next: Host configuration**
-8. On the **Host configuration** page, under **Host details**, select your **V:**, and leave the other settings as default
+7. Once validated, click **Apply**, wait a few moments, then click **Next: Connectivity**
+8. On the **Connectivity** page, read the information about **CredSSP**, then click **Enable**. Once enabled, click **Next: Host configuration**
+
+![Enable CredSSP in Windows Admin Center](/eval/media/aks_hostconfig_credssp.png "Enable CredSSP in Windows Admin Center")
+
+9.  On the **Host configuration** page, under **Host details**, select your **V:**, and leave the other settings as default
 
 ![Host configuration in Windows Admin Center](/eval/media/aks_hostconfig_hostdetails.png "Host configuration in Windows Admin Center")
 
-9. Under **VM Networking**, ensure that **InternalNAT** is selected for the **Internet-connected virtual switch**
-10. For **Enable virtual LAN identification**, leave this selected as **No**
-11. For **Cloudagent IP** this is optional, so we will leave this blank
-12. For **IP address allocation method** choose **either DHCP or Static** depending on the choice you made for deployment of your Azure VM. If you're not sure, you can check by [validating your DHCP config](#optional---enabledisable-dhcp)
-13. If you select **Static**, you should enter the following:
+10. Under **VM Networking**, ensure that **InternalNAT** is selected for the **Internet-connected virtual switch**
+11. For **Enable virtual LAN identification**, leave this selected as **No**
+12. For **Cloudagent IP** this is optional, so we will leave this blank
+13. For **IP address allocation method** choose **either DHCP or Static** depending on the choice you made for deployment of your Azure VM. If you're not sure, you can check by [validating your DHCP config](#optional---enabledisable-dhcp)
+14. If you select **Static**, you should enter the following:
     1.  **Subnet Prefix**: 192.168.0.0/16
     2.  **Gateway**: 192.168.0.1
     3.  **DNS Servers**: 192.168.0.1
@@ -175,16 +180,20 @@ You'll notice that Windows Admin Center will validate memory, storage, networkin
 
 ![Host configuration in Windows Admin Center](/eval/media/aks_hostconfig_vmnet.png "Host configuration in Windows Admin Center")
 
-14. Under **Load balancer settings**, enter the range from **192.168.0.150** to **192.168.0.250** and then click **Next:Azure registration**
+15. Under **Load balancer settings**, enter the range from **192.168.0.150** to **192.168.0.250** and then click **Next:Azure registration**
 
 ![Host configuration in Windows Admin Center](/eval/media/aks_hostconfig_lb.png "Host configuration in Windows Admin Center")
 
-15. On the **Azure registration page**, your Azure account should be automatically populated. Use the drop-down to select your preferred subscription. **Note**, nothing will be deployed into this subscription and no charges will be incurred. If you are prompted, log into Azure with your Azure credentials. Once successfully authenticated, you should see your **Account**, then **choose your subscription**
+16. On the **Azure registration page**, your Azure account should be automatically populated. Use the drop-down to select your preferred subscription. **Note**, nothing will be deployed into this subscription and no charges will be incurred. If you are prompted, log into Azure with your Azure credentials. Once successfully authenticated, you should see your **Account**, then **choose your subscription**
 
 ![AKS Azure Registration in Windows Admin Center](/eval/media/aks_azure_reg.png "AKS Azure Registration in Windows Admin Center")
 
-16. Once you've chosen your subscription, click **Next: Review + create**
-17. Review your choices and settings, then click **Next**. The deployment of the AKS management cluster will begin.
+17. Once you've chosen your subscription, click **Next: Review**
+18. Review your choices and settings, then click **Apply**. After a few moments, you should receive a notification:
+
+![Setting the AKS-HCI config in Windows Admin Center](/eval/media/aks_host_mgmtconfirm.png "Setting the AKS-HCI config in Windows Admin Center")
+
+19. Once confirmed, you can click **Next: New cluster** to start the deployment process of the management cluster.
 
 ![AKS on Azure Stack HCI management cluster deployment started in Windows Admin Center](/eval/media/aks_deploy_started.png "AKS on Azure Stack HCI management cluster deployment started in Windows Admin Center")
 
@@ -192,14 +201,34 @@ You'll notice that Windows Admin Center will validate memory, storage, networkin
 
 **NOTE 2** - You may receive a WinRM error message stating "Downloading virtual machine images and binaries for the AKS host failed" - this can be ignored, so **do not close/refresh the browser**.
 
-18. Upon completion you can review the successful deployment. In this case, you can see deployment of the AKS on Azure Stack HCI management cluster took just over 17 minutes.
+20.  Upon completion you should receive a notification of success. In this case, you can see deployment of the AKS on Azure Stack HCI management cluster took just over 7 minutes.
 
 ![AKS-HCI management cluster deployment completed in Windows Admin Center](/eval/media/aks_deploy_success.png "AKS-HCI management cluster deployment completed in Windows Admin Center")
 
-19. Once reviewed, click **Finish**. You will then be presented with a management dashboard where you can create and manage your Kubernetes clusters.
+21. Once reviewed, click **Finish**. You will then be presented with a management dashboard where you can create and manage your Kubernetes clusters.
 
 ### Updates and Cleanup ###
 To learn more about **updating**, **redeploying** or **uninstalling** AKS on Azure Stack HCI with Windows Admin Center, you can [read the official documentation here.](https://docs.microsoft.com/en-us/azure-stack/aks-hci/setup "Official documentation on updating, redeploying and uninstalling AKS on Azure Stack HCI")
+
+Enable Azure Arc integration (Optional)
+-----------
+In the next section, you'll be deploying target clusters to run workloads. During that process, you'll have the option to connect those clusters to [Azure Arc](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/overview "Azure Arc enabled Kubernetes"). Now, in order to do that successfully, you need to grant some additional permissions on the Windows Admin Center Azure AD application that was created when you connected Windows Admin Center to Azure, earlier.
+
+1. Still in Windows Admin Center, click on the **Settings** gear in the top-right corner
+2. Under **Gateway**, click **Azure**. You should see your previously registered Azure AD app:
+
+![Your Azure AD app in Windows Admin Center](/eval/media/wac_azureadapp.png "Your Azure AD app in Windows Admin Center")
+
+3. Click on **View in Azure** to be taken to the Azure AD app portal, where you should see information about this app, including permissions required. If you're prompted to log in, provide appropriate credentials.
+4. Once logged in, under **Configured permissions**, you may see the **Microsoft.Graph (5)** listed with the status **Not granted for...**
+
+![Your Azure AD app permissions in Windows Admin Center](/eval/media/wac_azuread_grant.png "Your Azure AD app permissions in Windows Admin Center")
+
+5. Click on **Grant admin consent for __________** and when prompted to confirm permissions, click **Yes**
+
+![Confirm Azure AD app permissions in Windows Admin Center](/eval/media/wac_azuread_confirm.png "Confirm Azure AD app permissions in Windows Admin Center")
+
+With that step completed, you're now ready to create your first target cluster.
 
 Create a Kubernetes cluster (Target cluster)
 -----------
@@ -223,7 +252,7 @@ There are two ways to create a Kubernetes cluster in Windows Admin Center.
 Whichever option you chose, you will now be at the start of the **Create kubernetes cluster** wizard.
 
 1. Firstly, review the prerequisites - your Azure VM environment will meet all the prerequisites, so you should be fine to click **Next: Basics**
-2. On the **Basics** page, firstly, choose whether you wish to **optionally** integrate with Azure Arc for Kubernetes. You can click the link on the page to learn more about Azure Arc. If you do wish to integrate, select the **Enabled** radio button, then use the drop downs to select the **subscription** and **resource group**.
+2. On the **Basics** page, firstly, choose whether you wish to **optionally** integrate with Azure Arc for Kubernetes. You can click the link on the page to learn more about Azure Arc. If you do wish to integrate, select the **Enabled** radio button, then use the drop downs to select the **subscription** and **resource group**. Alternatively, you can create a new resource group, in a specific region, exclusively for the Azure Arc integration resource.
 
 ![Enable Arc integration with Windows Admin Center](/eval/media/aks_basics_arc.png "Enable Arc integration with Windows Admin Center")
 
