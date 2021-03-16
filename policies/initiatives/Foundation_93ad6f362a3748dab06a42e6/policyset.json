@@ -1,0 +1,60 @@
+{
+ "properties": {
+  "displayName": "Foundation",
+  "policyType": "Custom",
+  "description": "",
+  "metadata": {
+   "category": "General",
+   "version": "1.0.0",
+   "parameterScopes": {
+    "listOfAllowedLocations": "/subscriptions/1871c43c-322b-4a95-8722-fe35b4daa1a3"
+   },
+   "createdBy": "2962707f-b211-42da-936b-4f29989d0a06",
+   "createdOn": "2021-03-16T16:22:33.4592995Z",
+   "updatedBy": "2962707f-b211-42da-936b-4f29989d0a06",
+   "updatedOn": "2021-03-16T16:27:35.1502001Z"
+  },
+  "parameters": {},
+  "policyDefinitions": [
+   {
+    "policyDefinitionReferenceId": "Allowed locations",
+    "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/e56962a6-4747-49cd-b67b-bf8b01975c4c",
+    "parameters": {
+     "listOfAllowedLocations": {
+      "value": [
+       "northeurope",
+       "francecentral",
+       "francesouth",
+       "westeurope"
+      ]
+     }
+    },
+    "groupNames": []
+   },
+   {
+    "policyDefinitionReferenceId": "Require owner tag on resource groups",
+    "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/96670d01-0a4d-4649-9c89-2d3abc0a5025",
+    "parameters": {
+     "tagName": {
+      "value": "owner"
+     }
+    },
+    "groupNames": []
+   },
+   {
+    "policyDefinitionReferenceId": "Inherit owner tag from the resource group",
+    "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/cd3aa116-8754-49c9-a813-ad46512ece54",
+    "parameters": {
+     "tagName": {
+      "value": "owner"
+     }
+    },
+    "groupNames": []
+   }
+  ],
+  "policyDefinitionGroups": []
+ },
+ "id": "/subscriptions/1871c43c-322b-4a95-8722-fe35b4daa1a3/providers/Microsoft.Authorization/policySetDefinitions/93ad6f362a3748dab06a42e6",
+ "type": "Microsoft.Authorization/policySetDefinitions",
+ "name": "93ad6f362a3748dab06a42e6"
+}
