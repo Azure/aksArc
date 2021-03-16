@@ -290,19 +290,21 @@ Whichever option you chose, you will now be at the start of the **Create kuberne
 
 ![Start deployment of AKS cluster in Windows Admin Center](/eval/media/aks_create_start.png "Start deployment of AKS cluster in Windows Admin Center")
 
-14. Once completed, you should see a message for successful creation, then click **Next: Next steps**
+14. Once completed, you should see a message for successful creation, then click **Finish**
 
 ![Completed deployment of AKS cluster in Windows Admin Center](/eval/media/aks_create_complete.png "Completed deployment of AKS cluster in Windows Admin Center")
 
-15. On the **Next steps** page, if you chose to integrate with Azure Arc, you should be able to click the link to be taken to the Azure Arc view in the Azure portal.
+15. Back in the **Azure Kubernetes Service Runtime on Windows Server**, you should now see your cluster listed
+
+![AKS cluster in Windows Admin Center](/eval/media/aks_dashboard.png "AKS cluster in Windows Admin Center")
+
+16. On the dashboard, if you chose to integrate with Azure Arc, you should be able to click the **Azure instance** link to be taken to the Azure Arc view in the Azure portal.
 
 ![AKS cluster in Azure Arc](/eval/media/aks_in_arc.png "AKS cluster in Azure Arc")
 
 16. In addition, you may wish to download your **Kubernetes cluster kubeconfig** file in order to access this Kubernetes via **kubectl** later.
 17. Once you have your Kubeconfig file, you can click **Finish**
-18. Back in the **Azure Kubernetes Service Runtime on Windows Server**, you should now see your cluster listed
 
-![AKS cluster in Windows Admin Center](/eval/media/aks_dashboard.png "AKS cluster in Windows Admin Center")
 
 Scale your Kubernetes cluster (Target cluster)
 -----------
