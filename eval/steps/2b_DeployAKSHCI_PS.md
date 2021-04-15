@@ -108,8 +108,8 @@ $spName = "AksHci-SP-$date"
 # Create the Service Principal
 
 $sp = New-AzADServicePrincipal -DisplayName $spName `
--Role 'Microsoft.Kubernetes connected cluster role' `
--Scope "/subscriptions/$sub"
+    -Role 'Microsoft.Kubernetes connected cluster role' `
+    -Scope "/subscriptions/$sub"
 
 # Retrieve the password for the Service Principal
 
