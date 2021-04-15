@@ -77,8 +77,14 @@ Now, seeing as you're deploying this evaluation in Azure, it assumes you already
 If you need to create a new Service Principal, the following steps will create a new Service Principal, with the built-in **Microsoft.Kubernetes connected cluster role** and set the scope at the subscription level.
 
 ```powershell
+Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
+Install-PackageProvider -Name NuGet -Force 
+Install-Module -Name PowershellGet -Force -Confirm:$false -SkipPublisherCheck
+Install-Module -Name Az.Accounts -AllowClobber -Force
+Install-Module -Name Az.Resources -AllowClobber -Force
+
 # Login to Azure
-Login-AzAccount
+Connect-AzAccount
 
 # Optional - if you wish to switch to a different subscription
 # First, get all available subscriptions as the currently logged in user

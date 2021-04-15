@@ -41,8 +41,11 @@ Before you deploy AKS on Azure Stack HCI, there are a few steps required to prep
 1. Run the following **PowerShell command as administrator**:
 
 ```powershell
+Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
 Install-PackageProvider -Name NuGet -Force 
 Install-Module -Name PowershellGet -Force -Confirm:$false -SkipPublisherCheck
+Install-Module -Name Az.Accounts -AllowClobber -Force
+Install-Module -Name Az.Resources -AllowClobber -Force
 ```
 
 2. Still in the **administrative PowerShell console**, run the following to uninstall previous modules and unregister private powershell repositories:
@@ -88,7 +91,7 @@ If you need to create a new Service Principal, the following steps will create a
 
 ```powershell
 # Login to Azure
-Login-AzAccount
+Connect-AzAccount
 
 # Optional - if you wish to switch to a different subscription
 # First, get all available subscriptions as the currently logged in user
@@ -132,7 +135,7 @@ Ahead of the registration process, you need to enable the appropriate resource p
 
 ```powershell
 # Login to Azure
-Login-AzAccount
+Connect-AzAccount
 
 # Optional - if you wish to switch to a different subscription
 # First, get all available subscriptions as the currently logged in user
@@ -252,7 +255,7 @@ Now, if you make a mistake, simply run **Set-AksHciConfig** without any paramete
 
 ```powershell
 # Login to Azure
-Login-AzAccount
+Connect-AzAccount
 
 # Optional - if you wish to switch to a different subscription
 # First, get all available subscriptions as the currently logged in user
