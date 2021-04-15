@@ -136,14 +136,14 @@ New-Item -Path "V:\AKS-HCI\" -Name "Config" -ItemType "directory" -Force
 Run the following command in your **administrative PowerShell window**:
 
 ```powershell
-$vnet = New-AksHciNetworkSetting -vnetName "InternalNAT" -vipPoolStart "192.168.0.150" -vipPoolEnd "192.168.0.250"
+$vnet = New-AksHciNetworkSetting -Name "MgmtvNet" -vSwitchName "InternalNAT" -vipPoolStart "192.168.0.150" -vipPoolEnd "192.168.0.250"
 ```
 
 #### If you wish to use Static IP addresses ####
 Run the following command in your **administrative PowerShell window**:
 
 ```powershell
-$vnet = New-AksHciNetworkSetting -vnetName "InternalNAT" -gateway "192.168.0.1" -dnsservers "192.168.0.1" `
+$vnet = New-AksHciNetworkSetting -Name "MgmtvNet" -vSwitchName "InternalNAT" -gateway "192.168.0.1" -dnsservers "192.168.0.1" `
     -ipaddressprefix "192.168.0.0/16" -k8snodeippoolstart "192.168.0.3" -k8snodeippoolend "192.168.0.149" `
     -vipPoolStart "192.168.0.150" -vipPoolEnd "192.168.0.250"
 ```
