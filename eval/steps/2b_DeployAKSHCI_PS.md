@@ -247,9 +247,45 @@ This command will take a few moments to complete, but once done, you should see 
 
 Now, if you make a mistake, simply run **Set-AksHciConfig** without any parameters, and that will reset your configuration.
 
+6. With the configuration files finalized, you need to finalize the registration configuration. From your **administrative PowerShell** window, run the following commands:
+
+```powershell
+# Login to Azure
+Login-AzAccount
+
+# Optional - if you wish to switch to a different subscription
+# First, get all available subscriptions as the currently logged in user
+$context = Get-AzContext -ListAvailable
+# Display those in a grid, select the chosen subscription, then press OK.
+if (($context).count -gt 1) {
+    $context | Out-GridView -OutputMode Single | Set-AzContext
+}
+
+# Retrieve the subscription and tenant ID
+$sub = (Get-AzSubscription).Id
+$tenant = (Get-AzSubscription).TenantId
+
+# First create a resource group in Azure that will contain the registration artifacts
+$rg = (New-AzResourceGroup -Name AksHciAzureEval -Location "East US" -Force).ResourceGroupName
+```
+7. You then need to run the **Set-AksHciRegistration** command, and this will vary depending on the type of login you prefer:
+
+```powershell
+# For an Interactive Login with a user account:
+Set-AksHciRegistration -SubscriptionId $sub -ResourceGroupName $rg
+
+# For a device login or are running in a headless shell, again with a user account:
+Set-AksHciRegistration -SubscriptionId $sub -ResourceGroupName $rg -UseDeviceAuthentication
+
+# To use your Service Principal, first enter your Service Principal credentials (app ID, secret)
+$cred = Get-Credential
+
+Set-AksHciRegistration -SubscriptionId $sub -ResourceGroupName $rg -TenantId $tenant -Credential $cred
+```
+
 After you've configured your deployment, you're now ready to start the installation process, which will install the AKS on Azure Stack HCI management cluster.
 
-1. From your **administrative PowerShell** window, run the following command:
+8. From your **administrative PowerShell** window, run the following command:
 
 ```powershell
 Install-AksHci
@@ -257,7 +293,7 @@ Install-AksHci
 
 This will take a few minutes.
 
-7. Once deployment is completed, you can verify the details by running the following command:
+9. Once deployment is completed, you can verify the details by running the following command:
 
 ```powershell
 Get-AksHciCluster
@@ -269,7 +305,7 @@ Your output should look like this:
 
 With the cluster verified, if you'd like to access the cluster using **kubectl** (which was installed on your host as part of the overall installation process), you'll first need a **kubeconfig file**.
 
-8. To retrieve the kubeconfig file, you'll need to run the following commands from your **administrative PowerShell**:
+10. To retrieve the kubeconfig file, you'll need to run the following commands from your **administrative PowerShell**:
 
 ```powershell
 Get-AksHciCredential -Name clustergroup-management
