@@ -153,6 +153,8 @@ Get-AzResourceProvider -ProviderNamespace Microsoft.Kubernetes
 Get-AzResourceProvider -ProviderNamespace Microsoft.KubernetesConfiguration
 ```
 
+![Resource Provider enabled in Azure](/eval/media/akshci_rp_enable.png "Resource Provider enabled Azure")
+
 Download artifacts
 -----------
 In order to deploy AKS on Azure Stack HCI, you'll need to register, and then download the public preview software. Once downloaded, you'll extract the files, and copy them to their final destinations before starting the deployment.
