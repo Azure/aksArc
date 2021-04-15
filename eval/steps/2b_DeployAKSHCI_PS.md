@@ -246,19 +246,19 @@ Notice that this time, this command lists both the management cluster and also t
 1. Next, you'll scale your Kubernetes cluster to **add a Windows worker node**. Note, this will trigger the download and extraction of a Windows container host image, which will take a few minutes, so please be patient.
 
 ```powershell
-Set-AksHciClusterNodeCount –Name akshciclus001 -linuxNodeCount 1 -windowsNodeCount 1
+Set-AksHciCluster –Name akshciclus001 -linuxNodeCount 1 -windowsNodeCount 1
 ```
 
 5. Next, you'll scale your Kubernetes cluster to have **2 Linux worker nodes**:
 
 ```powershell
-Set-AksHciClusterNodeCount –Name akshciclus001 -linuxNodeCount 2 -windowsNodeCount 1
+Set-AksHciCluster –Name akshciclus001 -linuxNodeCount 2 -windowsNodeCount 1
 ```
 
 **NOTE** - You can also scale your Control Plane nodes for this particular cluster, however it has to be **scaled independently from the worker nodes** themselves. You can scale the Control Plane nodes using the command:
 
 ```powershell
-Set-AksHciClusterNodeCount –Name akshciclus001 -controlPlaneNodeCount 3
+Set-AksHciCluster –Name akshciclus001 -controlPlaneNodeCount 3
 ```
 
 **NOTE** - the control plane node count should be an **odd** number, such as 1, 3, 5 etc.
