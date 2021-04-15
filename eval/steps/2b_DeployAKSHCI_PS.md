@@ -275,7 +275,7 @@ $rg = (New-AzResourceGroup -Name AksHciAzureEval -Location "East US" -Force).Res
 # For an Interactive Login with a user account:
 Set-AksHciRegistration -SubscriptionId $sub -ResourceGroupName $rg
 
-# For a device login or are running in a headless shell, again with a user account:
+# For a device login or if you are running in a headless shell, again with a user account:
 Set-AksHciRegistration -SubscriptionId $sub -ResourceGroupName $rg -UseDeviceAuthentication
 
 # To use your Service Principal, first enter your Service Principal credentials (app ID, secret) then set the registration
