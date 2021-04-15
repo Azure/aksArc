@@ -220,7 +220,8 @@ New-Item -Path "V:\AKS-HCI\" -Name "Config" -ItemType "directory" -Force
 Run the following command in your **administrative PowerShell window**:
 
 ```powershell
-$vnet = New-AksHciNetworkSetting -Name "mgmtvnet" -vSwitchName "InternalNAT" -vipPoolStart "192.168.0.150" -vipPoolEnd "192.168.0.250"
+$vnet = New-AksHciNetworkSetting -Name "mgmtvnet" -vSwitchName "InternalNAT" `
+    -vipPoolStart "192.168.0.150" -vipPoolEnd "192.168.0.250"
 ```
 
 #### If you wish to use Static IP addresses ####
@@ -277,9 +278,8 @@ Set-AksHciRegistration -SubscriptionId $sub -ResourceGroupName $rg
 # For a device login or are running in a headless shell, again with a user account:
 Set-AksHciRegistration -SubscriptionId $sub -ResourceGroupName $rg -UseDeviceAuthentication
 
-# To use your Service Principal, first enter your Service Principal credentials (app ID, secret)
+# To use your Service Principal, first enter your Service Principal credentials (app ID, secret) then set the registration
 $cred = Get-Credential
-
 Set-AksHciRegistration -SubscriptionId $sub -ResourceGroupName $rg -TenantId $tenant -Credential $cred
 ```
 
