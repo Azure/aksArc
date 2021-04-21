@@ -214,9 +214,11 @@ You'll notice that Windows Admin Center will validate memory, storage, networkin
 
 ![Host configuration in Windows Admin Center](/eval/media/aks_hostconfig_lb.png "Host configuration in Windows Admin Center")
 
-16. On the **Azure registration page**, your Azure account should be automatically populated. Use the drop-down to select your preferred subscription. **Note**, nothing will be deployed into this subscription and no charges will be incurred during the preview. If you are prompted, log into Azure with your Azure credentials. Once successfully authenticated, you should see your **Account**, then **choose your subscription**
+16. On the **Azure registration page**, your Azure account should be automatically populated. Use the drop-down to select your preferred subscription. If you are prompted, log into Azure with your Azure credentials. Once successfully authenticated, you should see your **Account**, then **choose your subscription**
 
 ![AKS on Azure Stack HCI Azure Registration in Windows Admin Center](/eval/media/aks_azure_reg.png "AKS on Azure Stack HCI Azure Registration in Windows Admin Center")
+
+**NOTE** - No charges will be incurred for using AKS on Azure Stack HCI during the preview. 
 
 17. Once you've chosen your subscription, choose an **existing Resource Group** or **create a new one** - Your resource group should be in the **East US, Southeast Asia, or West Europe region**
 18. Click on **Next:Review**
