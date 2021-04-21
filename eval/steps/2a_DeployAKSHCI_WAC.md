@@ -13,9 +13,9 @@ Contents
 - [Allow popups in Edge browser](#allow-popups-in-edge-browser)
 - [Download artifacts](#download-artifacts)
 - [Configure Windows Admin Center](#configure-windows-admin-center)
+- [Finalize Azure integration](#finalize-azure-integration)
 - [Optional - Enable/Disable DHCP](#optional---enabledisable-dhcp)
 - [Deploying AKS on Azure Stack HCI management cluster](#deploying-aks-on-azure-stack-hci-management-cluster)
-- [Enable Azure Arc integration (Optional)](#enable-azure-arc-integration-optional)
 - [Create a Kubernetes cluster (Target cluster)](#create-a-kubernetes-cluster-target-cluster)
 - [Scale your Kubernetes cluster (Target cluster)](#scale-your-kubernetes-cluster-target-cluster)
 - [Next Steps](#next-steps)
@@ -120,7 +120,37 @@ With your extensions correctly deployed, in order to deploy AKS-HCI with Windows
 
 ![Permissions for Windows Admin Center](/eval/media/wac_azure_permissions.png "Permissions for Windows Admin Center")
 
-18. Click on **Windows Admin Center** in the top-left corner to return to the home page
+**NOTE** - if you receive an error when signing in, still in **Settings**, under **User**, click on **Account** and click **Sign-in**. You should then be prompted for Azure credentials and permissions, to which you can then click **Accept**
+
+Finalize Azure integration
+-----------
+In order to successfully deploy AKS on Azure Stack HCI with Windows Admin Center, you need to grant some additional permissions on the Windows Admin Center Azure AD application that was created when you connected Windows Admin Center to Azure, earlier.
+
+1. Still in Windows Admin Center, click on the **Settings** gear in the top-right corner
+2. Under **Gateway**, click **Azure**. You should see your previously registered Azure AD app:
+
+![Your Azure AD app in Windows Admin Center](/eval/media/wac_azureadapp.png "Your Azure AD app in Windows Admin Center")
+
+3. Click on **View in Azure** to be taken to the Azure AD app portal, where you should see information about this app, including permissions required. If you're prompted to log in, provide appropriate credentials.
+4. Once logged in, under **Configured permissions**, you may see the **Microsoft.Graph (5)** listed with the status **Not granted for...**
+
+![Your Azure AD app permissions in Windows Admin Center](/eval/media/wac_azuread_grant.png "Your Azure AD app permissions in Windows Admin Center")
+
+**NOTE** If you don't see Microsoft Graph listed in the API permissions, you can either [re-register Windows Admin Center at Step 13 here](#configure-windows-admin-center "re-register Windows Admin Center at step 13 here") for the permissions to appear correctly, or manually add the **Microsoft Graph Appliation.ReadWrite.All** permission.
+
+5. If you have the permissions shown in the graphic above, click on **Grant admin consent for __________** and when prompted to confirm permissions, click **Yes**
+
+![Confirm Azure AD app permissions in Windows Admin Center](/eval/media/wac_azuread_confirm.png "Confirm Azure AD app permissions in Windows Admin Center")
+
+**NOTE** - If you don't see the permissions shown in the graphic, to manually add the permission:
+
+- Click **+ Add a permission**
+- Select **Microsoft Graph**, then **Delegated permissions**
+- Search for **Application.ReadWrite.All**, then if required, expand the **Application** dropdown
+- Select the **checkbox** and click **Add permissions**
+- Click on **Grant admin consent for __________** and when prompted to confirm permissions, click **Yes**
+
+6.  Click on **Windows Admin Center** in the top-left corner to return to the home page
 
 You'll notice that your AKSHCIHOST001 is already under management, so at this stage, you're ready to proceed to deploy the AKS on Azure Stack HCI management cluster onto your Windows Server 2019 Hyper-V host.
 
@@ -184,12 +214,14 @@ You'll notice that Windows Admin Center will validate memory, storage, networkin
 
 ![Host configuration in Windows Admin Center](/eval/media/aks_hostconfig_lb.png "Host configuration in Windows Admin Center")
 
-16. On the **Azure registration page**, your Azure account should be automatically populated. Use the drop-down to select your preferred subscription. **Note**, nothing will be deployed into this subscription and no charges will be incurred. If you are prompted, log into Azure with your Azure credentials. Once successfully authenticated, you should see your **Account**, then **choose your subscription**
+16. On the **Azure registration page**, your Azure account should be automatically populated. Use the drop-down to select your preferred subscription. **Note**, nothing will be deployed into this subscription and no charges will be incurred during the preview. If you are prompted, log into Azure with your Azure credentials. Once successfully authenticated, you should see your **Account**, then **choose your subscription**
 
 ![AKS Azure Registration in Windows Admin Center](/eval/media/aks_azure_reg.png "AKS Azure Registration in Windows Admin Center")
 
-17. Once you've chosen your subscription, click **Next: Review**
-18. Review your choices and settings, then click **Apply**. After a few moments, you should receive a notification:
+17. Once you've chosen your subscription, choose an **existing Resource Group** or **create a new one** - Your resource group will need to be in the **East US, Southeast Asia, or West Europe region**
+18. Still on the **Azure registration** page, click on **View in Azure** to view your Windows Admin Center Azure AD application permissions in the Azure portal.
+19. 
+20. Review your choices and settings, then click **Apply**. After a few moments, you should receive a notification:
 
 ![Setting the AKS-HCI config in Windows Admin Center](/eval/media/aks_host_mgmtconfirm.png "Setting the AKS-HCI config in Windows Admin Center")
 
@@ -209,33 +241,6 @@ You'll notice that Windows Admin Center will validate memory, storage, networkin
 
 ### Updates and Cleanup ###
 To learn more about **updating**, **redeploying** or **uninstalling** AKS on Azure Stack HCI with Windows Admin Center, you can [read the official documentation here.](https://docs.microsoft.com/en-us/azure-stack/aks-hci/setup "Official documentation on updating, redeploying and uninstalling AKS on Azure Stack HCI")
-
-Enable Azure Arc integration (Optional)
------------
-In the next section, you'll be deploying target clusters to run workloads. During that process, you'll have the option to connect those clusters to [Azure Arc](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/overview "Azure Arc enabled Kubernetes"). Now, in order to do that successfully, you need to grant some additional permissions on the Windows Admin Center Azure AD application that was created when you connected Windows Admin Center to Azure, earlier.
-
-1. Still in Windows Admin Center, click on the **Settings** gear in the top-right corner
-2. Under **Gateway**, click **Azure**. You should see your previously registered Azure AD app:
-
-![Your Azure AD app in Windows Admin Center](/eval/media/wac_azureadapp.png "Your Azure AD app in Windows Admin Center")
-
-3. Click on **View in Azure** to be taken to the Azure AD app portal, where you should see information about this app, including permissions required. If you're prompted to log in, provide appropriate credentials.
-4. Once logged in, under **Configured permissions**, you may see the **Microsoft.Graph (5)** listed with the status **Not granted for...**
-
-![Your Azure AD app permissions in Windows Admin Center](/eval/media/wac_azuread_grant.png "Your Azure AD app permissions in Windows Admin Center")
-
-**NOTE** If you don't see Microsoft Graph listed in the API permissions, you can either [re-register Windows Admin Center at Step 13 here](#configure-windows-admin-center "re-register Windows Admin Center at step 13 here") for the permissions to appear correctly, or manually add the **Microsoft Graph Appliation.ReadWrite.All** permission.  To manually add the permission:
-
-- Click **+ Add a permission**
-- Select **Microsoft Graph**, then **Delegated permissions**
-- Search for **Application.ReadWrite.All**, then if required, expand the **Application** dropdown
-- Select the **checkbox** and click **Add permissions**, then follow the next step
-
-5. Click on **Grant admin consent for __________** and when prompted to confirm permissions, click **Yes**
-
-![Confirm Azure AD app permissions in Windows Admin Center](/eval/media/wac_azuread_confirm.png "Confirm Azure AD app permissions in Windows Admin Center")
-
-With that step completed, you're now ready to create your first target cluster.
 
 Create a Kubernetes cluster (Target cluster)
 -----------
