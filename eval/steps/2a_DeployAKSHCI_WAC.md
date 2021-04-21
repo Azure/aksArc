@@ -120,7 +120,7 @@ With your extensions correctly deployed, in order to deploy AKS-HCI with Windows
 
 ![Permissions for Windows Admin Center](/eval/media/wac_azure_permissions.png "Permissions for Windows Admin Center")
 
-**NOTE** - if you receive an error when signing in, still in **Settings**, under **User**, click on **Account** and click **Sign-in**. You should then be prompted for Azure credentials and permissions, to which you can then click **Accept**
+**NOTE** - if you receive an error when signing in, still in **Settings**, under **User**, click on **Account** and click **Sign-in**. You should then be prompted for Azure credentials and permissions, to which you can then click **Accept**. Sometimes it just takes a few moments from Windows Admin Center creating the Azure AD application and being able to sign in.
 
 Finalize Azure integration
 -----------
@@ -216,12 +216,11 @@ You'll notice that Windows Admin Center will validate memory, storage, networkin
 
 16. On the **Azure registration page**, your Azure account should be automatically populated. Use the drop-down to select your preferred subscription. **Note**, nothing will be deployed into this subscription and no charges will be incurred during the preview. If you are prompted, log into Azure with your Azure credentials. Once successfully authenticated, you should see your **Account**, then **choose your subscription**
 
-![AKS Azure Registration in Windows Admin Center](/eval/media/aks_azure_reg.png "AKS Azure Registration in Windows Admin Center")
+![AKS on Azure Stack HCI Azure Registration in Windows Admin Center](/eval/media/aks_azure_reg.png "AKS on Azure Stack HCI Azure Registration in Windows Admin Center")
 
-17. Once you've chosen your subscription, choose an **existing Resource Group** or **create a new one** - Your resource group will need to be in the **East US, Southeast Asia, or West Europe region**
-18. Still on the **Azure registration** page, click on **View in Azure** to view your Windows Admin Center Azure AD application permissions in the Azure portal.
-19. 
-20. Review your choices and settings, then click **Apply**. After a few moments, you should receive a notification:
+17. Once you've chosen your subscription, choose an **existing Resource Group** or **create a new one** - Your resource group should be in the **East US, Southeast Asia, or West Europe region**
+18. Click on **Next:Review**
+19. Review your choices and settings, then click **Apply**. After a few moments, you should receive a notification:
 
 ![Setting the AKS-HCI config in Windows Admin Center](/eval/media/aks_host_mgmtconfirm.png "Setting the AKS-HCI config in Windows Admin Center")
 
