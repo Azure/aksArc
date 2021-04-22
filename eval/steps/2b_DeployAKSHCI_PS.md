@@ -377,7 +377,7 @@ Notice that this time, this command lists both the management cluster and also t
 
 ![Output of Get-AksHciCluster](/eval/media/get_akshcicluster_2.png "Output of Get-AksHciCluster")
 
-1. Next, you'll scale your Kubernetes cluster to **add a Windows worker node**. Note, this will trigger the download and extraction of a Windows container host image, which will take a few minutes, so please be patient.
+4. Next, you'll scale your Kubernetes cluster to **add a Windows worker node**. Note, this will trigger the download and extraction of a Windows container host image, which will take a few minutes, so please be patient.
 
 ```powershell
 Set-AksHciCluster –Name akshciclus001 -linuxNodeCount 1 -windowsNodeCount 1
@@ -401,7 +401,7 @@ Set-AksHciCluster –Name akshciclus001 -controlPlaneNodeCount 3
 
 *******************************************************************************************************
 
-5. Once these steps have been completed, you can verify the details by running the following command:
+6. Once these steps have been completed, you can verify the details by running the following command:
 
 ```powershell
 Get-AksHciCluster
@@ -411,7 +411,7 @@ Get-AksHciCluster
 
 To access this **akshciclus001** cluster using **kubectl** (which was installed on your host as part of the overall installation process), you'll first need the **kubeconfig file**.
 
-6. To retrieve the kubeconfig file for the akshciclus001 cluster, you'll need to run the following command from your **administrative PowerShell**:
+7. To retrieve the kubeconfig file for the akshciclus001 cluster, you'll need to run the following command from your **administrative PowerShell**:
 
 ```powershell
 Get-AksHciCredential -Name akshciclus001
