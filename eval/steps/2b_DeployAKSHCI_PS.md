@@ -95,14 +95,14 @@ Connect-AzAccount
 
 # Optional - if you wish to switch to a different subscription
 # First, get all available subscriptions as the currently logged in user
-$context = Get-AzContext -ListAvailable
+$subList = Get-AzSubscription
 # Display those in a grid, select the chosen subscription, then press OK.
-if (($context).count -gt 1) {
-    $context | Out-GridView -OutputMode Single | Set-AzContext
+if (($subList).count -gt 1) {
+    $subList | Out-GridView -OutputMode Single | Set-AzContext
 }
 
 # Retrieve the current subscription ID
-$sub = (Get-AzSubscription).Id
+$sub = (Get-AzContext).Subscription.Id
 
 # Create a unique name for the Service Principal
 $date = (Get-Date).ToString("MMddyy-HHmmss")
@@ -139,10 +139,10 @@ Connect-AzAccount
 
 # Optional - if you wish to switch to a different subscription
 # First, get all available subscriptions as the currently logged in user
-$context = Get-AzContext -ListAvailable
+$subList = Get-AzSubscription
 # Display those in a grid, select the chosen subscription, then press OK.
-if (($context).count -gt 1) {
-    $context | Out-GridView -OutputMode Single | Set-AzContext
+if (($subList).count -gt 1) {
+    $subList | Out-GridView -OutputMode Single | Set-AzContext
 }
 
 Register-AzResourceProvider -ProviderNamespace Microsoft.Kubernetes
@@ -258,15 +258,15 @@ Connect-AzAccount
 
 # Optional - if you wish to switch to a different subscription
 # First, get all available subscriptions as the currently logged in user
-$context = Get-AzContext -ListAvailable
+$subList = Get-AzSubscription
 # Display those in a grid, select the chosen subscription, then press OK.
-if (($context).count -gt 1) {
-    $context | Out-GridView -OutputMode Single | Set-AzContext
+if (($subList).count -gt 1) {
+    $subList | Out-GridView -OutputMode Single | Set-AzContext
 }
 
 # Retrieve the subscription and tenant ID
-$sub = (Get-AzSubscription).Id
-$tenant = (Get-AzSubscription).TenantId
+$sub = (Get-AzContext).Subscription.Id
+$tenant = (Get-AzContext).Subscription.Id
 
 # First create a resource group in Azure that will contain the registration artifacts
 $rg = (New-AzResourceGroup -Name AksHciAzureEval -Location "East US" -Force).ResourceGroupName
