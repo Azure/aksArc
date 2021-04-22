@@ -254,7 +254,7 @@ This command will take a few moments to complete, but once done, you should see 
 
 Now, if you make a mistake, simply run **Set-AksHciConfig** without any parameters, and that will reset your configuration.
 
-1. With the configuration files finalized, you need to **finalize the registration configuration**. From your **administrative PowerShell** window, run the following commands:
+6. With the configuration files finalized, you need to **finalize the registration configuration**. From your **administrative PowerShell** window, run the following commands:
 
 ```powershell
 # Login to Azure
