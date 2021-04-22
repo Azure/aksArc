@@ -22,9 +22,13 @@ Contents
 - [Product improvements](#product-improvements)
 - [Raising issues](#raising-issues)
 
+*******************************************************************************************************
+
 ### Important Note ###
 
 In this step, you'll be using Windows Admin Center to deploy AKS on Azure Stack HCI. If you prefer to use PowerShell, head on over to the [PowerShell guide](/eval/steps/2b_DeployAKSHCI_PS.md).
+
+*******************************************************************************************************
 
 Architecture
 -----------
@@ -120,7 +124,11 @@ With your extensions correctly deployed, in order to deploy AKS-HCI with Windows
 
 ![Permissions for Windows Admin Center](/eval/media/wac_azure_permissions.png "Permissions for Windows Admin Center")
 
+*******************************************************************************************************
+
 **NOTE** - if you receive an error when signing in, still in **Settings**, under **User**, click on **Account** and click **Sign-in**. You should then be prompted for Azure credentials and permissions, to which you can then click **Accept**. Sometimes it just takes a few moments from Windows Admin Center creating the Azure AD application and being able to sign in.
+
+*******************************************************************************************************
 
 Finalize Azure integration
 -----------
@@ -136,11 +144,17 @@ In order to successfully deploy AKS on Azure Stack HCI with Windows Admin Center
 
 ![Your Azure AD app permissions in Windows Admin Center](/eval/media/wac_azuread_grant.png "Your Azure AD app permissions in Windows Admin Center")
 
+*******************************************************************************************************
+
 **NOTE** If you don't see Microsoft Graph listed in the API permissions, you can either [re-register Windows Admin Center at Step 13 here](#configure-windows-admin-center "re-register Windows Admin Center at step 13 here") for the permissions to appear correctly, or manually add the **Microsoft Graph Appliation.ReadWrite.All** permission.
+
+*******************************************************************************************************
 
 5. If you have the permissions shown in the graphic above, click on **Grant admin consent for __________** and when prompted to confirm permissions, click **Yes**
 
 ![Confirm Azure AD app permissions in Windows Admin Center](/eval/media/wac_azuread_confirm.png "Confirm Azure AD app permissions in Windows Admin Center")
+
+*******************************************************************************************************
 
 **NOTE** - If you don't see the permissions shown in the graphic, to manually add the permission:
 
@@ -150,7 +164,9 @@ In order to successfully deploy AKS on Azure Stack HCI with Windows Admin Center
 - Select the **checkbox** and click **Add permissions**
 - Click on **Grant admin consent for __________** and when prompted to confirm permissions, click **Yes**
 
-6.  Click on **Windows Admin Center** in the top-left corner to return to the home page
+*******************************************************************************************************
+
+1.  Click on **Windows Admin Center** in the top-left corner to return to the home page
 
 You'll notice that your AKSHCIHOST001 is already under management, so at this stage, you're ready to proceed to deploy the AKS on Azure Stack HCI management cluster onto your Windows Server 2019 Hyper-V host.
 
@@ -218,7 +234,11 @@ You'll notice that Windows Admin Center will validate memory, storage, networkin
 
 ![AKS on Azure Stack HCI Azure Registration in Windows Admin Center](/eval/media/aks_azure_reg.png "AKS on Azure Stack HCI Azure Registration in Windows Admin Center")
 
-**NOTE** - No charges will be incurred for using AKS on Azure Stack HCI during the preview. 
+*******************************************************************************************************
+
+**NOTE** - No charges will be incurred for using AKS on Azure Stack HCI during the preview.
+
+*******************************************************************************************************
 
 17. Once you've chosen your subscription, choose an **existing Resource Group** or **create a new one** - Your resource group should be in the **East US, Southeast Asia, or West Europe region**
 18. Click on **Next:Review**
@@ -230,9 +250,13 @@ You'll notice that Windows Admin Center will validate memory, storage, networkin
 
 ![AKS on Azure Stack HCI management cluster deployment started in Windows Admin Center](/eval/media/aks_deploy_started.png "AKS on Azure Stack HCI management cluster deployment started in Windows Admin Center")
 
+*******************************************************************************************************
+
 **NOTE 1** - Do not close the Windows Admin Center browser at this time. Leave it open and wait for successful completion.
 
 **NOTE 2** - You may receive a WinRM error message stating "Downloading virtual machine images and binaries for the AKS host failed" - this can be ignored, so **do not close/refresh the browser**.
+
+*******************************************************************************************************
 
 21.  Upon completion you should receive a notification of success. In this case, you can see deployment of the AKS on Azure Stack HCI management cluster took just over 11 minutes.
 
@@ -343,6 +367,7 @@ Get-AksHciCluster
 ```powershell
 Set-AksHciClusterNodeCount –Name akshciclus001 -linuxNodeCount 2 -windowsNodeCount 1
 ```
+*******************************************************************************************************
 
 **NOTE** - You can also scale your Control Plane nodes for this particular cluster, however it has to be **scaled independently from the worker nodes** themselves. You can scale the Control Plane nodes using the command. Before you run this command however, check that you have an extra 16GB memory left of your AKSHCIHost001 OS - if your host has been deployed with 64GB RAM, you may not have enough capacity for an additonal 2 Control Plane VMs.
 
@@ -351,6 +376,8 @@ Set-AksHciClusterNodeCount –Name akshciclus001 -controlPlaneNodeCount 3
 ```
 
 **NOTE** - the control plane node count should be an **odd** number, such as 1, 3, 5 etc.
+
+*******************************************************************************************************
 
 4. Once these steps have been completed, you can verify the details by running the following command:
 
