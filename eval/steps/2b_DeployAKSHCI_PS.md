@@ -238,6 +238,10 @@ $vnet = New-AksHciNetworkSetting -Name "mgmtvnet" -vSwitchName "InternalNAT" -ga
 
 5. With the **networking configuration** defined, you can now finalize the configuration of your AKS on Azure Stack HCI deployment
 
+*******************************************************************************************************
+**IMPORTANT NOTE** - MSFT PLEASE CHECK OSGWIKI TO CHECK THE LATEST INTERNAL SET-AKSHCICONFIG PARAMETERS
+*******************************************************************************************************
+
 ```powershell
 Set-AksHciConfig -vnet $vnet -imageDir "V:\AKS-HCI\Images" -cloudConfigLocation "V:\AKS-HCI\Config" -Verbose
 ```
@@ -250,7 +254,7 @@ This command will take a few moments to complete, but once done, you should see 
 
 Now, if you make a mistake, simply run **Set-AksHciConfig** without any parameters, and that will reset your configuration.
 
-6. With the configuration files finalized, you need to **finalize the registration configuration**. From your **administrative PowerShell** window, run the following commands:
+1. With the configuration files finalized, you need to **finalize the registration configuration**. From your **administrative PowerShell** window, run the following commands:
 
 ```powershell
 # Login to Azure
