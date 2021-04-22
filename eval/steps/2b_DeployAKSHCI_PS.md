@@ -19,9 +19,13 @@ Contents
 - [Product improvements](#product-improvements)
 - [Raising issues](#raising-issues)
 
+*******************************************************************************************************
+
 ### Important Note ###
 
 In this step, you'll be using PowerShell to deploy AKS on Azure Stack HCI. If you prefer to use Windows Admin Center, which may provide more familiarity, head on over to the [Windows Admin Center guide](/eval/steps/2a_DeployAKSHCI_WAC.md).
+
+*******************************************************************************************************
 
 Architecture
 -----------
@@ -250,7 +254,11 @@ This command will take a few moments to complete, but once done, you should see 
 
 ![Output of Set-AksHciConfig](/eval/media/akshci_config_new.png "Output of Set-AksHciConfig")
 
+*******************************************************************************************************
+
 **NOTE** - If you're interested in learning more about some of the other parameters that can be used when defining your configuration, make sure you take a [look at the official documentation](https://docs.microsoft.com/en-us/azure-stack/aks-hci/setup-powershell#step-3-configure-your-deployment "Official documentation for defining your configuration file").
+
+*******************************************************************************************************
 
 Now, if you make a mistake, simply run **Set-AksHciConfig** without any parameters, and that will reset your configuration.
 
@@ -381,6 +389,8 @@ Set-AksHciCluster –Name akshciclus001 -linuxNodeCount 1 -windowsNodeCount 1
 Set-AksHciCluster –Name akshciclus001 -linuxNodeCount 2 -windowsNodeCount 1
 ```
 
+*******************************************************************************************************
+
 **NOTE** - You can also scale your Control Plane nodes for this particular cluster, however it has to be **scaled independently from the worker nodes** themselves. You can scale the Control Plane nodes using the command:
 
 ```powershell
@@ -388,6 +398,8 @@ Set-AksHciCluster –Name akshciclus001 -controlPlaneNodeCount 3
 ```
 
 **NOTE** - the control plane node count should be an **odd** number, such as 1, 3, 5 etc.
+
+*******************************************************************************************************
 
 5. Once these steps have been completed, you can verify the details by running the following command:
 
