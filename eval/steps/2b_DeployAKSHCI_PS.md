@@ -303,30 +303,7 @@ After you've configured your deployment, you're now ready to start the installat
 Install-AksHci
 ```
 
-This will take a few minutes.
-
-9. Once deployment is completed, you can verify the details by running the following command:
-
-```powershell
-Get-AksHciCluster
-```
-
-Your output should look like this:
-
-![Output of Get-AksHciCluster](/eval/media/get_akshcicluster_new.png "Output of Get-AksHciCluster")
-
-With the cluster verified, if you'd like to access the cluster using **kubectl** (which was installed on your host as part of the overall installation process), you'll first need a **kubeconfig file**.
-
-10. To retrieve the kubeconfig file, you'll need to run the following commands from your **administrative PowerShell**:
-
-```powershell
-Get-AksHciCredential -Name clustergroup-management
-dir $env:USERPROFILE\.kube
-```
-
-![Output of Get-AksHciCredential](/eval/media/get_akshcicred.png "Output of Get-AksHciCredential")
-
-The **default** output of this command is to create the kubeconfig file in **%USERPROFILE%\\.kube.** folder, and will name the file **config**, as you can see in the above image. This is important, because if you choose to run Get-AksHciCredential again, against a different cluster, this **config** file will be **overwritten**.
+This will take a few minutes, so please be patient and allow the process to finish.
 
 ### Updates and Cleanup ###
 To learn more about **updating**, **redeploying** or **uninstalling** AKS on Azure Stack HCI, you can [read the official documentation here.](https://docs.microsoft.com/en-us/azure-stack/aks-hci/setup-powershell#update-to-the-latest-version-of-azure-kubernetes-service-on-azure-stack-hci "Official documentation on updating, redeploying and uninstalling AKS on Azure Stack HCI")
@@ -363,25 +340,21 @@ This command will deploy a new Kubernetes cluster named **akshciclus001** with a
 
 To get a list of available VM sizes, run **Get-AksHciVmSize**
 
-The deployment of this Kubernetes workload cluster should take a few minutes, and once complete, should present an output like this:
-
-3. Once deployment is completed, you can verify the details by running the following command:
+The deployment of this Kubernetes workload cluster should take a few minutes, and once complete, should present information about the deployment, however you can verify the details by running the following command:
 
 ```powershell
 Get-AksHciCluster
 ```
 
-Notice that this time, this command lists both the management cluster and also the new workload cluster.
-
 ![Output of Get-AksHciCluster](/eval/media/get_akshcicluster_2.png "Output of Get-AksHciCluster")
 
-4. Next, you'll scale your Kubernetes cluster to **add a Windows worker node**. Note, this will trigger the download and extraction of a Windows container host image, which will take a few minutes, so please be patient.
+3. Next, you'll scale your Kubernetes cluster to **add a Windows worker node**. Note, this will trigger the download and extraction of a Windows container host image, which will take a few minutes, so please be patient.
 
 ```powershell
 Set-AksHciCluster –Name akshciclus001 -linuxNodeCount 1 -windowsNodeCount 1
 ```
 
-5. Next, you'll scale your Kubernetes cluster to have **2 Linux worker nodes**:
+4. Next, you'll scale your Kubernetes cluster to have **2 Linux worker nodes**:
 
 ```powershell
 Set-AksHciCluster –Name akshciclus001 -linuxNodeCount 2 -windowsNodeCount 1
@@ -399,17 +372,17 @@ Set-AksHciCluster –Name akshciclus001 -controlPlaneNodeCount 3
 
 *******************************************************************************************************
 
-6. Once these steps have been completed, you can verify the details by running the following command:
+5. Once these steps have been completed, you can verify the details by running the following command:
 
 ```powershell
 Get-AksHciCluster
 ```
 
-![Output of Get-AksHciCluster](/eval/media/get_akshcicluster_3.png "Output of Get-AksHciCluster")
+![Output of Get-AksHciCluster](/eval/media/get_akshcicluster_4.png "Output of Get-AksHciCluster")
 
 To access this **akshciclus001** cluster using **kubectl** (which was installed on your host as part of the overall installation process), you'll first need the **kubeconfig file**.
 
-7. To retrieve the kubeconfig file for the akshciclus001 cluster, you'll need to run the following command from your **administrative PowerShell**:
+6. To retrieve the kubeconfig file for the akshciclus001 cluster, you'll need to run the following command from your **administrative PowerShell** and accept the prompt when prompted:
 
 ```powershell
 Get-AksHciCredential -Name akshciclus001
@@ -418,7 +391,7 @@ dir $env:USERPROFILE\.kube
 
 ![Output of Get-AksHciCredential](/eval/media/get_akshcicred_2.png "Output of Get-AksHciCredential")
 
-As we saw earlier, the **default** output of this command is to create the kubeconfig file in **%USERPROFILE%\\.kube.** folder, and will name the file **config**. This **config** file will overwrite the previous kubeconfig file for the management cluster retrieved earlier.
+The **default** output of this command is to create the kubeconfig file in **%USERPROFILE%\\.kube.** folder, and will name the file **config**. This **config** file will overwrite the previous kubeconfig file retrieved earlier. You can also specify a custom location by using **-configPath c:\myfiles\kubeconfig**
 
 ### Updates and Cleanup ###
 To learn more about **updating**, **redeploying** or **uninstalling** AKS on Azure Stack HCI, you can [read the official documentation here.](https://docs.microsoft.com/en-us/azure-stack/aks-hci/create-kubernetes-cluster-powershell#step-3-upgrade-kubernetes-version "Official documentation on updating, redeploying and uninstalling AKS on Azure Stack HCI")
