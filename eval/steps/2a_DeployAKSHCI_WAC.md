@@ -91,7 +91,7 @@ Your Azure VM deployment automatically installed Windows Admin Center 2103, whic
 
 1. Navigate to your **Downloads folder**, then into the **previously-extracted AKS-HCI Public Preview folder**
 2. **Double-click** the Windows Admin Center MSI file to start the update process
-3. Follow the installation wizard, leaving the **default selections** to complete the upgrade of Windows Admin Center
+3. Follow the installation wizard, make the selections for diagnostic data and the use of Microsoft Update, leaving the **default selections** for the rest of the options, to complete the upgrade of Windows Admin Center. This will take a few minutes to complete.
 
 *******************************************************************************************************
 
