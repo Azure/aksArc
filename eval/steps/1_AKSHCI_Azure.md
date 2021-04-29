@@ -34,9 +34,13 @@ From an architecture perspective, the following graphic showcases the different 
 
 The outer box represents the Azure Resource Group, which will contain all of the artifacts deployed in Azure, including the virtual machine itself, and accompaying network adapter, storage and so on. You'll deploy an Azure VM running Windows Server 2019 Datacenter. Once deployed, you'll perform some host configuration, and then begin to deploy the other key components. Firstly, on the left hand side, you'll deploy the management cluster. This provides the the core orchestration mechanism and interface for deploying and managing one or more target clusters, which are shown on the right of the diagram. These target, or workload clusters contain worker nodes and are where application workloads run. These are managed by a management cluster. If you're interested in learning more about the building blocks of the Kubernetes infrastructure, you can [read more here](https://docs.microsoft.com/en-us/azure-stack/aks-hci/kubernetes-concepts "Kubernetes core concepts for Azure Kubernetes Service on Azure Stack HCI").
 
+*******************************************************************************************************
+
 Important Note
 -----------
 The steps outlined in this evaluation guide are **specific to running inside an Azure VM**, running a single Windows Server 2019 OS, without a domain environment configured. If you plan to use these steps in an alternative environment, such as one nested/physical on-premises, or in a domain-joined environment, the steps may differ and certain procedures may not work. If that is the case, please refer to the [official documentation to deploy AKS on Azure Stack HCI](https://docs.microsoft.com/en-us/azure-stack/aks-hci/ "official documentation to deploy AKS on Azure Stack HCI").
+
+*******************************************************************************************************
 
 Get an Azure subscription
 -----------
@@ -83,11 +87,15 @@ For reference, the Standard_D16s_v4 VM size costs approximately US $0.77 per hou
 
 For reference, the Standard_E8s_v4 VM size costs approximately US $0.50 per hour based on East US region, under a Visual Studio subscription.
 
+*******************************************************************************************************
+
 **NOTE 1** - A number of these VM sizes include temp storage, which offers high performance, but is not persistent through reboots, Azure host migrations and more. It's therefore advisable, that if you are going to be running the Azure VM for a period of time, but shutting down frequently, that you choose a VM size with no temp storage, and ensure your nested VMs are placed on the persistent data drive within the OS.
 
 **NOTE 2** - It's strongly recommended that you choose a VM size that supports **premium storage** - when running nested virtual machines, increasing the number of available IOPS can have a significant impact on performance, hence choosing **premium storage** over Standard HDD or Standard SSD, is strongly advised. Refer to the table above to make the most appropriate selection.
 
 **NOTE 3** - Please ensure that whichever VM size you choose, it [supports nested virtualization](https://docs.microsoft.com/en-us/azure/virtual-machines/acu "Nested virtualization support") and is [available in your chosen region](https://azure.microsoft.com/en-us/global-infrastructure/services/?products=virtual-machines "Virtual machines available by region").
+
+*******************************************************************************************************
 
 Deploying the Azure VM
 -----------
@@ -125,7 +133,11 @@ Upon clicking the **Deploy to Azure** button, enter the details, which should lo
 
 ![Custom template deployment in Azure](/eval/media/azure_vm_custom_template_new.png "Custom template deployment in Azure")
 
+*******************************************************************************************************
+
 **NOTE** - For customers with Software Assurance, Azure Hybrid Benefit for Windows Server allows you to use your on-premises Windows Server licenses and run Windows virtual machines on Azure at a reduced cost. By selecting **Yes** for the "Already have a Windows Server License", **you confirm I have an eligible Windows Server license with Software Assurance or Windows Server subscription to apply this Azure Hybrid Benefit** and have reviewed the [Azure hybrid benefit compliance](http://go.microsoft.com/fwlink/?LinkId=859786 "Azure hybrid benefit compliance document")
+
+*******************************************************************************************************
 
 The custom template will be validated, and if all of your entries are correct, you can click **Create**. Within a few minutes, your VM will be created.
 
@@ -262,9 +274,13 @@ $getIp = Get-AzPublicIpAddress -Name "AKSHCILabPubIp" -ResourceGroupName $rgName
 $getIp | Select-Object Name,IpAddress,@{label='FQDN';expression={$_.DnsSettings.Fqdn}}
 ```
 
+*******************************************************************************************************
+
 **NOTE 1** - When running the above script, if your VM size contains an 's', such as 'Standard_E16**s**_v4' it can use **Premium LRS storage**. If it does not contain an 's', it can only deploy with a Standard SSD. Refer to the [table earlier](#azure-vm-size-considerations) to determine the appropriate size for your deployment.
 
 **NOTE 2** - For customers with Software Assurance, Azure Hybrid Benefit for Windows Server allows you to use your on-premises Windows Server licenses and run Windows virtual machines on Azure at a reduced cost. By removing the comment in the script above, for the -LicenseType parameter, **you confirm you have an eligible Windows Server license with Software Assurance or Windows Server subscription to apply this Azure Hybrid Benefit** and have reviewed the [Azure hybrid benefit compliance document](http://go.microsoft.com/fwlink/?LinkId=859786 "Azure hybrid benefit compliance document")
+
+*******************************************************************************************************
 
 Once you've made your size and region selection, based on the information provided earlier, run the PowerShell script and wait around 10 minutes for your VM deployment to complete.
 
@@ -363,7 +379,11 @@ Get-DscConfigurationStatus
 
 ![Result of Get-DscConfigurationStatus](/eval/media/get-dscconfigurationstatus2.png "Result of Get-DscConfigurationStatus")
 
+*******************************************************************************************************
+
 **NOTE** - If this doesn't fix your issue, consider redeploying your Azure VM. If the issue persists, please **raise an issue!**
+
+*******************************************************************************************************
 
 Product improvements
 -----------

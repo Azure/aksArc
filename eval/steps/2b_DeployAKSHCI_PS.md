@@ -11,6 +11,7 @@ Contents
 - [Architecture](#architecture)
 - [Prepare environment](#prepare-environment)
 - [Optional - Enable/Disable DHCP](#optional---enabledisable-dhcp)
+- [Enable Azure integration](#enable-azure-integration)
 - [Download artifacts](#download-artifacts)
 - [Deploying AKS on Azure Stack HCI management cluster](#deploying-aks-on-azure-stack-hci-management-cluster)
 - [Create a Kubernetes cluster (Target cluster)](#create-a-kubernetes-cluster-target-cluster)
@@ -18,9 +19,13 @@ Contents
 - [Product improvements](#product-improvements)
 - [Raising issues](#raising-issues)
 
+*******************************************************************************************************
+
 ### Important Note ###
 
 In this step, you'll be using PowerShell to deploy AKS on Azure Stack HCI. If you prefer to use Windows Admin Center, which may provide more familiarity, head on over to the [Windows Admin Center guide](/eval/steps/2a_DeployAKSHCI_WAC.md).
+
+*******************************************************************************************************
 
 Architecture
 -----------
@@ -40,6 +45,7 @@ Before you deploy AKS on Azure Stack HCI, there are a few steps required to prep
 1. Run the following **PowerShell command as administrator**:
 
 ```powershell
+Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
 Install-PackageProvider -Name NuGet -Force 
 Install-Module -Name PowershellGet -Force -Confirm:$false -SkipPublisherCheck
 ```
@@ -71,9 +77,92 @@ $dhcpState = "Active" # Or Inactive
 Set-DhcpServerv4Scope -ScopeId 192.168.0.0 -State $dhcpState -Verbose
 ```
 
+Enable Azure integration
+-----------
+Before downloading and deploying AKS on Azure Stack HCI, there are a set of steps that are required to prepare your Azure environment for integration. This can be performed using Azure CLI, but for the purpose of this guide, you will be using PowerShell
+
+Now, seeing as you're deploying this evaluation in Azure, it assumes you already have a valid Azure subscription, but to confirm, in order to integrate AKS on Azure Stack HCI with an Azure subscription, you will need the following:
+
+* An Azure subscription with **at least one** of the following:
+   1. A user account with the built-in **Owner** role 
+   2. A Service Principal with either the built-in **Microsoft.Kubernetes connected cluster role** (Minimum), built-in **Contributer** role or built-in **Owner** role
+
+#### Optional - Create a new Service Principal ####
+
+If you need to create a new Service Principal, the following steps will create a new Service Principal, with the built-in **Microsoft.Kubernetes connected cluster role** and set the scope at the subscription level.
+
+```powershell
+# Login to Azure
+Connect-AzAccount
+
+# Optional - if you wish to switch to a different subscription
+# First, get all available subscriptions as the currently logged in user
+$subList = Get-AzSubscription
+# Display those in a grid, select the chosen subscription, then press OK.
+if (($subList).count -gt 1) {
+    $subList | Out-GridView -OutputMode Single | Set-AzContext
+}
+
+# Retrieve the current subscription ID
+$sub = (Get-AzContext).Subscription.Id
+
+# Create a unique name for the Service Principal
+$date = (Get-Date).ToString("MMddyy-HHmmss")
+$spName = "AksHci-SP-$date"
+
+# Create the Service Principal
+
+$sp = New-AzADServicePrincipal -DisplayName $spName `
+    -Role 'Microsoft.Kubernetes connected cluster role' `
+    -Scope "/subscriptions/$sub"
+
+# Retrieve the password for the Service Principal
+
+$secret = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto(
+    [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($sp.Secret)
+)
+
+Write-Host "Application ID: $($sp.ApplicationId)"
+Write-Host "App Secret: $secret"
+```
+
+From the above output, you have the **Application ID** and the **secret** for use when deploying AKS on Azure Stack HCI, so take a note of those and store them safely.
+
+With that created, in the **Azure portal**, under **Subscriptions**, **Access **Control****, and then **Role Assignments**, you should see your new Service Principal.
+
+![Service principal shown in Azure](/eval/media/akshci-spcreated.png "Service principal shown in Azure")
+
+#### Register the resource provider to your subscription ####
+Ahead of the registration process, you need to enable the appropriate resource provider in Azure for AKS on Azure Stack HCI integration. To do that, run the following PowerShell commands:
+
+```powershell
+# Login to Azure
+Connect-AzAccount
+
+# Optional - if you wish to switch to a different subscription
+# First, get all available subscriptions as the currently logged in user
+$subList = Get-AzSubscription
+# Display those in a grid, select the chosen subscription, then press OK.
+if (($subList).count -gt 1) {
+    $subList | Out-GridView -OutputMode Single | Set-AzContext
+}
+
+Register-AzResourceProvider -ProviderNamespace Microsoft.Kubernetes
+Register-AzResourceProvider -ProviderNamespace Microsoft.KubernetesConfiguration
+```
+
+This registration process can take up to 10 minutes, so please be patient. It only needs to be performed once on a particular subscription. To validate the registration process, run the following PowerShell command:
+
+```powershell
+Get-AzResourceProvider -ProviderNamespace Microsoft.Kubernetes
+Get-AzResourceProvider -ProviderNamespace Microsoft.KubernetesConfiguration
+```
+
+![Resource Provider enabled in Azure](/eval/media/akshci_rp_enable.png "Resource Provider enabled Azure")
+
 Download artifacts
 -----------
-In order to deploy AKS on Azure Stack HCI, you'll need to register, and then download the public preview software.  Once downloaded, you'll extract the files, and copy them to their final destinations before starting the deployment.
+In order to deploy AKS on Azure Stack HCI, you'll need to register, and then download the public preview software. Once downloaded, you'll extract the files, and copy them to their final destinations before starting the deployment.
 
 1. Inside your **AKSHCIHOST001 VM**, open **Microsoft Edge** and navigate to https://aka.ms/AKS-HCI-Evaluate
 2. Complete the registration form, and once completed, click on the **Download AKS on Azure Stack HCI** button to download the software
@@ -136,65 +225,85 @@ New-Item -Path "V:\AKS-HCI\" -Name "Config" -ItemType "directory" -Force
 Run the following command in your **administrative PowerShell window**:
 
 ```powershell
-$vnet = New-AksHciNetworkSetting -vnetName "InternalNAT" -vipPoolStart "192.168.0.150" -vipPoolEnd "192.168.0.250"
+$vnet = New-AksHciNetworkSetting -Name "mgmtvnet" -vSwitchName "InternalNAT" `
+    -vipPoolStart "192.168.0.150" -vipPoolEnd "192.168.0.250"
 ```
 
 #### If you wish to use Static IP addresses ####
 Run the following command in your **administrative PowerShell window**:
 
 ```powershell
-$vnet = New-AksHciNetworkSetting -vnetName "InternalNAT" -gateway "192.168.0.1" -dnsservers "192.168.0.1" `
+$vnet = New-AksHciNetworkSetting -Name "mgmtvnet" -vSwitchName "InternalNAT" -gateway "192.168.0.1" -dnsservers "192.168.0.1" `
     -ipaddressprefix "192.168.0.0/16" -k8snodeippoolstart "192.168.0.3" -k8snodeippoolend "192.168.0.149" `
     -vipPoolStart "192.168.0.150" -vipPoolEnd "192.168.0.250"
 ```
 
 5. With the **networking configuration** defined, you can now finalize the configuration of your AKS on Azure Stack HCI deployment
 
+*******************************************************************************************************
+**IMPORTANT NOTE** - MSFT PLEASE CHECK OSGWIKI TO CHECK THE LATEST INTERNAL SET-AKSHCICONFIG PARAMETERS
+*******************************************************************************************************
+
 ```powershell
-Set-AksHciConfig -vnet $vnet -imageDir "V:\AKS-HCI\Images" -cloudConfigLocation "V:\AKS-HCI\Config" `
-    -enableDiagnosticData -Verbose
+Set-AksHciConfig -vnet $vnet -imageDir "V:\AKS-HCI\Images" -cloudConfigLocation "V:\AKS-HCI\Config" -Verbose
 ```
 
 This command will take a few moments to complete, but once done, you should see confirmation that the configuration has been saved.
 
 ![Output of Set-AksHciConfig](/eval/media/akshci_config_new.png "Output of Set-AksHciConfig")
 
+*******************************************************************************************************
+
 **NOTE** - If you're interested in learning more about some of the other parameters that can be used when defining your configuration, make sure you take a [look at the official documentation](https://docs.microsoft.com/en-us/azure-stack/aks-hci/setup-powershell#step-3-configure-your-deployment "Official documentation for defining your configuration file").
+
+*******************************************************************************************************
 
 Now, if you make a mistake, simply run **Set-AksHciConfig** without any parameters, and that will reset your configuration.
 
+6. With the configuration files finalized, you need to **finalize the registration configuration**. From your **administrative PowerShell** window, run the following commands:
+
+```powershell
+# Login to Azure
+Connect-AzAccount
+
+# Optional - if you wish to switch to a different subscription
+# First, get all available subscriptions as the currently logged in user
+$subList = Get-AzSubscription
+# Display those in a grid, select the chosen subscription, then press OK.
+if (($subList).count -gt 1) {
+    $subList | Out-GridView -OutputMode Single | Set-AzContext
+}
+
+# Retrieve the subscription and tenant ID
+$sub = (Get-AzContext).Subscription.Id
+$tenant = (Get-AzContext).Subscription.Id
+
+# First create a resource group in Azure that will contain the registration artifacts
+$rg = (New-AzResourceGroup -Name AksHciAzureEval -Location "East US" -Force).ResourceGroupName
+```
+7. You then need to run the **Set-AksHciRegistration** command, and this will vary depending on the type of login you prefer:
+
+```powershell
+# For an Interactive Login with a user account:
+Set-AksHciRegistration -SubscriptionId $sub -ResourceGroupName $rg
+
+# For a device login or if you are running in a headless shell, again with a user account:
+Set-AksHciRegistration -SubscriptionId $sub -ResourceGroupName $rg -UseDeviceAuthentication
+
+# To use your Service Principal, first enter your Service Principal credentials (app ID, secret) then set the registration
+$cred = Get-Credential
+Set-AksHciRegistration -SubscriptionId $sub -ResourceGroupName $rg -TenantId $tenant -Credential $cred
+```
+
 After you've configured your deployment, you're now ready to start the installation process, which will install the AKS on Azure Stack HCI management cluster.
 
-1. From your **administrative PowerShell** window, run the following command:
+8. From your **administrative PowerShell** window, run the following command:
 
 ```powershell
 Install-AksHci
 ```
 
-This will take a few minutes.
-
-7. Once deployment is completed, you can verify the details by running the following command:
-
-```powershell
-Get-AksHciCluster
-```
-
-Your output should look like this:
-
-![Output of Get-AksHciCluster](/eval/media/get_akshcicluster_new.png "Output of Get-AksHciCluster")
-
-With the cluster verified, if you'd like to access the cluster using **kubectl** (which was installed on your host as part of the overall installation process), you'll first need a **kubeconfig file**.
-
-8. To retrieve the kubeconfig file, you'll need to run the following commands from your **administrative PowerShell**:
-
-```powershell
-Get-AksHciCredential -Name clustergroup-management
-dir $env:USERPROFILE\.kube
-```
-
-![Output of Get-AksHciCredential](/eval/media/get_akshcicred.png "Output of Get-AksHciCredential")
-
-The **default** output of this command is to create the kubeconfig file in **%USERPROFILE%\\.kube.** folder, and will name the file **config**, as you can see in the above image. This is important, because if you choose to run Get-AksHciCredential again, against a different cluster, this **config** file will be **overwritten**.
+This will take a few minutes, so please be patient and allow the process to finish.
 
 ### Updates and Cleanup ###
 To learn more about **updating**, **redeploying** or **uninstalling** AKS on Azure Stack HCI, you can [read the official documentation here.](https://docs.microsoft.com/en-us/azure-stack/aks-hci/setup-powershell#update-to-the-latest-version-of-azure-kubernetes-service-on-azure-stack-hci "Official documentation on updating, redeploying and uninstalling AKS on Azure Stack HCI")
@@ -231,37 +340,37 @@ This command will deploy a new Kubernetes cluster named **akshciclus001** with a
 
 To get a list of available VM sizes, run **Get-AksHciVmSize**
 
-The deployment of this Kubernetes workload cluster should take a few minutes, and once complete, should present an output like this:
-
-3. Once deployment is completed, you can verify the details by running the following command:
+The deployment of this Kubernetes workload cluster should take a few minutes, and once complete, should present information about the deployment, however you can verify the details by running the following command:
 
 ```powershell
 Get-AksHciCluster
 ```
 
-Notice that this time, this command lists both the management cluster and also the new workload cluster.
-
 ![Output of Get-AksHciCluster](/eval/media/get_akshcicluster_2.png "Output of Get-AksHciCluster")
 
-1. Next, you'll scale your Kubernetes cluster to **add a Windows worker node**. Note, this will trigger the download and extraction of a Windows container host image, which will take a few minutes, so please be patient.
+3. Next, you'll scale your Kubernetes cluster to **add a Windows worker node**. Note, this will trigger the download and extraction of a Windows container host image, which will take a few minutes, so please be patient.
 
 ```powershell
-Set-AksHciClusterNodeCount –Name akshciclus001 -linuxNodeCount 1 -windowsNodeCount 1
+Set-AksHciCluster –Name akshciclus001 -linuxNodeCount 1 -windowsNodeCount 1
 ```
 
-5. Next, you'll scale your Kubernetes cluster to have **2 Linux worker nodes**:
+4. Next, you'll scale your Kubernetes cluster to have **2 Linux worker nodes**:
 
 ```powershell
-Set-AksHciClusterNodeCount –Name akshciclus001 -linuxNodeCount 2 -windowsNodeCount 1
+Set-AksHciCluster –Name akshciclus001 -linuxNodeCount 2 -windowsNodeCount 1
 ```
 
-**NOTE** - You can also scale your Control Plane nodes for this particular cluster, however it has to be **scaled independently from the worker nodes** themselves. You can scale the Control Plane nodes using the command:
+*******************************************************************************************************
+
+**NOTE** - You can also scale your Control Plane nodes for this particular cluster, however it has to be **scaled independently from the worker nodes** themselves. You can scale the Control Plane nodes using the command. Before you run this command however, check that you have an extra 16GB memory left of your AKSHCIHost001 OS - if your host has been deployed with 64GB RAM, you may not have enough capacity for an additonal 2 Control Plane VMs.
 
 ```powershell
-Set-AksHciClusterNodeCount –Name akshciclus001 -controlPlaneNodeCount 3
+Set-AksHciCluster –Name akshciclus001 -controlPlaneNodeCount 3
 ```
 
 **NOTE** - the control plane node count should be an **odd** number, such as 1, 3, 5 etc.
+
+*******************************************************************************************************
 
 5. Once these steps have been completed, you can verify the details by running the following command:
 
@@ -269,11 +378,11 @@ Set-AksHciClusterNodeCount –Name akshciclus001 -controlPlaneNodeCount 3
 Get-AksHciCluster
 ```
 
-![Output of Get-AksHciCluster](/eval/media/get_akshcicluster_3.png "Output of Get-AksHciCluster")
+![Output of Get-AksHciCluster](/eval/media/get_akshcicluster_4.png "Output of Get-AksHciCluster")
 
 To access this **akshciclus001** cluster using **kubectl** (which was installed on your host as part of the overall installation process), you'll first need the **kubeconfig file**.
 
-6. To retrieve the kubeconfig file for the akshciclus001 cluster, you'll need to run the following command from your **administrative PowerShell**:
+6. To retrieve the kubeconfig file for the akshciclus001 cluster, you'll need to run the following command from your **administrative PowerShell** and accept the prompt when prompted:
 
 ```powershell
 Get-AksHciCredential -Name akshciclus001
@@ -282,7 +391,7 @@ dir $env:USERPROFILE\.kube
 
 ![Output of Get-AksHciCredential](/eval/media/get_akshcicred_2.png "Output of Get-AksHciCredential")
 
-As we saw earlier, the **default** output of this command is to create the kubeconfig file in **%USERPROFILE%\\.kube.** folder, and will name the file **config**. This **config** file will overwrite the previous kubeconfig file for the management cluster retrieved earlier.
+The **default** output of this command is to create the kubeconfig file in **%USERPROFILE%\\.kube.** folder, and will name the file **config**. This **config** file will overwrite the previous kubeconfig file retrieved earlier. You can also specify a custom location by using **-configPath c:\myfiles\kubeconfig**
 
 ### Updates and Cleanup ###
 To learn more about **updating**, **redeploying** or **uninstalling** AKS on Azure Stack HCI, you can [read the official documentation here.](https://docs.microsoft.com/en-us/azure-stack/aks-hci/create-kubernetes-cluster-powershell#step-3-upgrade-kubernetes-version "Official documentation on updating, redeploying and uninstalling AKS on Azure Stack HCI")
