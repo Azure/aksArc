@@ -12,6 +12,7 @@ Contents
 - [Set Microsoft Edge as default browser](#set-microsoft-edge-as-default-browser)
 - [Allow popups in Edge browser](#allow-popups-in-edge-browser)
 - [Download artifacts](#download-artifacts)
+- [Update Windows Admin Center](#update-windows-admin-center)
 - [Configure Windows Admin Center](#configure-windows-admin-center)
 - [Finalize Azure integration](#finalize-azure-integration)
 - [Optional - Enable/Disable DHCP](#optional---enabledisable-dhcp)
@@ -78,41 +79,52 @@ In order to deploy AKS on Azure Stack HCI, you'll need to register, and then dow
 
 ![Folder containing key AKS-HCI files](/eval/media/akshci_wac_folders.png "Folder containing key AKS-HCI files")
 
-In this folder, you'll find a number of important files. You'll see a zip file containing the PowerShell modules, a text file, a PowerShell Script file, along with a **Windows Admin Center extension**, which you'll use later.
+In this folder, you'll find a number of important files. You'll see a zip file containing the PowerShell modules, a text file, a PowerShell Script file, an updated Windows Admin Center MSI file, along with a **Windows Admin Center extension**, which you'll use later.
+
+Update Windows Admin Center
+-----------
+Your Azure VM deployment automatically installed Windows Admin Center 2103, which is the public build currently available.
+
+*******************************************************************************************************
+
+**IMPORTANT** - For the April release of AKS on Azure Stack HCI, an **updated version of Windows Admin Center is required**. This updated build can be found within the extracted zip file.  To update the installed version of Windows Admin Center, follow these steps:
+
+1. Navigate to your **Downloads folder**, then into the **previously-extracted AKS-HCI Public Preview folder**
+2. **Double-click** the Windows Admin Center MSI file to start the update process
+3. Follow the installation wizard, leaving the **default selections** to complete the upgrade of Windows Admin Center
+
+*******************************************************************************************************
 
 Configure Windows Admin Center
 -----------
-The Azure VM deployment has already deployed Windows Admin Center, and updated all the extensions that are pre-installed, however there are some additional configuration steps that must be performed before you can use it to deploy AKS on Azure Stack HCI.
+With Windows Admin Center installed and updated, there are some additional configuration steps that must be performed before you can use it to deploy AKS on Azure Stack HCI.
 
 1. **Double-click the Windows Admin Center** shortcut on the desktop.
 2. Once Windows Admin Center is open, you may receive notifications in the top-right corner, indicating that some extensions are updating automatically. **Let these finish updating before proceeding**. Windows Admin Center may refresh automatically during this process. Once complete, **minimize Windows Admin Center**.
-
-![Windows Admin Center extensions available](/eval/media/extension_update.png "Windows Admin Center extensions available")
-
-5. Open **File Explorer** and navigate to **C:\\**. Right-click and select **New**, **Folder** and enter **"Feed"** as the new name for the folder.
-6. Navigate to your **Downloads folder**, then into the **previously-extracted AKS-HCI Public Preview folder**
-7. Select the **NUPKG file**, right-click and select **copy**, then navigate to **C:\Feed** and paste into this folder.
-8. With the NUPKG file in your C:\Feed folder, maximize Windows Admin Center.  Navigate to **Settings**, then **Extensions**, and finally, click on **Feeds**
-9.  On the Feeds page, click **Add**. In the **"Add package source"** blade, enter **"C:\Feed"** (without the quotes) and click **Add** in the bottom-right corner.
+3. Open **File Explorer** and navigate to **C:\\**. Right-click and select **New**, **Folder** and enter **"Feed"** as the new name for the folder.
+4. Navigate to your **Downloads folder**, then into the **previously-extracted AKS-HCI Public Preview folder**
+5. Select the **NUPKG file**, right-click and select **copy**, then navigate to **C:\Feed** and paste into this folder.
+6. With the NUPKG file in your C:\Feed folder, maximize Windows Admin Center.  Navigate to **Settings**, then **Extensions**, and finally, click on **Feeds**
+7.  On the Feeds page, click **Add**. In the **"Add package source"** blade, enter **"C:\Feed"** (without the quotes) and click **Add** in the bottom-right corner.
 
 ![Adding an extension feed in Windows Admin Center](/eval/media/add_feed.png "Adding an extension feed in Windows Admin Center")
 
-10. Click on **Available extensions** and you should now see **Azure Kubernetes Service** listed as available
+8. Click on **Available extensions** and you should now see **Azure Kubernetes Service** listed as available
 
 ![Available extensions in Windows Admin Center](/eval/media/available_extensions.png "Available extensions in Windows Admin Center")
 
-11. To install the extension, simply click on it, and click **Install** and then **OK**. Within a few moments, this will be completed. You can double-check by navigating to **Installed extensions**, where you should see Azure Kubernetes Service listed as **Installed**
+9. To install the extension, simply click on it, and click **Install** and then **OK**. Within a few moments, this will be completed. You can double-check by navigating to **Installed extensions**, where you should see Azure Kubernetes Service listed as **Installed**
 
 With your extensions correctly deployed, in order to deploy AKS-HCI with Windows Admin Center, you need to connect your Windows Admin Center instance to Azure.
 
-12. Click on **Settings** then under **Gateway** click on **Azure**.
-13. Click **Register**, and in the **Get started with Azure in Windows Admin Center** blade, follow the instructions to **Copy the code** and then click on the link to configure device login.
-14. When prompted for credentials, **enter your Azure credentials** for a tenant you'd like to use to register the Windows Admin Center
-15. Back in Windows Admin Center, you'll notice your tenant information has been added.  You can now click **Connect** to connect Windows Admin Center to Azure
+10. Click on **Settings** then under **Gateway** click on **Azure**.
+11.  Click **Register**, and in the **Get started with Azure in Windows Admin Center** blade, follow the instructions to **Copy the code** and then click on the link to configure device login.
+12.  When prompted for credentials, **enter your Azure credentials** for a tenant you'd like to use to register the Windows Admin Center
+13.  Back in Windows Admin Center, you'll notice your tenant information has been added.  You can now click **Connect** to connect Windows Admin Center to Azure
 
 ![Connecting Windows Admin Center to Azure](/eval/media/wac_azure_connect.png "Connecting Windows Admin Center to Azure")
 
-17. Click on **Sign in** and when prompted for credentials, **enter your Azure credentials** and you should see a popup that asks for you to accept the permissions, so click **Accept**
+14. Click on **Sign in** and when prompted for credentials, **enter your Azure credentials** and you should see a popup that asks for you to accept the permissions, so click **Accept**
 
 ![Permissions for Windows Admin Center](/eval/media/wac_azure_permissions.png "Permissions for Windows Admin Center")
 
