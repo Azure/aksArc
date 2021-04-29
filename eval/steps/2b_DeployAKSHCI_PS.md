@@ -240,10 +240,6 @@ $vnet = New-AksHciNetworkSetting -Name "mgmtvnet" -vSwitchName "InternalNAT" -ga
 
 5. With the **networking configuration** defined, you can now finalize the configuration of your AKS on Azure Stack HCI deployment
 
-*******************************************************************************************************
-**IMPORTANT NOTE** - MSFT PLEASE CHECK OSGWIKI TO CHECK THE LATEST INTERNAL SET-AKSHCICONFIG PARAMETERS
-*******************************************************************************************************
-
 ```powershell
 Set-AksHciConfig -vnet $vnet -imageDir "V:\AKS-HCI\Images" -cloudConfigLocation "V:\AKS-HCI\Config" -Verbose
 ```
