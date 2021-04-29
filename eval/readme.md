@@ -14,7 +14,7 @@ In this guide, we'll walk you deploying the [Azure Kubernetes Service (AKS) on A
 
 Version
 -----------
-This guide has been tested and validated with the **April 2021 Release Candidate** of AKS on Azure Stack HCI.
+This guide has been tested and validated with the **April 2021 release** of AKS on Azure Stack HCI.
 
 Contents
 -----------
