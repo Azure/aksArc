@@ -48,6 +48,9 @@ Before you deploy AKS on Azure Stack HCI, there are a few steps required to prep
 Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
 Install-PackageProvider -Name NuGet -Force 
 Install-Module -Name PowershellGet -Force -Confirm:$false -SkipPublisherCheck
+Install-Module -Name Az.Accounts -Repository PSGallery -Force -AllowClobber -RequiredVersion 2.2.4
+Install-Module -Name Az.Resources -Repository PSGallery -Force -AllowClobber -RequiredVersion 3.2.0
+Install-Module -Name AzureAD -Repository PSGallery -Force -AllowClobber -RequiredVersion 2.0.2.128
 ```
 
 2. Still in the **administrative PowerShell console**, run the following to uninstall previous modules and unregister private powershell repositories:
