@@ -34,7 +34,11 @@ kubectl get nodes
 
 ![Output of kubectl get nodes](/eval/media/kubectl_get_nodes.png "Output of kubectl get nodes")
 
+*******************************************************************************************************
+
 **NOTE** - if you receive an error that *"kubectl is not recognized as the name of a cmdlet, function, script file or operable program"*, you can either log out of the Azure VM, then log back in, or run the following command from your PowerShell console: **choco install kubernetes-cli**, then **close and re-open PowerShell**.
+
+*******************************************************************************************************
 
 If you've followed the steps in this eval guide, your output should look similar, with 2 Linux worker nodes and 3 control plane nodes.
 
@@ -58,7 +62,7 @@ During deployment, you may see the **External-IP** showing as *Pending* - when t
 
 In our case, you can see that the service has been allocated the **192.168.0.152** IP address.
 
-4. At this point, you should then be able to **open Microsoft Edge** and after accepting the defaults, you should be able to navigate to that IP address
+4. At this point, you should then be able to **open Microsoft Edge** and after accepting the defaults, you should be able to navigate to that IP address. Note, it may take a few moments to start
 
 ![Azure vote app in Edge](/eval/media/azure_vote_app.png "Azure vote app in Edge")
 
