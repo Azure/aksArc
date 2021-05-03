@@ -275,7 +275,7 @@ if (($subList).count -gt 1) {
 
 # Retrieve the subscription and tenant ID
 $sub = (Get-AzContext).Subscription.Id
-$tenant = (Get-AzContext).Subscription.Id
+$tenant = (Get-AzContext).Tenant.Id
 
 # First create a resource group in Azure that will contain the registration artifacts
 $rg = (New-AzResourceGroup -Name AksHciAzureEval -Location "East US" -Force).ResourceGroupName
