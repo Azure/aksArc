@@ -231,7 +231,7 @@ $vnet = New-AksHciNetworkSetting -Name "mgmtvnet" -vSwitchName "InternalNAT" -ga
 
 *******************************************************************************************************
 
-**NOTE** - Microsoft internal testers will need to add **-catalog** and **-ring** to the Set-AksHciConfig command. Refer to OSW Wiki for details.
+**NOTE** - Microsoft internal testers will need to add **-catalog** and **-ring** to the Set-AksHciConfig command. Refer to OSG Wiki for details.
 
 *******************************************************************************************************
 
