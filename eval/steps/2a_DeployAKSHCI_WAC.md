@@ -2,7 +2,7 @@ Deploy your AKS-HCI infrastructure with Windows Admin Center
 ==============
 Overview
 -----------
-With your Windows Server 2019 Hyper-V host up and running, it's now time to deploy AKS on Azure Stack HCI. You'll first use the Windows Admin Center to deploy the AKS on Azure Stack HCI management cluster onto your Windows Server 2019 Hyper-V host, and finally, deploy a target cluster, onto which you can test deployment of a workload.
+With your Windows Server 2019 Hyper-V host up and running, it's now time to deploy AKS on Azure Stack HCI. You'll first use Windows Admin Center to deploy the AKS on Azure Stack HCI management cluster onto your Windows Server 2019 Hyper-V host, and finally, deploy a target cluster, onto which you can test deployment of a workload.
 
 Contents
 -----------
@@ -37,7 +37,7 @@ From an architecture perspective, as shown earlier, this graphic showcases the d
 
 ![Architecture diagram for AKS on Azure Stack HCI in Azure](/eval/media/nested_virt_arch_ga.png "Architecture diagram for AKS on Azure Stack HCI in Azure")
 
-You've already deployed the outer box , which represents the Azure Resource Group. Inside here, you've deployed the virtual machine itself, and accompaying network adapter, storage and so on. You've also completed some host configuration
+You've already deployed the outer box, which represents the Azure Resource Group. Inside here, you've deployed the virtual machine itself, and accompaying network adapter, storage and so on. You've also completed some host configuration
 
 In this section, you'll first install and configure the Windows Admin Center. You'll use this to deploy the management cluster, also known as a management cluster. This provides the the core orchestration mechanism and interface for deploying and managing one or more target clusters, which are shown on the right of the diagram. These target, or workload clusters contain worker nodes and are where application workloads run. These are managed by a management cluster. If you're interested in learning more about the building blocks of the Kubernetes infrastructure, you can [read more here](https://docs.microsoft.com/en-us/azure-stack/aks-hci/kubernetes-concepts "Kubernetes core concepts for Azure Kubernetes Service on Azure Stack HCI").
 
