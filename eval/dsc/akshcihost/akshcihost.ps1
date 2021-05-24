@@ -623,5 +623,27 @@ configuration AKSHCIHost
             Protocol    = 'TCP'
             Description = 'Allow Windows Admin Center'
         }
+
+        script "SetRunFlag"
+        {
+            GetScript = {
+                $result = Test-Path -Path "C:\AksHciAzureEval.txt"
+                return @{ 'Result' = $result }
+            }
+
+            SetScript = {
+                #This is a simple flag to monitor number of runs
+                [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+                try { Invoke-WebRequest "http://bit.ly/AksHciAzureEval" -UseBasicParsing -DisableKeepAlive | Out-Null } catch { $_.Exception.Response.StatusCode.Value__ }
+                New-item -Path C:\ -Name "AksHciAzureEval.txt" -ItemType File -Force
+            }
+
+            TestScript = {
+                # Create and invoke a scriptblock using the $GetScript automatic variable, which contains a string representation of the GetScript.
+                $state = [scriptblock]::Create($GetScript).Invoke()
+                return $state.Result
+            }
+            DependsOn = '[cChocoInstaller]installChoco'
+        }
     }
 }
