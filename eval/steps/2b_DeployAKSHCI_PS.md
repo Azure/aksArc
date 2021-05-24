@@ -62,19 +62,11 @@ Unregister-PSRepository -Name AksHciPSGalleryPreview -ErrorAction:SilentlyContin
 Exit
 ```
 
-3. Open a new **administrative PowerShell console**, and run the following to install the required PowerShell modules:
+3. Open a new **administrative PowerShell console**, and run the following to install the required PowerShell module and dependencies:
 
 ```powershell
-Install-Module -Name Az.Accounts -Repository PSGallery -Force -AllowClobber -RequiredVersion 2.2.4
-Install-Module -Name Az.Resources -Repository PSGallery -Force -AllowClobber -RequiredVersion 3.2.0
-Install-Module -Name AzureAD -Repository PSGallery -Force -AllowClobber -RequiredVersion 2.0.2.128
+Install-Module -Name AksHci -Repository PSGallery -RequiredVersion 1.0.0 -AcceptLicense -Force
 ```
-
-*******************************************************************************************************
-
-**NOTE** - **Microsoft internal teams** - use the internal method documented on OSG Wiki to install the AKS-HCI PS modules
-
-*******************************************************************************************************
 
 4. Once complete, if you haven't already, make sure you **close all PowerShell windows**
 
@@ -229,12 +221,6 @@ $vnet = New-AksHciNetworkSetting -Name "mgmtvnet" -vSwitchName "InternalNAT" -ga
 
 5. With the **networking configuration** defined, you can now finalize the configuration of your AKS on Azure Stack HCI deployment
 
-*******************************************************************************************************
-
-**NOTE** - Microsoft internal testers will need to add **-catalog** and **-ring** to the Set-AksHciConfig command. Refer to OSG Wiki for details.
-
-*******************************************************************************************************
-
 ```powershell
 Set-AksHciConfig -vnet $vnet -imageDir "V:\AKS-HCI\Images" -cloudConfigLocation "V:\AKS-HCI\Config" -Verbose
 ```
@@ -251,7 +237,7 @@ This command will take a few moments to complete, but once done, you should see 
 
 Now, if you make a mistake, simply run **Set-AksHciConfig** without any parameters, and that will reset your configuration.
 
-6. With the configuration files finalized, you need to **finalize the registration configuration**. From your **administrative PowerShell** window, run the following commands:
+1. With the configuration files finalized, you need to **finalize the registration configuration**. From your **administrative PowerShell** window, run the following commands:
 
 ```powershell
 # Login to Azure
