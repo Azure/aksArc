@@ -11,7 +11,6 @@ Contents
 - [Architecture](#architecture)
 - [Set Microsoft Edge as default browser](#set-microsoft-edge-as-default-browser)
 - [Allow popups in Edge browser](#allow-popups-in-edge-browser)
-- [Update Windows Admin Center](#update-windows-admin-center)
 - [Configure Windows Admin Center](#configure-windows-admin-center)
 - [Validate Azure integration](#validate-azure-integration)
 - [Optional - Enable/Disable DHCP](#optional---enabledisable-dhcp)
@@ -152,7 +151,7 @@ The next section will walk through configuring the AKS on Azure Stack HCI manage
 
 ![Ready to deploy AKS-HCI with Windows Admin Center](/eval/media/aks_extension.png "Ready to deploy AKS-HCI with Windows Admin Center")
 
-You'll notice the terminology used refers to the **Azure Kubernetes Service Runtime on Windows Server​​** - the naming differs depending on if you're running the installation of AKS on a Windows Server 2019 platform, or the newer Azure Stack HCI 20H2 platform. The overall deployment experience is the same regardless of underlying platform.
+You'll notice the terminology used refers to the **Azure Kubernetes Service Runtime on Windows Server​​** - the naming differs depending on if you're running the installation of AKS on a Windows Server 2019 Hyper-V platform, or the newer Azure Stack HCI 20H2 platform. The overall deployment experience is the same regardless of underlying platform.
 
 3. Click on **Set up** to start the deployment process
 4. Firstly, review the prerequisites - your Azure VM environment will meet all the prerequisites, so you should be fine to click **Next: System checks**
@@ -195,7 +194,7 @@ You'll notice that Windows Admin Center will validate memory, storage, networkin
 
 *******************************************************************************************************
 
-**NOTE** - No charges will be incurred for using AKS on Azure Stack HCI during the preview.
+**NOTE** - No charges will be incurred for using AKS on Azure Stack HCI for free trial period of 60 days.
 
 *******************************************************************************************************
 
