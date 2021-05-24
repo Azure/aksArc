@@ -65,26 +65,13 @@ To give the optimal experience with Windows Admin Center, you should enable **Mi
 
 5. Close the **settings tab**.
 
-Update Windows Admin Center
------------
-Your Azure VM deployment automatically installed Windows Admin Center 2103, which is the public build currently available.
-
-*******************************************************************************************************
-
-**IMPORTANT** - For this release of AKS on Azure Stack HCI, an **updated version of Windows Admin Center is required**. Ensure you download the correct version from the Microsoft internal location. To update the installed version of Windows Admin Center, follow these steps:
-
-1. Navigate to your downloaded Windows Admin Center MSI file and **Double-click** to start the update process
-2. Follow the installation wizard, make the selections for diagnostic data and the use of Microsoft Update, leaving the **default selections** for the rest of the options, to complete the upgrade of Windows Admin Center. This will take a few minutes to complete.
-
-*******************************************************************************************************
-
 Configure Windows Admin Center
 -----------
-With Windows Admin Center installed and updated, there are some additional configuration steps that must be performed before you can use it to deploy AKS on Azure Stack HCI.
+Your Azure VM deployment automatically installed Windows Admin Center 2103, however there are some additional configuration steps that must be performed before you can use it to deploy AKS on Azure Stack HCI.
 
 1. **Double-click the Windows Admin Center** shortcut on the desktop.
-2. Once Windows Admin Center is open, you may receive notifications in the top-right corner, indicating that some extensions are updating automatically. **Let these finish updating before proceeding**. Windows Admin Center may refresh automatically during this process. Once complete, **minimize Windows Admin Center**.
-3. In Windows Admin Center, navigate to **Settings**, then **Extensions**
+2. Once Windows Admin Center is open, you may receive notifications in the top-right corner, indicating that some extensions are updating automatically. **Let these finish updating before proceeding**. Windows Admin Center may refresh automatically during this process.
+3. Once complete, navigate to **Settings**, then **Extensions**
 4. Click on **Available extensions** and you should see **Azure Kubernetes Service** listed as available
 
 ![Available extensions in Windows Admin Center](/eval/media/available_extensions.png "Available extensions in Windows Admin Center")
