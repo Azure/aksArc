@@ -229,7 +229,7 @@ There are two ways to create a Kubernetes cluster in Windows Admin Center.
 
 #### Option 1 ####
 1. From your Windows Admin Center landing page (https://akshcihost001), click on **+Add**.
-2. In the **Add or create resources blade**, in the **Kubernetes clusters (preview) tile**, click **Create new**
+2. In the **Add or create resources blade**, in the **Kubernetes clusters tile**, click **Create new**
 
 ![Create Kubernetes cluster in Windows Admin Center](/eval/media/create_cluster_method1.png "Create Kubernetes cluster in Windows Admin Center")
 

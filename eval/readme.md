@@ -1,9 +1,9 @@
-AKS on Azure Stack HCI (Preview) in Azure - Eval Guide
+AKS on Azure Stack HCI in Azure - Eval Guide
 ==============
 
-## Welcome to the AKS on Azure Stack HCI (Preview) in Azure - Eval Guide ##
+## Welcome to the AKS on Azure Stack HCI in Azure - Eval Guide ##
 
-In this guide, we'll walk you deploying the [Azure Kubernetes Service (AKS) on Azure Stack HCI (currently in preview) in an Azure VM](https://docs.microsoft.com/en-us/azure-stack/aks-hci/overview "link to the What is Azure Kubernetes Service on Azure Stack HCI documentation landing page"), and set the foundation for you to explore in your own time.  You'll cover aspects such as:
+In this guide, we'll walk you deploying the [Azure Kubernetes Service (AKS) on Azure Stack HCI in an Azure VM](https://docs.microsoft.com/en-us/azure-stack/aks-hci/overview "link to the What is Azure Kubernetes Service on Azure Stack HCI documentation landing page"), and set the foundation for you to explore in your own time.  You'll cover aspects such as:
 
 * Deploying and configuring a Windows Server 2019 Azure VM to host the infrastructure
 * Deployment of the AKS on Azure Stack HCI management cluster with Windows Admin Center and/or PowerShell
@@ -18,7 +18,7 @@ This guide has been tested and validated with the **April 2021 release** of AKS 
 
 Contents
 -----------
-- [Welcome to the AKS on Azure Stack HCI (Preview) in Azure - Eval Guide](#welcome-to-the-aks-on-azure-stack-hci-preview-in-azure---eval-guide)
+- [Welcome to the AKS on Azure Stack HCI in Azure - Eval Guide](#welcome-to-the-aks-on-azure-stack-hci-in-azure---eval-guide)
 - [Version](#version)
 - [Contents](#contents)
 - [What is AKS on Azure Stack HCI?](#what-is-aks-on-azure-stack-hci)
