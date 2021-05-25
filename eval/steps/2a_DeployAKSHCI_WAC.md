@@ -71,22 +71,20 @@ Your Azure VM deployment automatically installed Windows Admin Center 2103, howe
 1. **Double-click the Windows Admin Center** shortcut on the desktop.
 2. Once Windows Admin Center is open, you may receive notifications in the top-right corner, indicating that some extensions are updating automatically. **Let these finish updating before proceeding**. Windows Admin Center may refresh automatically during this process.
 3. Once complete, navigate to **Settings**, then **Extensions**
-4. Click on **Available extensions** and you should see **Azure Kubernetes Service** listed as available
+4. Click on **Installed extensions** and you should see **Azure Kubernetes Service** listed as installed
 
-![Available extensions in Windows Admin Center](/eval/media/available_extensions.png "Available extensions in Windows Admin Center")
+![Installed extensions in Windows Admin Center](/eval/media/installed_extensions.png "Installed extensions in Windows Admin Center")
 
-5. To install the extension, simply click on it, and click **Install** and then **OK**. Within a few moments, this will be completed. You can double-check by navigating to **Installed extensions**, where you should see Azure Kubernetes Service listed as **Installed**
+In order to deploy AKS-HCI with Windows Admin Center, you need to connect your Windows Admin Center instance to Azure.
 
-With your extension correctly deployed, in order to deploy AKS-HCI with Windows Admin Center, you need to connect your Windows Admin Center instance to Azure.
-
-6. Click on **Settings** then under **Gateway** click on **Azure**.
-7. Click **Register**, and in the **Get started with Azure in Windows Admin Center** blade, follow the instructions to **Copy the code** and then click on the link to configure device login.
-8.   When prompted for credentials, **enter your Azure credentials** for a tenant you'd like to use to register the Windows Admin Center
-9.   Back in Windows Admin Center, you'll notice your tenant information has been added.  You can now click **Connect** to connect Windows Admin Center to Azure
+5. Still in **Settings**, under **Gateway** click on **Azure**.
+6. Click **Register**, and in the **Get started with Azure in Windows Admin Center** blade, follow the instructions to **Copy the code** and then click on the link to configure device login.
+7.   When prompted for credentials, **enter your Azure credentials** for a tenant you'd like to use to register the Windows Admin Center
+8.   Back in Windows Admin Center, you'll notice your tenant information has been added.  You can now click **Connect** to connect Windows Admin Center to Azure
 
 ![Connecting Windows Admin Center to Azure](/eval/media/wac_azure_connect.png "Connecting Windows Admin Center to Azure")
 
-10. Click on **Sign in** and when prompted for credentials, **enter your Azure credentials** and you should see a popup that asks for you to accept the permissions, so click **Accept**
+9.  Click on **Sign in** and when prompted for credentials, **enter your Azure credentials** and you should see a popup that asks for you to accept the permissions. Make sure you select **Consent on behalf of your organization** then click **Accept**
 
 ![Permissions for Windows Admin Center](/eval/media/wac_azure_permissions.png "Permissions for Windows Admin Center")
 
@@ -106,11 +104,9 @@ In order to successfully deploy AKS on Azure Stack HCI with Windows Admin Center
 ![Your Azure AD app in Windows Admin Center](/eval/media/wac_azureadapp.png "Your Azure AD app in Windows Admin Center")
 
 3. Click on **View in Azure** to be taken to the Azure AD app portal, where you should see information about this app, including permissions required. If you're prompted to log in, provide appropriate credentials.
-4. Once logged in, under **Configured permissions**, you should see the **Microsoft.Graph (5)** listed with the status **Granted for...**
+4. Once logged in, under **Configured permissions**, you should see a few permissions listed with the status **Granted for...** and the name of your tenant. The **Microsoft Graph (5)** API permissions will show as **not granted** but this will be updated upon deployment
 
-![Confirm Azure AD app permissions in Windows Admin Center](/eval/media/wac_azuread_confirm.png "Confirm Azure AD app permissions in Windows Admin Center")
-
-5. If you **don't have the permissions shown in the graphic above**, click on **Grant admin consent for __________** and when prompted to confirm permissions, click **Yes**. This should then apply the correct permissions.
+![Confirm Azure AD app permissions in Windows Admin Center](/eval/media/wac_azuread_grant.png "Confirm Azure AD app permissions in Windows Admin Center")
 
 *******************************************************************************************************
 
@@ -120,11 +116,10 @@ In order to successfully deploy AKS on Azure Stack HCI with Windows Admin Center
 - Select **Microsoft Graph**, then **Delegated permissions**
 - Search for **Application.ReadWrite.All**, then if required, expand the **Application** dropdown
 - Select the **checkbox** and click **Add permissions**
-- Click on **Grant admin consent for __________** and when prompted to confirm permissions, click **Yes**
 
 *******************************************************************************************************
 
-6. Switch back to the **Windows Admin Center tab** and click on **Windows Admin Center** in the top-left corner to return to the home page
+5. Switch back to the **Windows Admin Center tab** and click on **Windows Admin Center** in the top-left corner to return to the home page
 
 You'll notice that your AKSHCIHOST001 is already under management, so at this stage, you're ready to proceed to deploy the AKS on Azure Stack HCI management cluster onto your Windows Server 2019 Hyper-V host.
 
@@ -155,15 +150,15 @@ You'll notice the terminology used refers to the **Azure Kubernetes Service Runt
 
 3. Click on **Set up** to start the deployment process
 4. Firstly, review the prerequisites - your Azure VM environment will meet all the prerequisites, so you should be fine to click **Next: System checks**
-5. On the **System checks** page, enter the password for your **azureuser** account
-6. Once your credentials have been validated, Windows Admin Center will begin to validate it's own configuration, and the configuration of your target nodes, which in this case, is the Windows Server 2019 Hyper-V host (running in your Azure VM)
+5. On the **System checks** page, enter the password for your **azureuser** account and when successfully validated, click on the **Install** button to **install the required PowerShell modules**
+6. During the system checks stage, Windows Admin Center will begin to validate it's own configuration, and the configuration of your target nodes, which in this case, is the Windows Server 2019 Hyper-V host (running in your Azure VM)
 
 ![System checks performed by Windows Admin Center](/eval/media/wac_system_checks.png "System checks performed by Windows Admin Center")
 
 You'll notice that Windows Admin Center will validate memory, storage, networking, roles and features and more. If you've followed the guide correctly, you'll find you'll pass all the checks and can proceed.
 
-7. Once validated, click **Apply**, wait a few moments, then click **Next: Connectivity**
-8. On the **Connectivity** page, read the information about **CredSSP**, then click **Enable**. Once enabled, click **Next: Host configuration**
+7. Once validated, click **Next: Credential delegation**
+8. On the **Credential delegation** page, read the information about **CredSSP**, then click **Enable**. Once enabled, click **Next: Host configuration**
 
 ![Enable CredSSP in Windows Admin Center](/eval/media/aks_hostconfig_credssp.png "Enable CredSSP in Windows Admin Center")
 
@@ -186,7 +181,7 @@ You'll notice that Windows Admin Center will validate memory, storage, networkin
 
 15. Under **Load balancer settings**, enter the range from **192.168.0.150** to **192.168.0.250** and then click **Next: Azure registration**
 
-![Host configuration in Windows Admin Center](/eval/media/aks_hostconfig_lb.png "Host configuration in Windows Admin Center")
+![Load balancer configuration in Windows Admin Center](/eval/media/aks_hostconfig_lb.png "Load balancer configuration in Windows Admin Center")
 
 16. On the **Azure registration page**, your Azure account should be automatically populated. Use the drop-down to select your preferred subscription. If you are prompted, log into Azure with your Azure credentials. Once successfully authenticated, you should see your **Account**, then **choose your subscription**
 
@@ -200,7 +195,8 @@ You'll notice that Windows Admin Center will validate memory, storage, networkin
 
 17. Once you've chosen your subscription, choose an **existing Resource Group** or **create a new one** - Your resource group should be in the **East US, Southeast Asia, or West Europe region**
 18. Click on **Next:Review**
-19. Review your choices and settings, then click **Apply**. After a few moments, you should receive some notifications:
+19. Review your choices and settings, then click **Apply**.
+20. After a few moments, you may be **prompted to grant consent** to the Windows Admin Center Azure AD application. Ensure you select **Consent on behalf of your organization** then click **Accept**. The settings will be applied, and you should receive some notifications:
 
 ![Setting the AKS-HCI config in Windows Admin Center](/eval/media/aks_host_mgmtconfirm.png "Setting the AKS-HCI config in Windows Admin Center")
 
