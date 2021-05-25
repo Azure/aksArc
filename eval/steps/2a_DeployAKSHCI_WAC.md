@@ -261,7 +261,7 @@ Whichever option you chose, you will now be at the start of the **Create kuberne
    2. **OS type**: Linux
    3. **Node size**: Standard_K8S3_v1 (6 GB Memory, 4 CPU)
    4. **Node count**: 1
-7. Repeat step 6, to add a **Windows node** and the following info, then click **Add**
+7. Optionally, repeat step 6, to add a **Windows node** and the following info, then click **Add**
    1. **Node pool name**: WindowsPool1
    2. **OS type**: Windows
    3. **Node size**: Standard_K8S3_v1 (6 GB Memory, 4 CPU)
@@ -317,7 +317,7 @@ Get-Command -Module AksHci
 Get-AksHciCluster
 ```
 
-![Output of Get-AksHciCluster](/eval/media/get_akshcicluster_2.png "Output of Get-AksHciCluster")
+![Output of Get-AksHciCluster](/eval/media/get_akshcicluster_wac1.png "Output of Get-AksHciCluster")
 
 3. Next, you'll scale your Kubernetes cluster to have **2 Linux worker nodes**:
 
