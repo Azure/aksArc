@@ -243,7 +243,7 @@ There are two ways to create a Kubernetes cluster in Windows Admin Center.
 Whichever option you chose, you will now be at the start of the **Create kubernetes cluster** wizard.
 
 1. Firstly, review the prerequisites - your Azure VM environment will meet all the prerequisites, so you should be fine to click **Next: Basics**
-2. On the **Basics** page, firstly, choose whether you wish to **optionally** integrate with Azure Arc for Kubernetes. You can click the link on the page to learn more about Azure Arc. If you do wish to integrate, select the **Enabled** radio button, then use the drop downs to select the **subscription** and **resource group**. Alternatively, you can create a new resource group, in a specific region, exclusively for the Azure Arc integration resource.
+2. On the **Basics** page, firstly, choose whether you wish to **optionally** integrate with Azure Arc enabled Kubernetes. You can click the link on the page to learn more about Azure Arc. If you do wish to integrate, select the **Enabled** radio button, then use the drop downs to select the **subscription**,  **resource group** and **region**. Alternatively, you can create a new resource group, in a specific region, exclusively for the Azure Arc integration resource.
 
 ![Enable Arc integration with Windows Admin Center](/eval/media/aks_basics_arc.png "Enable Arc integration with Windows Admin Center")
 
