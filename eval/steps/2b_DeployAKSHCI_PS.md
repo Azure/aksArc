@@ -2,7 +2,7 @@ Deploy your AKS-HCI infrastructure with PowerShell
 ==============
 Overview
 -----------
-With your Windows Server 2019 Hyper-V host up and running, it's now time to deploy AKS on Azure Stack HCI. You'll first download the necessary artifacts, then deploy the AKS management cluster onto your Windows Server 2019 Hyper-V host, and finally, deploy a target cluster, onto which you can test deployment of a workload.
+With your Windows Server 2019 Hyper-V host up and running, it's now time to deploy AKS on Azure Stack HCI. You'll first deploy the AKS management cluster onto your Windows Server 2019 Hyper-V host, then deploy a target cluster, onto which you can test deployment of a workload.
 
 Contents
 -----------
@@ -12,7 +12,6 @@ Contents
 - [Prepare environment](#prepare-environment)
 - [Optional - Enable/Disable DHCP](#optional---enabledisable-dhcp)
 - [Enable Azure integration](#enable-azure-integration)
-- [Download artifacts](#download-artifacts)
 - [Deploying AKS on Azure Stack HCI management cluster](#deploying-aks-on-azure-stack-hci-management-cluster)
 - [Create a Kubernetes cluster (Target cluster)](#create-a-kubernetes-cluster-target-cluster)
 - [Next Steps](#next-steps)
@@ -48,9 +47,6 @@ Before you deploy AKS on Azure Stack HCI, there are a few steps required to prep
 Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
 Install-PackageProvider -Name NuGet -Force 
 Install-Module -Name PowershellGet -Force -Confirm:$false -SkipPublisherCheck
-Install-Module -Name Az.Accounts -Repository PSGallery -Force -AllowClobber -RequiredVersion 2.2.4
-Install-Module -Name Az.Resources -Repository PSGallery -Force -AllowClobber -RequiredVersion 3.2.0
-Install-Module -Name AzureAD -Repository PSGallery -Force -AllowClobber -RequiredVersion 2.0.2.128
 ```
 
 2. Still in the **administrative PowerShell console**, run the following to uninstall previous modules and unregister private powershell repositories:
@@ -66,7 +62,13 @@ Unregister-PSRepository -Name AksHciPSGalleryPreview -ErrorAction:SilentlyContin
 Exit
 ```
 
-3. Once complete, if you haven't already, make sure you **close all PowerShell windows**
+3. Open a new **administrative PowerShell console**, and run the following to install the required PowerShell module and dependencies:
+
+```powershell
+Install-Module -Name AksHci -Repository PSGallery -RequiredVersion 1.0.0 -AcceptLicense -Force
+```
+
+4. Once complete, if you haven't already, make sure you **close all PowerShell windows**
 
 Optional - Enable/Disable DHCP
 -----------
@@ -163,30 +165,6 @@ Get-AzResourceProvider -ProviderNamespace Microsoft.KubernetesConfiguration
 
 ![Resource Provider enabled in Azure](/eval/media/akshci_rp_enable.png "Resource Provider enabled Azure")
 
-Download artifacts
------------
-In order to deploy AKS on Azure Stack HCI, you'll need to register, and then download the public preview software. Once downloaded, you'll extract the files, and copy them to their final destinations before starting the deployment.
-
-1. Inside your **AKSHCIHOST001 VM**, open **Microsoft Edge** and navigate to https://aka.ms/AKS-HCI-Evaluate
-2. Complete the registration form, and once completed, click on the **Download AKS on Azure Stack HCI** button to download the software
-3. When prompted, click **Save as** and choose to save the ZIP file in your **Downloads folder**
-4. With the download completed, open **File Explorer**, navigate to your **Downloads** folder
-5. **Right-click** on the AKS-HCI zip file, click **Extract **All****, then in the popup window, click **Extract**
-6. Inside the extracted folder should be a number of files.  **Right-click** the **AksHci.Powershell.ZIP**, click **Extract All**, then **Extract**
-7. As these files have been downloaded from the internet, they may require **unblocking** to allow successful import later, so run the following **PowerShell command as administrator** to unblock all files:
-
-```powershell
-# Adjust the path to your extracted AKS-HCI download
-$path = "C:\Users\AzureUser\Downloads\AKS-HCI-Public-Preview"
-Get-ChildItem -Path $path -Recurse | Unblock-File -Verbose
-```
-
-8. With the files all unblocked, inside the extracted **AksHci.Powershell** folder, you should find 4 folders containing various PowerShell modules and components.
-
-![4 folders containing various PowerShell modules and components](/eval/media/akshci_powershell_folders.png "4 folders containing various PowerShell modules and components")
-
-9. Select all 4 folders, then **right-click** and **copy**, then navigate to **C:\Program Files\WindowsPowerShell\Modules** and **right-click**, and paste the 4 folders into their new location.
-
 With those steps completed, you're ready to deploy the AKS management cluster, onto your Windows Server 2019 Hyper-V host.
 
 Deploying AKS on Azure Stack HCI management cluster
@@ -259,7 +237,7 @@ This command will take a few moments to complete, but once done, you should see 
 
 Now, if you make a mistake, simply run **Set-AksHciConfig** without any parameters, and that will reset your configuration.
 
-6. With the configuration files finalized, you need to **finalize the registration configuration**. From your **administrative PowerShell** window, run the following commands:
+1. With the configuration files finalized, you need to **finalize the registration configuration**. From your **administrative PowerShell** window, run the following commands:
 
 ```powershell
 # Login to Azure
