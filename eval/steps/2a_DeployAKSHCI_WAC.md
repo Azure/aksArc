@@ -296,7 +296,7 @@ Whichever option you chose, you will now be at the start of the **Create kuberne
 
 ![AKS cluster in Azure Arc](/eval/media/aks_in_arc.png "AKS cluster in Azure Arc")
 
-17. In addition, you may wish to download your **Kubernetes cluster kubeconfig** file in order to access this Kubernetes cluster via **kubectl** later.
+17. In addition, back in Windows Admin Center, you may wish to download your **Kubernetes cluster kubeconfig** file in order to access this Kubernetes cluster via **kubectl** later.
 18. Once you have your Kubeconfig file, you can click **Finish**
 
 
