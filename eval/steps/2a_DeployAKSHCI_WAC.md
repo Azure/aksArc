@@ -342,7 +342,7 @@ Set-AksHciClusterNodeCount –Name akshciclus001 -controlPlaneNodeCount 3
 Get-AksHciCluster
 ```
 
-![Output of Get-AksHciCluster](/eval/media/get_akshcicluster_4.png "Output of Get-AksHciCluster")
+![Output of Get-AksHciCluster](/eval/media/get_akshcicluster_wac2.png "Output of Get-AksHciCluster")
 
 To access this **akshciclus001** cluster using **kubectl** (which was installed on your host as part of the overall installation process), you'll first need the **kubeconfig file**.
 

@@ -49,7 +49,7 @@ Install-PackageProvider -Name NuGet -Force
 Install-Module -Name PowershellGet -Force -Confirm:$false -SkipPublisherCheck
 ```
 
-2. Still in the **administrative PowerShell console**, run the following to uninstall previous modules and unregister private powershell repositories:
+2. Still in the **administrative PowerShell console**, run the following to uninstall previous modules and unregister any preview powershell repositories:
 
 ```powershell
 Uninstall-Module -Name AksHci -AllVersions -Force -ErrorAction:SilentlyContinue 
@@ -65,7 +65,7 @@ Exit
 3. Open a new **administrative PowerShell console**, and run the following to install the required PowerShell module and dependencies:
 
 ```powershell
-Install-Module -Name AksHci -Repository PSGallery -RequiredVersion 1.0.0 -AcceptLicense -Force
+Install-Module -Name AksHci -Repository PSGallery -RequiredVersion 1.0.2 -AcceptLicense -Force
 ```
 
 4. Once complete, if you haven't already, make sure you **close all PowerShell windows**
