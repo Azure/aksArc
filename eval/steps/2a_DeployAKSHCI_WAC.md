@@ -168,9 +168,8 @@ You'll notice that Windows Admin Center will validate memory, storage, networkin
 
 10. Under **VM Networking**, ensure that **InternalNAT** is selected for the **Internet-connected virtual switch**
 11. For **Enable virtual LAN identification**, leave this selected as **No**
-12. For **Cloudagent IP** this is optional, so we will leave this blank
-13. For **IP address allocation method** choose **either DHCP or Static** depending on the choice you made for deployment of your Azure VM. If you're not sure, you can check by [validating your DHCP config](#optional---enabledisable-dhcp)
-14. If you select **Static**, you should enter the following:
+12. For **IP address allocation method** choose **either DHCP or Static** depending on the choice you made for deployment of your Azure VM. If you're not sure, you can check by [validating your DHCP config](#optional---enabledisable-dhcp)
+13. If you select **Static**, you should enter the following:
     1.  **Subnet Prefix**: 192.168.0.0/16
     2.  **Gateway**: 192.168.0.1
     3.  **DNS Servers**: 192.168.0.1
@@ -179,11 +178,11 @@ You'll notice that Windows Admin Center will validate memory, storage, networkin
 
 ![Host configuration in Windows Admin Center](/eval/media/aks_hostconfig_vmnet.png "Host configuration in Windows Admin Center")
 
-15. Under **Load balancer settings**, enter the range from **192.168.0.150** to **192.168.0.250** and then click **Next: Azure registration**
+14. Under **Load balancer settings**, enter the range from **192.168.0.150** to **192.168.0.250** and then click **Next: Azure registration**
 
 ![Load balancer configuration in Windows Admin Center](/eval/media/aks_hostconfig_lb.png "Load balancer configuration in Windows Admin Center")
 
-16. On the **Azure registration page**, your Azure account should be automatically populated. Use the drop-down to select your preferred subscription. If you are prompted, log into Azure with your Azure credentials. Once successfully authenticated, you should see your **Account**, then **choose your subscription**
+15. On the **Azure registration page**, your Azure account should be automatically populated. Use the drop-down to select your preferred subscription. If you are prompted, log into Azure with your Azure credentials. Once successfully authenticated, you should see your **Account**, then **choose your subscription**
 
 ![AKS on Azure Stack HCI Azure Registration in Windows Admin Center](/eval/media/aks_azure_reg.png "AKS on Azure Stack HCI Azure Registration in Windows Admin Center")
 
@@ -193,10 +192,10 @@ You'll notice that Windows Admin Center will validate memory, storage, networkin
 
 *******************************************************************************************************
 
-17. Once you've chosen your subscription, choose an **existing Resource Group** or **create a new one** - Your resource group should be in the **East US, Southeast Asia, or West Europe region**
-18. Click on **Next:Review**
-19. Review your choices and settings, then click **Apply**.
-20. After a few moments, you may be **prompted to grant consent** to the Windows Admin Center Azure AD application. Ensure you select **Consent on behalf of your organization** then click **Accept**. The settings will be applied, and you should receive some notifications:
+16. Once you've chosen your subscription, choose an **existing Resource Group** or **create a new one** - Your resource group should be in the **East US, Southeast Asia, or West Europe region**
+17. Click on **Next:Review**
+18. Review your choices and settings, then click **Apply**.
+19. After a few moments, you may be **prompted to grant consent** to the Windows Admin Center Azure AD application. Ensure you select **Consent on behalf of your organization** then click **Accept**. The settings will be applied, and you should receive some notifications:
 
 ![Setting the AKS-HCI config in Windows Admin Center](/eval/media/aks_host_mgmtconfirm.png "Setting the AKS-HCI config in Windows Admin Center")
 
