@@ -332,6 +332,16 @@ ____________________
 If you're not familiar with the concept of **node pools**, a node pool is a **group of nodes**, or virtual machines that run your applications, within a Kubernetes cluster that have the same configuration, giving you more granular control over your clusters. You can deploy multiple Windows node pools and multiple Linux node pools of different sizes, within the same Kubernetes cluster.
 _____________________
 
+First, you can confirm your node pool names and details by running the following command:
+
+```powershell
+Get-AksHciNodePool -clusterName akshciclus001
+```
+
+![Output of Get-AksHciNodePool](/eval/media/get_akshcinodepool_wac.png "Output of Get-AksHciNodePool")
+
+Next, run the following command to scale out the Linux node pool:
+
 ```powershell
 Set-AksHciNodePool -clusterName akshciclus001 -name akshciclus001-linux -count 2
 ```
