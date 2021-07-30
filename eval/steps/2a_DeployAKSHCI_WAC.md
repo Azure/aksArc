@@ -347,7 +347,7 @@ Set-AksHciCluster –Name akshciclus001 -controlPlaneNodeCount 3
 
 *******************************************************************************************************
 
-1. Once these steps have been completed, you can verify the details by running the following command:
+4. Once these steps have been completed, you can verify the details by running the following command:
 
 ```powershell
 Get-AksHciCluster
