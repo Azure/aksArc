@@ -31,7 +31,7 @@ Architecture
 
 From an architecture perspective, as shown earlier, this graphic showcases the different layers and interconnections between the different components:
 
-![Architecture diagram for AKS on Azure Stack HCI in Azure](/eval/media/nested_virt_arch_ga.png "Architecture diagram for AKS on Azure Stack HCI in Azure")
+![Architecture diagram for AKS on Azure Stack HCI in Azure](/eval/media/nested_virt_arch_ga2.png "Architecture diagram for AKS on Azure Stack HCI in Azure")
 
 You've already deployed the outer box , which represents the Azure Resource Group. Inside here, you've deployed the virtual machine itself, and accompaying network adapter, storage and so on. You've also completed some host configuration
 
@@ -41,12 +41,12 @@ Prepare environment
 -----------
 Before you deploy AKS on Azure Stack HCI, there are a few steps required to prepare your host, including downloading the latest PowerShell packages and modules along with cleanup of any existing artifacts to ensure you're starting from a clean slate. First, you'll install pre-requisite Powershell packages and modules.
 
-1. Run the following **PowerShell command as administrator**:
+1. Run the following **PowerShell command as administrator**, accepting any prompts:
 
 ```powershell
 Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
 Install-PackageProvider -Name NuGet -Force 
-Install-Module -Name PowershellGet -Force -Confirm:$false -SkipPublisherCheck
+Install-Module -Name PowershellGet -Force
 ```
 
 2. Still in the **administrative PowerShell console**, run the following to uninstall previous modules and unregister any preview powershell repositories:
@@ -65,7 +65,7 @@ Exit
 3. Open a new **administrative PowerShell console**, and run the following to install the required PowerShell module and dependencies:
 
 ```powershell
-Install-Module -Name AksHci -Repository PSGallery -RequiredVersion 1.0.2 -AcceptLicense -Force
+Install-Module -Name AksHci -Repository PSGallery -RequiredVersion 1.1.0 -AcceptLicense -Force
 ```
 
 4. Once complete, if you haven't already, make sure you **close all PowerShell windows**
@@ -304,18 +304,28 @@ In the output, you'll see a number of available versions across both Windows and
 2. You can then run the following command to **create and deploy a new Kubernetes cluster**:
 
 ```powershell
-New-AksHciCluster -Name akshciclus001 -controlPlaneNodeCount 1 -linuxNodeCount 1 -windowsNodeCount 0
+New-AksHciCluster -Name akshciclus001 -nodePoolName linuxnodepool -controlPlaneNodeCount 1 -nodeCount 1 -osType linux
 ```
 
-This command will deploy a new Kubernetes cluster named **akshciclus001** with a single control plane node, and a single Linux worker node, which is fine for evaluation purposes to begin with. There are a number of optional parameters that you can add here if you wish:
+This command will deploy a new Kubernetes cluster named **akshciclus001** with the following:
+
+* A single Control Plane node (VM)
+* A single Load Balancer VM
+* A single Node Pool called linuxnodepool, containing a single Linux worker node (VM)
+
+This is fine for evaluation purposes to begin with. There are a number of optional parameters that you can add here if you wish:
 
 * **-kubernetesVersion** - by default, the deployment will use the latest, but you can specify a version
 * **-controlPlaneVmSize** - Size of the control plane VM. Default is Standard_A2_v2.
 * **-loadBalancerVmSize** - Size of your load balancer VM. Default is Standard_A2_V2
-* **-linuxNodeVmSize** - Size of your Linux Node VM. Default is Standard_K8S3_v1
-* **-windowsNodeVmSize** - Size of your Windows Node VM. Default is Standard_K8S3_v1
+* **-nodeVmSize** - Size of your worker node VM. Default is Standard_K8S3_v1
 
 To get a list of available VM sizes, run **Get-AksHciVmSize**
+
+____________________
+
+If you're not familiar with the concept of **node pools**, a node pool is a **group of nodes**, or virtual machines that run your applications, within a Kubernetes cluster that have the same configuration, giving you more granular control over your clusters. You can deploy multiple Windows node pools and multiple Linux node pools of different sizes, within the same Kubernetes cluster.
+_____________________
 
 The deployment of this Kubernetes workload cluster should take a few minutes, and once complete, should present information about the deployment, however you can verify the details by running the following command:
 
@@ -323,19 +333,39 @@ The deployment of this Kubernetes workload cluster should take a few minutes, an
 Get-AksHciCluster
 ```
 
-![Output of Get-AksHciCluster](/eval/media/get_akshcicluster_2.png "Output of Get-AksHciCluster")
+![Output of Get-AksHciCluster](/eval/media/get_akshcicluster_july.png "Output of Get-AksHciCluster")
 
-3. Next, you'll scale your Kubernetes cluster to **add a Windows worker node**. Note, this will trigger the download and extraction of a Windows container host image, which will take a few minutes, so please be patient.
+____________
+
+**NOTE** - If you use the new parameter sets in New-AksHciCluster to deploy a cluster and then run Get-AksHciCluster to get the cluster information, the fields WindowsNodeCount and LinuxNodeCount in the output will return 0. To get the accurate number of nodes in each node pool, please use the command Get-AksHciNodePool with the specified cluster name:
 
 ```powershell
-Set-AksHciCluster –Name akshciclus001 -linuxNodeCount 1 -windowsNodeCount 1
+Get-AksHciNodePool -clusterName akshciclus001
+```
+
+![Output of Get-AksHciNodePool](/eval/media/get_akshcinodepool.png "Output of Get-AksHciNodePool")
+
+____________
+
+3. Next, you'll scale your Kubernetes cluster to **add a Windows Node Pool and worker node**. Note, this will trigger the download and extraction of a Windows container host image, which will take a few minutes, so please be patient.
+
+```powershell
+New-AksHciNodePool -clusterName akshciclus001 -name windowsnodepool -count 1 -osType windows
 ```
 
 4. Next, you'll scale your Kubernetes cluster to have **2 Linux worker nodes**:
 
 ```powershell
-Set-AksHciCluster –Name akshciclus001 -linuxNodeCount 2 -windowsNodeCount 1
+Set-AksHciNodePool -clusterName akshciclus001 -name linuxnodepool -count 2
 ```
+
+With your cluster scaled out, you can check the node pool status by running:
+
+```powershell
+Get-AksHciNodePool -clusterName akshciclus001
+```
+
+![Output of Get-AksHciNodePool](/eval/media/get_akshcinodepool2.png "Output of Get-AksHciNodePool")
 
 *******************************************************************************************************
 
@@ -355,7 +385,7 @@ Set-AksHciCluster –Name akshciclus001 -controlPlaneNodeCount 3
 Get-AksHciCluster
 ```
 
-![Output of Get-AksHciCluster](/eval/media/get_akshcicluster_4.png "Output of Get-AksHciCluster")
+![Output of Get-AksHciCluster](/eval/media/get_akshcicluster_july_2.png "Output of Get-AksHciCluster")
 
 To access this **akshciclus001** cluster using **kubectl** (which was installed on your host as part of the overall installation process), you'll first need the **kubeconfig file**.
 
