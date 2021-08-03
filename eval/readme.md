@@ -14,7 +14,7 @@ In this guide, we'll walk you deploying the [Azure Kubernetes Service (AKS) on A
 
 Version
 -----------
-This guide has been tested and validated with the **June 2021 release** of AKS on Azure Stack HCI.
+This guide has been tested and validated with the **July 2021 release** of AKS on Azure Stack HCI.
 
 Contents
 -----------
@@ -65,9 +65,9 @@ Deployment Overview
 -----------
 For those of you who don't have multiple server-class pieces of hardware running Azure Stack HCI 20H2 or Windows Server 2019, this evaluation guide will detail deploying AKS on Azure Stack HCI inside an Azure VM, using **nested virtualization**.
 
-![Architecture diagram for AKS on Azure Stack HCI nested in Azure](media/nested_virt_arch_ga.png "Architecture diagram for AKS on Azure Stack HCI nested in Azure")
+![Architecture diagram for AKS on Azure Stack HCI nested in Azure](media/nested_virt_arch_ga2.png "Architecture diagram for AKS on Azure Stack HCI nested in Azure")
 
-In this configuration, you'll take advantage of the nested virtualization support provided within certain Azure VM sizes. You'll first deploy a single Azure VM running Windows Server 2019 Datacenter. Inside this VM, you'll enable the Hyper-V and DNS roles, and download the necessary software to deploy AKS on Azure Stack HCI. You'll then deploy the AKS on Azure Stack HCI management cluster, and worker node clusters. All of this, in a single Azure VM!
+In this configuration, you'll take advantage of the nested virtualization support provided within certain Azure VM sizes. You'll first deploy a single Azure VM running Windows Server 2019 Datacenter. Inside this VM, you'll have all the necessary roles and features configured, so you can quickly proceed to deploying AKS on Azure Stack HCI. You'll first deploy the AKS on Azure Stack HCI management cluster, and then worker node clusters. All of this, in a single Azure VM!
 
 ### Important Note ###
 The steps outlined in this evaluation guide are **specific to running inside an Azure VM**, running a single Windows Server 2019 OS, without a domain environment configured. If you plan to use these steps in an alternative environment, such as one nested/physical on-premises, or in a domain-joined environment, the steps may differ and certain procedures may not work. If that is the case, please refer to the [official documentation to deploy AKS on Azure Stack HCI](https://docs.microsoft.com/en-us/azure-stack/aks-hci/ "official documentation to deploy AKS on Azure Stack HCI").
@@ -80,7 +80,7 @@ The general flow will be as follows:
 
 ![Evaluation guide workflow using nested virtualization](media/flow_chart_ga.png "Evaluation guide workflow using nested virtualization")
 
-**Part 1 - Deploy Windows Server 2019 Hyper-V host in Azure**: In this step, you'll create a suitable VM in Azure using PowerShell or an Azure Resource Manager template. This VM will run Windows Server 2019 Datacenter, with the full desktop experience.  On this system, you'll enable the necessary roles and features and accompanying management tools, and configure networking to enable network communication between sandbox VMs, and out to the internet.
+**Part 1 - Deploy Windows Server 2019 Hyper-V host in Azure**: In this step, you'll create a suitable VM in Azure using PowerShell or an Azure Resource Manager template. This VM will run Windows Server 2019 Datacenter, with the full desktop experience.  On this system, we'll automatically enable the necessary roles and features and accompanying management tools, and configure networking to enable network communication between sandbox VMs, and out to the internet.
 
 **Part 2 - Deploy AKS on Azure Stack HCI**: In this step, you'll use **either Windows Admin Center, or PowerShell** to deploy AKS on Azure Stack HCI - this will consist of first deploying the necessary management cluster, then followed by a target cluster, for running workloads.
 
