@@ -183,7 +183,16 @@ PS C:\> New-AksHciCluster -name gpuwl -linuxNodeVmSize "Standard_NK6" -kubernete
 > **[NOTE]** The Kubernetes version must be v1.19.9!
 
 ### Post-setup ###
-1.	Use SSH to connect to the linux worker and setup the configuration.
+1.	Get your Kubeconfig for the target cluster
+```powershell
+PS C:? Get-AksHciCredentials -Name gpuwl
+```
+2. Use kubectl to get the node IP address
+```powershell
+kubectl get nodes -o wide
+```
+
+4.	Use SSH to connect to the linux worker and setup the configuration.
 > **[NOTE]** Make sure to replace the IP address below!
 
 ```powershell
