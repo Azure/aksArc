@@ -65,7 +65,7 @@ Exit
 3. Open a new **administrative PowerShell console**, and run the following to install the required PowerShell module and dependencies:
 
 ```powershell
-Install-Module -Name AksHci -Repository PSGallery -RequiredVersion 1.1.0 -AcceptLicense -Force
+Install-Module -Name AksHci -Repository PSGallery -AcceptLicense -Force
 ```
 
 4. Once complete, if you haven't already, make sure you **close all PowerShell windows**
