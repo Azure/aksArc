@@ -21,7 +21,7 @@ Get-ChildItem -Path C:\AksHciHost -Directory | Copy-Item -Destination "$env:Prog
 
 # Change your location
 Set-Location 'C:\AksHciHost'
-.\akshcihost.ps1
+. .\akshcihost.ps1
 
 # Set Parameters for the DSC to run
 $Admincreds = Get-Credential -Message "Enter your administrator credentials"
