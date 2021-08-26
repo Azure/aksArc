@@ -34,7 +34,7 @@ Architecture
 
 From an architecture perspective, as shown earlier, this graphic showcases the different layers and interconnections between the different components:
 
-![Architecture diagram for AKS on Azure Stack HCI in Azure](/eval/media/nested_virt_arch_ga.png "Architecture diagram for AKS on Azure Stack HCI in Azure")
+![Architecture diagram for AKS on Azure Stack HCI in Azure](/eval/media/nested_virt_arch_ga2.png "Architecture diagram for AKS on Azure Stack HCI in Azure")
 
 You've already deployed the outer box, which represents the Azure Resource Group. Inside here, you've deployed the virtual machine itself, and accompaying network adapter, storage and so on. You've also completed some host configuration
 
@@ -74,6 +74,12 @@ Your Azure VM deployment automatically installed Windows Admin Center 2103, howe
 4. Click on **Installed extensions** and you should see **Azure Kubernetes Service** listed as installed
 
 ![Installed extensions in Windows Admin Center](/eval/media/installed_extensions.png "Installed extensions in Windows Admin Center")
+
+____________
+
+**NOTE** - Ensure that your Azure Kubernetes Service extension is the **latest available version**. If the **Status** is **Installed**, you have the latest version. If the **Status** shows **Update available (1.#.#)**, ensure you apply this update and refresh before proceeding.
+
+_____________
 
 In order to deploy AKS-HCI with Windows Admin Center, you need to connect your Windows Admin Center instance to Azure.
 
@@ -142,7 +148,7 @@ Deploying AKS on Azure Stack HCI management cluster
 The next section will walk through configuring the AKS on Azure Stack HCI management cluster, on your single node Windows Server 2019 host.
 
 1. From the Windows Admin Center homepage, click on your **akshcihost001.akshci.local \[Gateway\]** machine.
-2. You'll be presented with a rich array of information about your akshcihost001 machine, of which you can feel free to explore the different options and metrics. When you're ready, on the left-hand side, scroll down and under **Extensions**, click **Azure Kubernetes Service**
+2. You'll be presented with a rich array of information about your akshcihost001 machine, of which you can feel free to explore the different options and metrics. When you're ready, on the left-hand side, click **Azure Kubernetes Service**
 
 ![Ready to deploy AKS-HCI with Windows Admin Center](/eval/media/aks_extension.png "Ready to deploy AKS-HCI with Windows Admin Center")
 
@@ -189,7 +195,7 @@ You'll notice that Windows Admin Center will validate memory, storage, networkin
 
 *******************************************************************************************************
 
-**NOTE** - No charges will be incurred for using AKS on Azure Stack HCI for free trial period of 60 days.
+**NOTE** - No charges will be incurred for using AKS on Azure Stack HCI during the free trial period of 60 days.
 
 *******************************************************************************************************
 
@@ -259,12 +265,12 @@ Whichever option you chose, you will now be at the start of the **Create kuberne
 6. In the **Add a node pool** blade, enter the following, then click **Add**
    1. **Node pool name**: LinuxPool1
    2. **OS type**: Linux
-   3. **Node size**: Standard_K8S3_v1 (6 GB Memory, 4 CPU)
+   3. **Node size**: Default (4 GB Memory, 4 CPU)
    4. **Node count**: 1
 7. Optionally, repeat step 6, to add a **Windows node** and the following info, then click **Add**
    1. **Node pool name**: WindowsPool1
    2. **OS type**: Windows
-   3. **Node size**: Standard_K8S3_v1 (6 GB Memory, 4 CPU)
+   3. **Node size**: Default (4 GB Memory, 4 CPU)
    4. **Node count**: 1
 
 ![AKS node pools in Windows Admin Center](/eval/media/aks_node_pools.png "AKS node pools in Windows Admin Center")
@@ -275,8 +281,8 @@ Whichever option you chose, you will now be at the start of the **Create kuberne
 
 ![AKS virtual networking in Windows Admin Center](/eval/media/aks_virtual_networking.png "AKS virtual networking in Windows Admin Center")
 
-11. Click on the **aks-default-network**, ensure **Flannel** network configuration is selected, and then click **Next: Review + Create**
-12. On the **Review + Create** page, review your chosen settings, then click **Create**
+1.  Click on the **aks-default-network**, select **Calico** as the network configuration, and then click **Next: Review + Create**
+2.  On the **Review + Create** page, review your chosen settings, then click **Create**
 
 ![Finalize creation of AKS cluster in Windows Admin Center](/eval/media/aks_create.png "Finalize creation of AKS cluster in Windows Admin Center")
 
@@ -319,10 +325,25 @@ Get-AksHciCluster
 
 ![Output of Get-AksHciCluster](/eval/media/get_akshcicluster_wac1.png "Output of Get-AksHciCluster")
 
-3. Next, you'll scale your Kubernetes cluster to have **2 Linux worker nodes**:
+3. Next, you'll scale your Kubernetes cluster to have **2 Linux worker nodes**. You'll do this by specifying a node pool to update.
+
+____________________
+
+If you're not familiar with the concept of **node pools**, a node pool is a **group of nodes**, or virtual machines that run your applications, within a Kubernetes cluster that have the same configuration, giving you more granular control over your clusters. You can deploy multiple Windows node pools and multiple Linux node pools of different sizes, within the same Kubernetes cluster.
+_____________________
+
+First, you can confirm your node pool names and details by running the following command:
 
 ```powershell
-Set-AksHciCluster –Name akshciclus001 -linuxNodeCount 2 -windowsNodeCount 1
+Get-AksHciNodePool -clusterName akshciclus001
+```
+
+![Output of Get-AksHciNodePool](/eval/media/get_akshcinodepool_wac.png "Output of Get-AksHciNodePool")
+
+Next, run the following command to scale out the Linux node pool:
+
+```powershell
+Set-AksHciNodePool -clusterName akshciclus001 -name akshciclus001-linux -count 2
 ```
 *******************************************************************************************************
 
@@ -342,7 +363,7 @@ Set-AksHciCluster –Name akshciclus001 -controlPlaneNodeCount 3
 Get-AksHciCluster
 ```
 
-![Output of Get-AksHciCluster](/eval/media/get_akshcicluster_wac2.png "Output of Get-AksHciCluster")
+![Output of Get-AksHciCluster](/eval/media/get_akshcicluster_wac3.png "Output of Get-AksHciCluster")
 
 To access this **akshciclus001** cluster using **kubectl** (which was installed on your host as part of the overall installation process), you'll first need the **kubeconfig file**.
 
