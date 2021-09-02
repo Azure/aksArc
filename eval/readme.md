@@ -86,6 +86,8 @@ The general flow will be as follows:
 
 **Part 3 - Explore AKS on Azure Stack HCI Environment**: With your deployment completed, you're now ready to explore many of the aspects within the AKS on Azure Stack HCI. We'll also provide links to further scenarios and resources to continue your evaluation.
 
+**Part 4 - Deploy Hybrid Solutions on the AKS on Azure Stack HCI Environment**: Now that you are knowledgeable on how to interact with various aspects of your AKS on the Azure Stack HCI cluster, it is time to experiment with various hybrid solutions that can help you get started in using your AKS on the Azure Stack HCI cluster. These hybrid solutions use AKS on Azure Stack HCI capabilities in combination with other Azure Services to enable complex hybrid use cases.  
+
 Get started
 -----------
 
@@ -93,6 +95,7 @@ Get started
 * [**Part 2a** - Deploy your AKS-HCI infrastructure with Windows Admin Center **(Choose 2a or 2b)**](/eval/steps/2a_DeployAKSHCI_WAC.md "Deploy your AKS-HCI infrastructure with Windows Admin Center")
 * [**Part 2b** - Deploy your AKS-HCI infrastructure with PowerShell **(Choose 2a or 2b)**](/eval/steps/2b_DeployAKSHCI_PS.md "Deploy your AKS-HCI infrastructure with PowerShell")
 * [**Part 3** - Explore the AKS on Azure Stack HCI Environment](/eval/steps/3_ExploreAKSHCI.md "Explore the AKS on Azure Stack HCI Environment")
+* [**Part 4** - Deploy Hybrid Solutions on the AKS on Azure Stack HCI Environment](/eval/steps/4_Solutions.md "Deploy Hybrid Solutions on the AKS on Azure Stack HCI Environment")
 
 
 Product improvements
