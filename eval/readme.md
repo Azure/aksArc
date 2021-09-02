@@ -93,7 +93,7 @@ Get started
 * [**Part 2a** - Deploy your AKS-HCI infrastructure with Windows Admin Center **(Choose 2a or 2b)**](/eval/steps/2a_DeployAKSHCI_WAC.md "Deploy your AKS-HCI infrastructure with Windows Admin Center")
 * [**Part 2b** - Deploy your AKS-HCI infrastructure with PowerShell **(Choose 2a or 2b)**](/eval/steps/2b_DeployAKSHCI_PS.md "Deploy your AKS-HCI infrastructure with PowerShell")
 * [**Part 3** - Explore the AKS on Azure Stack HCI Environment](/eval/steps/3_ExploreAKSHCI.md "Explore the AKS on Azure Stack HCI Environment")
-* [**Part 4**] - [Deploy Hybrid Solutions on the AKS on Azure Stack HCI Environment](/eval/steps/4_Solutions.md "Deploy Hybrid Solutions on the AKS on Azure Stack HCI Environment")
+* [**Part 4** - [Deploy Hybrid Solutions on the AKS on Azure Stack HCI Environment](/eval/steps/4_Solutions.md "Deploy Hybrid Solutions on the AKS on Azure Stack HCI Environment")
 
 Product improvements
 -----------
