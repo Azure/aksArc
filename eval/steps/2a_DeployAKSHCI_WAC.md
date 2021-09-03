@@ -263,12 +263,12 @@ Whichever option you chose, you will now be at the start of the **Create kuberne
 
 5. On the **Node pools** page, click on **+Add node pool**
 6. In the **Add a node pool** blade, enter the following, then click **Add**
-   1. **Node pool name**: LinuxPool1
+   1. **Node pool name**: linuxnodepool
    2. **OS type**: Linux
    3. **Node size**: Default (4 GB Memory, 4 CPU)
    4. **Node count**: 1
 7. Optionally, repeat step 6, to add a **Windows node** and the following info, then click **Add**
-   1. **Node pool name**: WindowsPool1
+   1. **Node pool name**: windowsnodepool
    2. **OS type**: Windows
    3. **Node size**: Default (4 GB Memory, 4 CPU)
    4. **Node count**: 1
@@ -343,7 +343,7 @@ Get-AksHciNodePool -clusterName akshciclus001
 Next, run the following command to scale out the Linux node pool:
 
 ```powershell
-Set-AksHciNodePool -clusterName akshciclus001 -name akshciclus001-linux -count 2
+Set-AksHciNodePool -clusterName akshciclus001 -name linuxnodepool -count 2
 ```
 *******************************************************************************************************
 

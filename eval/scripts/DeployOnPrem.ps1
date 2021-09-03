@@ -3,9 +3,9 @@
 $Nic = Get-NetAdapter -Physical | Select-Object Name, Status, InterfaceDescription, ifIndex, MacAddress, LinkSpeed, MTUSize | `
     Sort-Object ifindex | Out-GridView -title "Choose a single network adapter for use with AKS-HCI" -OutputMode Single
 Get-NetAdapter | Where-Object ifIndex -NotLike $nic.ifIndex | Disable-NetAdapter -Confirm:$false
-Get-NetAdapter -Physical | Select-Object Name, Status, InterfaceDescription, ifIndex, MacAddress, LinkSpeed, MTUSize | Sort-Object ifindex
+Get-NetAdapter -Physical | Sort-Object Status -Descending
 
-# Download Windows Adminn Center
+# Download Windows Admin Center
 $ProgressPreference = "SilentlyContinue"
 mkdir -Path "C:\WAC"
 Invoke-WebRequest -UseBasicParsing -Uri 'https://aka.ms/WACDownload' -OutFile "C:\WAC\WindowsAdminCenter.msi"

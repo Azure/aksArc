@@ -27,6 +27,7 @@ configuration AKSHCIHost
     Import-DscResource -ModuleName 'NetworkingDSC'
     Import-DscResource -ModuleName 'xDHCpServer'
     Import-DscResource -ModuleName 'xDNSServer'
+    Import-DscResource -ModuleName 'DnsServerDsc'
     Import-DscResource -ModuleName 'cChoco'
     Import-DscResource -ModuleName 'DSCR_Shortcut'
     Import-DscResource -ModuleName 'xCredSSP'
@@ -42,6 +43,7 @@ configuration AKSHCIHost
     $ipConfig = (Get-NetAdapter -Physical | Where-Object Status -EQ Up | Get-NetIPConfiguration | Where-Object IPv4DefaultGateway)
     $netAdapters = Get-NetAdapter -Name ($ipConfig.InterfaceAlias) | Select-Object -First 1
     $InterfaceAlias = $($netAdapters.Name)
+    $existingDns = (Get-DnsClientServerAddress -InterfaceAlias $InterfaceAlias -AddressFamily IPv4).ServerAddresses
 
     Node localhost
     {
@@ -487,7 +489,7 @@ configuration AKSHCIHost
 
         if ($environment -eq "Workgroup") {
 
-            xDnsServerPrimaryZone SetPrimaryDNSZone {
+            DnsServerPrimaryZone SetPrimaryDNSZone {
                 Name          = "$DomainName"
                 Ensure        = 'Present'
                 DependsOn     = "[script]NAT"
@@ -495,12 +497,22 @@ configuration AKSHCIHost
                 DynamicUpdate = 'NonSecureAndSecure'
             }
     
-            xDnsServerPrimaryZone SetReverseLookupZone {
+            DnsServerPrimaryZone SetReverseLookupZone {
                 Name          = '0.168.192.in-addr.arpa'
                 Ensure        = 'Present'
-                DependsOn     = "[xDnsServerPrimaryZone]SetPrimaryDNSZone"
+                DependsOn     = "[DnsServerPrimaryZone]SetPrimaryDNSZone"
                 ZoneFile      = '0.168.192.in-addr.arpa.dns'
                 DynamicUpdate = 'NonSecureAndSecure'
+            }
+
+            if ($existingDns -notcontains "127.0.0.1") {
+                DnsServerForwarder 'SetForwarders'
+                {
+                    IsSingleInstance = 'Yes'
+                    IPAddresses      = $existingDns
+                    UseRootHint      = $True
+                    DependsOn     = "[DnsServerPrimaryZone]SetReverseLookupZone"
+                }
             }
         }
 
@@ -523,14 +535,14 @@ configuration AKSHCIHost
             {
                 InterfaceAlias           = "$InterfaceAlias"
                 ConnectionSpecificSuffix = "$DomainName"
-                DependsOn                = "[xDnsServerPrimaryZone]SetPrimaryDNSZone"
+                DependsOn                = "[DnsServerPrimaryZone]SetPrimaryDNSZone"
             }
     
             DnsConnectionSuffix AddSpecificSuffixNATNic
             {
                 InterfaceAlias           = "vEthernet `($vSwitchNameHost`)"
                 ConnectionSpecificSuffix = "$DomainName"
-                DependsOn                = "[xDnsServerPrimaryZone]SetPrimaryDNSZone"
+                DependsOn                = "[DnsServerPrimaryZone]SetPrimaryDNSZone"
             }
 
             #### STAGE 2h - CONFIGURE CREDSSP & WinRM
@@ -542,11 +554,11 @@ configuration AKSHCIHost
                 SuppressReboot = $true
             }
             xCredSSP Client {
-                Ensure            = "Present"
-                Role              = "Client"
+                Ensure         = "Present"
+                Role           = "Client"
                 DelegateComputers = "$env:COMPUTERNAME" + ".$DomainName"
-                DependsOn         = "[xCredSSP]Server"
-                SuppressReboot    = $true
+                DependsOn      = "[xCredSSP]Server"
+                SuppressReboot = $true
             }
 
             #### STAGE 3a - CONFIGURE WinRM
@@ -624,14 +636,13 @@ configuration AKSHCIHost
             Description = 'Allow Windows Admin Center'
         }
 
-        script "SetRunFlag"
-        {
-            GetScript = {
+        script "SetRunFlag" {
+            GetScript  = {
                 $result = Test-Path -Path "C:\AksHciAzureEval.txt"
                 return @{ 'Result' = $result }
             }
 
-            SetScript = {
+            SetScript  = {
                 #This is a simple flag to monitor number of runs
                 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
                 try { Invoke-WebRequest "http://bit.ly/AksHciAzureEval" -UseBasicParsing -DisableKeepAlive | Out-Null } catch { $_.Exception.Response.StatusCode.Value__ }
@@ -643,7 +654,7 @@ configuration AKSHCIHost
                 $state = [scriptblock]::Create($GetScript).Invoke()
                 return $state.Result
             }
-            DependsOn = '[cChocoInstaller]installChoco'
+            DependsOn  = '[cChocoInstaller]installChoco'
         }
     }
 }
