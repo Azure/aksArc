@@ -8,10 +8,10 @@ Support through issues on this repository is provided on a best-effort basis for
 Do not file issues for AKS, AKS-Engine, Virtual-Kubelet, Azure Container Instances, or services on this repository unless it is related to that feature/service and functionality with Azure Kubernetes Service on Azure Stack HCI.
 
 # Important links
-* AKS-HCI Roadmap: https://aka.ms/aks-hci/roadmap
-* AKS-HCI Release Notes: https://github.com/Azure/aks-hci/releases
+* AKS-HCI Roadmap: https://aka.ms/aks-hci-roadmap
+* AKS-HCI Release Notes: https://aka.ms/aks-hci-relnotes
 * AKS-HCI Known Issues: https://aka.ms/aks-hci/issues
-* AKS-HCI Preview Documentaton: https://aka.ms/AKSonHCI-Docs
+* AKS-HCI Documentaton: https://aka.ms/aks-hci-docs
 * Meet the product team in Microsoft Teams (click the link to join): https://aka.ms/akshciteams fill in the form and we will add you to the channel ASAP.
 
 # Contributing
