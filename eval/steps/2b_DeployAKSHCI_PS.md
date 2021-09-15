@@ -106,12 +106,12 @@ $spName = "AksHci-SP-$date"
 # Create the Service Principal
 
 $sp = New-AzADServicePrincipal -DisplayName $spName `
-    -Role 'Microsoft.Kubernetes connected cluster role' `
+    -Role 'Kubernetes Cluster - Azure Arc Onboarding' `
     -Scope "/subscriptions/$sub"
 
 # Retrieve the password for the Service Principal
 
-$secret = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto(
+$secret = [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR(
     [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($sp.Secret)
 )
 
