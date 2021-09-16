@@ -494,7 +494,13 @@
         "publicIpAddressType": "Dynamic",
         "publicIpAddressSku": "Basic",
         "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
-        "subnetRef": "[concat(variables('vnetId'), '/subnets/', variables('subnetName'))]"
+        "subnetRef": "[concat(variables('vnetId'), '/subnets/', variables('subnetName'))]",
+        "dscName": "[if(equals(parameters('installWindowsAdminCenter'), 'Yes'), 'ConfigureAksHciHostPostWac', 'ConfigureAksHciHost')]",
+        "ps_adminUsername": "[concat('base64:', base64(parameters('adminUsername')))]",
+        "ps_adminPassword": "[concat('base64:', base64(parameters('adminPassword')))]",
+        "ps appId": "[concat('base64:', base64(parameters('AksHciAppId')))]",
+        "ps_appSecret": "[concat('base64:', base64(parameters('AksHciAppSecret')))]",
+        "scriptParameters": "[concat(' -userName ', variables('ps_adminUsername'), '-adminUsername ',variables('ps_adminUsername'),' -adminPassword \"',variables('ps_adminPassword'),'\"',' -appId \"',variables('ps appId'),'\"',' -appSecret \"',variables('ps_appSecret'),'\"', '-rgName \"',resourceGroup().name,'\"','-rgName \"',resourceGroup().name,'\"','-location \"',resourceGroup().location,'\"','-subID \"',subscription().subscriptionId,'\"','-tenantID \"',subscription().tenantId,'\"',' -domainName \"',parameters('domainName'),'\"',' -installWAC \"', parameters('installWindowsAdminCenter'),'\"',' -aksHciNetworking \"',parameters('aksHciNetworking'),'\"',' -$kubernetesVersion \"',parameters('kubernetesVersion'),'\"',' -controlPlaneNodes ',parameters('controlPlaneNodes'),' -controlPlaneNodeSize \"',parameters('controlPlaneNodeSize'),'\"',' -loadBalancerSize \"',parameters('loadBalancerSize'),'\"',' -linuxWorkerNodes ',parameters('linuxWorkerNodes'),' -linuxWorkerNodeSize \"',parameters('linuxWorkerNodeSize'),'\"',' -windowsWorkerNodes ',parameters('windowsWorkerNodes'),' -windowsWorkerNodeSize \"',parameters('windowsWorkerNodeSize'),'\"')]"
     },
     "resources": [
         {
@@ -658,112 +664,152 @@
                     }
                 },
                 "licenseType": "[if(equals(parameters('alreadyHaveAWindowsServerLicense'), 'Yes'), 'Windows_Server', 'None')]"
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2020-06-01",
-            "name": "InstallWindowsAdminCenter",
-            "dependsOn": [
-                "[parameters('virtualMachineName')]"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[uri(variables('artifactsLocation'), concat('autodeploy/json/installWAC.json'))]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "artifactsLocation": {
-                        "value": "[variables('artifactsLocation')]"
-                    },
-                    "adminUsername": {
-                        "value": "[parameters('adminUsername')]"
-                    },
-                    "virtualMachineName": {
-                        "value": "[parameters('virtualMachineName')]"
-                    },
-                    "location": {
-                        "value": "[resourceGroup().location]"
-                    }
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat(parameters('virtualMachineName'), '/', 'ConfigureAksHciHost')]",
-            "apiVersion": "2020-06-01",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[parameters('virtualMachineName')]",
-                "[resourceId('Microsoft.Resources/deployments/', 'InstallWindowsAdminCenter')]"
-            ],
-            "properties": {
-                "publisher": "Microsoft.Powershell",
-                "type": "DSC",
-                "typeHandlerVersion": "2.77",
-                "autoUpgradeMinorVersion": true,
-                "settings": {
-                    "wmfVersion": "latest",
-                    "configuration": {
-                        "url": "[variables('dscUri')]",
-                        "script": "akshciauto.ps1",
-                        "function": "AksHciAutoDeploy"
-                    },
-                    "configurationArguments": {
-                        "installWAC": "[parameters('installWindowsAdminCenter')]",
-                        "domainName": "[parameters('domainName')]",
-                        "environment": "[variables('environment')]",
-                        "aksHciNetworking": "[parameters('AksHciNetworking')]",
-                        "customRdpPort": "[parameters('customRdpPort')]",
-                        "controlPlaneNodes": "[parameters('ControlPlaneNodes')]",
-                        "controlPlaneNodeSize": "[parameters('ControlPlaneNodeSize')]",
-                        "loadBalancerSize": "[parameters('LoadBalancerSize')]",
-                        "linuxWorkerNodes": "[parameters('LinuxWorkerNodes')]",
-                        "linuxWorkerNodeSize": "[parameters('LinuxWorkerNodeSize')]",
-                        "windowsWorkerNodes": "[parameters('WindowsWorkerNodes')]",
-                        "windowsWorkerNodeSize": "[parameters('WindowsWorkerNodeSize')]"
+            },
+            "resources": [
+                {
+                    "condition": "[equals(parameters('installWindowsAdminCenter'),'Yes')]",
+                    "type": "extensions",
+                    "name": "InstallWindowsAdminCenter",
+                    "apiVersion": "2021-03-01",
+                    "location": "[resourceGroup().location]",
+                    "dependsOn": [
+                        "[parameters('virtualMachineName')]"
+                    ],
+                    "properties": {
+                        "publisher": "Microsoft.Compute",
+                        "type": "CustomScriptExtension",
+                        "typeHandlerVersion": "1.10",
+                        "autoUpgradeMinorVersion": true,
+                        "settings": {
+                            "fileUris": [
+                                "[uri(variables('artifactsLocation'), concat('scripts/installWac.ps1'))]"
+                            ]
+                        },
+                        "protectedSettings": {
+                            "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File installWac.ps1')]"
+                        }
                     }
                 },
-                "protectedSettings": {
-                    "configurationArguments": {
-                        "adminCreds": {
-                            "username": "[parameters('adminUsername')]",
-                            "password": "[parameters('adminPassword')]"
+                /*
+                {
+                    "condition": "[equals(parameters('installWindowsAdminCenter'),'Yes')]",
+                    "type": "extensions",
+                    "name": "ConfigureAksHciHostPostWac",
+                    "apiVersion": "2021-03-01",
+                    "location": "[resourceGroup().location]",
+                    "dependsOn": [
+                        "[parameters('virtualMachineName')]",
+                        "[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('virtualMachineName'), 'InstallWindowsAdminCenter')]"
+                    ],
+                    "properties": {
+                        "publisher": "Microsoft.Powershell",
+                        "type": "DSC",
+                        "typeHandlerVersion": "2.77",
+                        "autoUpgradeMinorVersion": true,
+                        "settings": {
+                            "wmfVersion": "latest",
+                            "configuration": {
+                                "url": "[variables('dscUri')]",
+                                "script": "akshciauto.ps1",
+                                "function": "AksHciAutoDeploy"
+                            },
+                            "configurationArguments": {
+                                "installWAC": "[parameters('installWindowsAdminCenter')]",
+                                "domainName": "[parameters('domainName')]",
+                                "environment": "[variables('environment')]",
+                                "aksHciNetworking": "[parameters('AksHciNetworking')]",
+                                "customRdpPort": "[parameters('customRdpPort')]",
+                                "controlPlaneNodes": "[parameters('ControlPlaneNodes')]",
+                                "controlPlaneNodeSize": "[parameters('ControlPlaneNodeSize')]",
+                                "loadBalancerSize": "[parameters('LoadBalancerSize')]",
+                                "linuxWorkerNodes": "[parameters('LinuxWorkerNodes')]",
+                                "linuxWorkerNodeSize": "[parameters('LinuxWorkerNodeSize')]",
+                                "windowsWorkerNodes": "[parameters('WindowsWorkerNodes')]",
+                                "windowsWorkerNodeSize": "[parameters('WindowsWorkerNodeSize')]"
+                            }
+                        },
+                        "protectedSettings": {
+                            "configurationArguments": {
+                                "adminCreds": {
+                                    "username": "[parameters('adminUsername')]",
+                                    "password": "[parameters('adminPassword')]"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "condition": "[equals(parameters('installWindowsAdminCenter'),'No')]",
+                    "type": "extensions",
+                    "name": "ConfigureAksHciHost",
+                    "apiVersion": "2021-03-01",
+                    "location": "[resourceGroup().location]",
+                    "dependsOn": [
+                        "[parameters('virtualMachineName')]"
+                    ],
+                    "properties": {
+                        "publisher": "Microsoft.Powershell",
+                        "type": "DSC",
+                        "typeHandlerVersion": "2.77",
+                        "autoUpgradeMinorVersion": true,
+                        "settings": {
+                            "wmfVersion": "latest",
+                            "configuration": {
+                                "url": "[variables('dscUri')]",
+                                "script": "akshciauto.ps1",
+                                "function": "AksHciAutoDeploy"
+                            },
+                            "configurationArguments": {
+                                "installWAC": "[parameters('installWindowsAdminCenter')]",
+                                "domainName": "[parameters('domainName')]",
+                                "environment": "[variables('environment')]",
+                                "aksHciNetworking": "[parameters('AksHciNetworking')]",
+                                "customRdpPort": "[parameters('customRdpPort')]",
+                                "controlPlaneNodes": "[parameters('ControlPlaneNodes')]",
+                                "controlPlaneNodeSize": "[parameters('ControlPlaneNodeSize')]",
+                                "loadBalancerSize": "[parameters('LoadBalancerSize')]",
+                                "linuxWorkerNodes": "[parameters('LinuxWorkerNodes')]",
+                                "linuxWorkerNodeSize": "[parameters('LinuxWorkerNodeSize')]",
+                                "windowsWorkerNodes": "[parameters('WindowsWorkerNodes')]",
+                                "windowsWorkerNodeSize": "[parameters('WindowsWorkerNodeSize')]"
+                            }
+                        },
+                        "protectedSettings": {
+                            "configurationArguments": {
+                                "adminCreds": {
+                                    "username": "[parameters('adminUsername')]",
+                                    "password": "[parameters('adminPassword')]"
+                                }
+                            }
+                        }
+                    }
+                },
+                */
+                {
+                    "type": "extensions",
+                    "name": "InstallAksHci",
+                    "apiVersion": "2021-03-01",
+                    "location": "[resourceGroup().location]",
+                    "dependsOn": [
+                        "[parameters('virtualMachineName')]"//,
+                        //"[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('virtualMachineName'), variables('dscName'))]"
+                    ],
+                    "properties": {
+                        "publisher": "Microsoft.Compute",
+                        "type": "CustomScriptExtension",
+                        "typeHandlerVersion": "1.10",
+                        "autoUpgradeMinorVersion": true,
+                        "settings": {
+                            "fileUris": [
+                                "[uri(variables('artifactsLocation'), concat('scripts/installAksHci.ps1'))]"
+                            ]
+                        },
+                        "protectedSettings": {
+                            "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File installAksHci.ps1',variables('scriptParameters'))]"
                         }
                     }
                 }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2020-06-01",
-            "name": "InstallAksHci",
-            "dependsOn": [
-                "[parameters('virtualMachineName')]",
-                "[resourceId('Microsoft.Compute/virtualMachines/extensions/', parameters('virtualMachineName'), 'ConfigureAksHciHost')]"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[uri(variables('artifactsLocation'), concat('autodeploy/json/installAksHci.json'))]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "artifactsLocation": {
-                        "value": "[variables('artifactsLocation')]"
-                    },
-                    "adminUsername": {
-                        "value": "[parameters('adminUsername')]"
-                    },
-                    "virtualMachineName": {
-                        "value": "[parameters('virtualMachineName')]"
-                    },
-                    "location": {
-                        "value": "[resourceGroup().location]"
-                    }
-                }
-            }
+            ]
         },
         {
             "name": "[concat('shutdown-computevm-', parameters('virtualMachineName'))]",
@@ -788,7 +834,7 @@
             "apiVersion": "2020-06-01",
             "name": "[concat(variables('virtualNetworkName'),'-UpdateDNS')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines/extensions/', parameters('virtualMachineName'), 'ConfigureAksHciHost')]"
+                "[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('virtualMachineName'), variables('dscName'))]"
             ],
             "properties": {
                 "mode": "Incremental",
