@@ -127,6 +127,7 @@ catch {
     return
 } #>
 
+Log "Current user is $(whoami)"
 Log "Resource group = $rgName"
 Log "Location = $location"
 Log "SubID = $subId"
