@@ -122,19 +122,19 @@
                 "description": "If you wish to use a different port to RDP into the VM (between 0 and 65535), change it here, otherwise, leave the default."
             }
         },
-        "AksHciAppId": {
+        "AKS-HCIAppId": {
             "type": "string",
             "metadata": {
                 "description": "Enter the Application ID for your Azure AD Service Principal that will be used to integrate AKS on Azure Stack HCI, with Azure"
             }
         },
-        "AksHciAppSecret": {
+        "AKS-HCIAppSecret": {
             "type": "securestring",
             "metadata": {
                 "description": "Enter the corresponding secret for your Application ID"
             }
         },
-        "AksHciNetworking": {
+        "AKS-HCINetworking": {
             "type": "string",
             "defaultValue": "DHCP",
             "allowedValues": [
@@ -498,9 +498,10 @@
         "dscName": "[if(equals(parameters('installWindowsAdminCenter'), 'Yes'), 'ConfigureAksHciHostPostWac', 'ConfigureAksHciHost')]",
         "ps_adminUsername": "[concat('base64:', base64(parameters('adminUsername')))]",
         "ps_adminPassword": "[concat('base64:', base64(parameters('adminPassword')))]",
-        "ps appId": "[concat('base64:', base64(parameters('AksHciAppId')))]",
-        "ps_appSecret": "[concat('base64:', base64(parameters('AksHciAppSecret')))]",
-        "scriptParameters": "[concat(' -userName ', variables('ps_adminUsername'), '-adminUsername ',variables('ps_adminUsername'),' -adminPassword \"',variables('ps_adminPassword'),'\"',' -appId \"',variables('ps appId'),'\"',' -appSecret \"',variables('ps_appSecret'),'\"', '-rgName \"',resourceGroup().name,'\"','-rgName \"',resourceGroup().name,'\"','-location \"',resourceGroup().location,'\"','-subID \"',subscription().subscriptionId,'\"','-tenantID \"',subscription().tenantId,'\"',' -domainName \"',parameters('domainName'),'\"',' -installWAC \"', parameters('installWindowsAdminCenter'),'\"',' -aksHciNetworking \"',parameters('aksHciNetworking'),'\"',' -$kubernetesVersion \"',parameters('kubernetesVersion'),'\"',' -controlPlaneNodes ',parameters('controlPlaneNodes'),' -controlPlaneNodeSize \"',parameters('controlPlaneNodeSize'),'\"',' -loadBalancerSize \"',parameters('loadBalancerSize'),'\"',' -linuxWorkerNodes ',parameters('linuxWorkerNodes'),' -linuxWorkerNodeSize \"',parameters('linuxWorkerNodeSize'),'\"',' -windowsWorkerNodes ',parameters('windowsWorkerNodes'),' -windowsWorkerNodeSize \"',parameters('windowsWorkerNodeSize'),'\"')]"
+        "ps appId": "[concat('base64:', base64(parameters('AKS-HCIAppId')))]",
+        "ps_appSecret": "[concat('base64:', base64(parameters('AKS-HCIAppSecret')))]",
+        //"scriptParameters": "[concat(' -userName ', parameters('adminUsername'), '-adminUsername ',variables('ps_adminUsername'),' -adminPassword \"',variables('ps_adminPassword'),'\"',' -appId \"',variables('ps appId'),'\"',' -appSecret \"',variables('ps_appSecret'),'\"', '-rgName \"',resourceGroup().name,'\"','-location \"',resourceGroup().location,'\"','-subID \"',subscription().subscriptionId,'\"','-tenantID \"',subscription().tenantId,'\"',' -domainName \"',parameters('domainName'),'\"',' -installWAC \"', parameters('installWindowsAdminCenter'),'\"',' -aksHciNetworking \"',parameters('AKS-HCINetworking'),'\"',' -$kubernetesVersion \"',parameters('kubernetesVersion'),'\"',' -controlPlaneNodes ',parameters('controlPlaneNodes'),' -controlPlaneNodeSize \"',parameters('controlPlaneNodeSize'),'\"',' -loadBalancerSize \"',parameters('loadBalancerSize'),'\"',' -linuxWorkerNodes ',parameters('linuxWorkerNodes'),' -linuxWorkerNodeSize \"',parameters('linuxWorkerNodeSize'),'\"',' -windowsWorkerNodes ',parameters('windowsWorkerNodes'),' -windowsWorkerNodeSize \"',parameters('windowsWorkerNodeSize'),'\"')]"
+        "scriptParameters": "[concat(' -userName ', parameters('adminUsername'), '-adminUsername ',parameters('adminUsername'),' -adminPassword \"',parameters('adminPassword'),'\"',' -appId \"',parameters('AKS-HCIAppId'),'\"',' -appSecret \"',parameters('AKS-HCIAppSecret'),'\"', '-rgName \"',resourceGroup().name,'\"','-location \"',resourceGroup().location,'\"','-subID \"',subscription().subscriptionId,'\"','-tenantID \"',subscription().tenantId,'\"',' -domainName \"',parameters('domainName'),'\"',' -installWAC \"', parameters('installWindowsAdminCenter'),'\"',' -aksHciNetworking \"',parameters('AKS-HCINetworking'),'\"',' -$kubernetesVersion \"',parameters('kubernetesVersion'),'\"',' -controlPlaneNodes ',parameters('controlPlaneNodes'),' -controlPlaneNodeSize \"',parameters('controlPlaneNodeSize'),'\"',' -loadBalancerSize \"',parameters('loadBalancerSize'),'\"',' -linuxWorkerNodes ',parameters('linuxWorkerNodes'),' -linuxWorkerNodeSize \"',parameters('linuxWorkerNodeSize'),'\"',' -windowsWorkerNodes ',parameters('windowsWorkerNodes'),' -windowsWorkerNodeSize \"',parameters('windowsWorkerNodeSize'),'\"')]"
     },
     "resources": [
         {
@@ -717,7 +718,7 @@
                                 "installWAC": "[parameters('installWindowsAdminCenter')]",
                                 "domainName": "[parameters('domainName')]",
                                 "environment": "[variables('environment')]",
-                                "aksHciNetworking": "[parameters('AksHciNetworking')]",
+                                "aksHciNetworking": "[parameters('AKS-HCINetworking')]",
                                 "customRdpPort": "[parameters('customRdpPort')]",
                                 "controlPlaneNodes": "[parameters('ControlPlaneNodes')]",
                                 "controlPlaneNodeSize": "[parameters('ControlPlaneNodeSize')]",
@@ -763,7 +764,7 @@
                                 "installWAC": "[parameters('installWindowsAdminCenter')]",
                                 "domainName": "[parameters('domainName')]",
                                 "environment": "[variables('environment')]",
-                                "aksHciNetworking": "[parameters('AksHciNetworking')]",
+                                "aksHciNetworking": "[parameters('AKS-HCINetworking')]",
                                 "customRdpPort": "[parameters('customRdpPort')]",
                                 "controlPlaneNodes": "[parameters('ControlPlaneNodes')]",
                                 "controlPlaneNodeSize": "[parameters('ControlPlaneNodeSize')]",
@@ -828,7 +829,7 @@
             "dependsOn": [
                 "[concat('Microsoft.Compute/virtualMachines/', parameters('virtualMachineName'))]"
             ]
-        },
+        }/*, 
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-06-01",
@@ -865,7 +866,7 @@
                     }
                 }
             }
-        }
+        } */
     ],
     "outputs": {
         "adminUsername": {

@@ -14,13 +14,11 @@ param
     [Parameter(Mandatory)]
     [string]$adminUsername,
     [Parameter(Mandatory)]
-    [string]$userName,
-    [Parameter(Mandatory)]
-    [string]$adminPassword,
+    [SecureString]$adminPassword,
     [Parameter(Mandatory)]
     [string]$appId,
     [Parameter(Mandatory)]
-    [string]$appSecret,
+    [SecureString]$appSecret,
     [Parameter(Mandatory)]
     [string]$installWAC,
     [Parameter(Mandatory)]
