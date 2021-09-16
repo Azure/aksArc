@@ -164,11 +164,11 @@
         },
         "ControlPlaneNodes": {
             "type": "int",
-            "defaultValue": "1",
+            "defaultValue": 1,
             "allowedValues": [
-                "1",
-                "3",
-                "5"
+                1,
+                3,
+                5
             ],
             "metadata": {
                 "description": "Enter the number of control plane nodes for this target cluster"
@@ -226,13 +226,13 @@
         },
         "LinuxWorkerNodes": {
             "type": "int",
-            "defaultValue": "1",
+            "defaultValue": 1,
             "allowedValues": [
-                "1",
-                "2",
-                "3",
-                "4",
-                "5"
+                1,
+                2,
+                3,
+                4,
+                5
             ],
             "metadata": {
                 "description": "Enter the number of Linux worker nodes for this target cluster"
@@ -265,14 +265,14 @@
         },
         "WindowsWorkerNodes": {
             "type": "int",
-            "defaultValue": "0",
+            "defaultValue": 0,
             "allowedValues": [
-                "0",
-                "1",
-                "2",
-                "3",
-                "4",
-                "5"
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
             ],
             "metadata": {
                 "description": "Enter the number of Windows worker nodes for this target cluster"
@@ -664,7 +664,6 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-06-01",
             "name": "InstallWAC",
-            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[parameters('virtualMachineName')]"
             ],
@@ -680,18 +679,21 @@
                     },
                     "adminUsername": {
                         "value": "[parameters('adminUsername')]"
+                    },
+                    "location": {
+                        "value": "[resourceGroup().location]"
                     }
                 }
             }
         },
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "ConfigureAksHciHost",
+            "name": "[concat(parameters('virtualMachineName'), '/', 'ConfigureAksHciHost')]",
             "apiVersion": "2020-06-01",
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[parameters('virtualMachineName')]",
-                "[resourceId('Microsoft.Resources/deployments', 'InstallWAC')]"
+                "[resourceId('Microsoft.Resources/deployments/', 'InstallWAC')]"
             ],
             "properties": {
                 "publisher": "Microsoft.Powershell",
@@ -707,13 +709,10 @@
                     },
                     "configurationArguments": {
                         "installWAC": "[parameters('installWindowsAdminCenter')]",
-                        "rgName": "[resourceGroup().name]",
-                        "location": "[resourceGroup().location]",
                         "domainName": "[parameters('domainName')]",
                         "environment": "[variables('environment')]",
                         "aksHciNetworking": "[parameters('AksHciNetworking')]",
                         "customRdpPort": "[parameters('customRdpPort')]",
-                        "kubernetesVersion": "[parameters('KubernetesVersion')]",
                         "controlPlaneNodes": "[parameters('ControlPlaneNodes')]",
                         "controlPlaneNodeSize": "[parameters('ControlPlaneNodeSize')]",
                         "loadBalancerSize": "[parameters('LoadBalancerSize')]",
@@ -730,10 +729,6 @@
                         "adminCreds": {
                             "username": "[parameters('adminUsername')]",
                             "password": "[parameters('adminPassword')]"
-                        },
-                        "aksHciSpCreds": {
-                            "username": "[parameters('AksHciAppId')]",
-                            "password": "[parameters('AksHciAppSecret')]"
                         }
                     }
                 }
@@ -743,10 +738,9 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-06-01",
             "name": "InstallAksHci",
-            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[parameters('virtualMachineName')]",
-                "[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('virtualMachineName'), 'ConfigureAksHciHost')]"
+                "[resourceId('Microsoft.Compute/virtualMachines/extensions/', parameters('virtualMachineName'), 'ConfigureAksHciHost')]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -760,6 +754,9 @@
                     },
                     "adminUsername": {
                         "value": "[parameters('adminUsername')]"
+                    },
+                    "location": {
+                        "value": "[resourceGroup().location]"
                     }
                 }
             }
@@ -787,7 +784,7 @@
             "apiVersion": "2020-06-01",
             "name": "[concat(variables('virtualNetworkName'),'-UpdateDNS')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('virtualMachineName'), 'ConfigureAksHciHost')]"
+                "[resourceId('Microsoft.Compute/virtualMachines/extensions/', parameters('virtualMachineName'), 'ConfigureAksHciHost')]"
             ],
             "properties": {
                 "mode": "Incremental",

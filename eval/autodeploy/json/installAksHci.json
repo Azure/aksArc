@@ -13,6 +13,12 @@
             "metadata": {
                 "description": "Username of the administrator to run the script as"
             }
+        },
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "Location for all resources."
+            }
         }
     },
     "resources": [
