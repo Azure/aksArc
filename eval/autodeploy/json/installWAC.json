@@ -14,6 +14,12 @@
                 "description": "Username of the administrator to run the script as"
             }
         },
+        "virtualMachineName": {
+            "type": "string",
+            "metadata": {
+                "description": "Username of the administrator to run the script as"
+            }
+        },
         "location": {
             "type": "string",
             "metadata": {
@@ -24,9 +30,9 @@
     "resources": [
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "InstallWAC",
+            "name": "[concat(parameters('virtualMachineName'), '/', 'InstallWAC')]",
             "apiVersion": "2020-06-01",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('location')]",
             "properties": {
                 "publisher": "Microsoft.Compute",
                 "type": "CustomScriptExtension",
