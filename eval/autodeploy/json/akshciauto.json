@@ -303,6 +303,14 @@
                 "description": "Choose the VM size for your Windows worker nodes for this target cluster. Visit this link for more information about VM sizes: https://docs.microsoft.com/en-us/azure-stack/aks-hci/reference/ps/get-akshcivmsize"
             }
         },
+        "installWindowsAdminCenter": {
+            "type": "string",
+            "defaultValue": "No",
+            "allowedValues": [
+                "Yes",
+                "No"
+            ]
+        },
         "autoShutdownStatus": {
             "type": "string",
             "defaultValue": "Enabled",
@@ -694,9 +702,10 @@
                             "configuration": {
                                 "url": "[variables('dscUri')]",
                                 "script": "akshciauto.ps1",
-                                "function": "AKSHCIHost"
+                                "function": "AksHciAutoDeploy"
                             },
                             "configurationArguments": {
+                                "installWAC": "[parameters('installWindowsAdminCenter')]",
                                 "rgName": "[resourceGroup().name]",
                                 "location": "[resourceGroup().location]",
                                 "domainName": "[parameters('domainName')]",

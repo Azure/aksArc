@@ -1,15 +1,7 @@
-configuration AKSHCIHost
+configuration AksHciAutoDeploy
 {
     param 
     ( 
-        [Parameter(Mandatory)]
-        [string]$rgName,
-        [Parameter(Mandatory)]
-        [string]$location,
-        [Parameter(Mandatory)]
-        [string]$subId,
-        [Parameter(Mandatory)]
-        [string]$tenantId,
         [Parameter(Mandatory)]
         [string]$domainName,
         [Parameter(Mandatory)]
@@ -19,11 +11,9 @@ configuration AKSHCIHost
         [Parameter(Mandatory)]
         [string]$customRdpPort,
         [Parameter(Mandatory)]
+        [string]$installWAC,
+        [Parameter(Mandatory)]
         [string]$aksHciNetworking,
-        [Parameter(Mandatory)]
-        [System.Management.Automation.PSCredential]$aksHciSpCreds,
-        [Parameter(Mandatory)]
-        [string]$kubernetesVersion,
         [Parameter(Mandatory)]
         [int]$controlPlaneNodes,
         [Parameter(Mandatory)]
@@ -62,13 +52,12 @@ configuration AKSHCIHost
     Import-DscResource -ModuleName 'PackageManagement' -ModuleVersion 1.4.7
     Import-DscResource -ModuleName 'PowerShellGet' -ModuleVersion 2.2.5
 
-    if ($AksHciNetworking -eq "DHCP") {
+    if ($aksHciNetworking -eq "DHCP") {
         $dhcpStatus = "Active"
     }
     else { $dhcpStatus = "Inactive" }
 
     [System.Management.Automation.PSCredential]$domainCreds = New-Object System.Management.Automation.PSCredential ("${domainName}\$($adminCreds.Username)", $adminCreds.Password)
-    [System.Management.Automation.PSCredential]$spCreds = New-Object System.Management.Automation.PSCredential ($aksHciSpCreds.Username, $aksHciSpCreds.Password)
     
     $ipConfig = (Get-NetAdapter -Physical | Where-Object Status -EQ Up | Get-NetIPConfiguration | Where-Object IPv4DefaultGateway)
     $netAdapters = Get-NetAdapter -Name ($ipConfig.InterfaceAlias) | Select-Object -First 1
@@ -78,33 +67,33 @@ configuration AKSHCIHost
     # Memory Check before deployment of AKS-HCI
     # First get VM sizes in an array:
 
-    $vmSizes = @()
-    $vmSizes.Clear()
-    $vmSizes =
+    $vmSizeArray = @()
+    $vmSizeArray.Clear()
+    $vmSizeArray =
     @(
-        # Name, CPU, MemoryGB
-    ([VmSize]::Default, "4", "4"),
-    ([VmSize]::Standard_A2_v2, "2", "4"),
-    ([VmSize]::Standard_A4_v2, "4", "8"),
-    ([VmSize]::Standard_D2s_v3, "2", "8"),
-    ([VmSize]::Standard_D4s_v3, "4", "16"),
-    ([VmSize]::Standard_D8s_v3, "8", "32"),
-    ([VmSize]::Standard_D16s_v3, "16", "64"),
-    ([VmSize]::Standard_D32s_v3, "32", "128"),
-    ([VmSize]::Standard_DS2_v2, "2", "7"),
-    ([VmSize]::Standard_DS3_v2, "2", "14"),
-    ([VmSize]::Standard_DS4_v2, "8", "28"),
-    ([VmSize]::Standard_DS5_v2, "16", "56"),
-    ([VmSize]::Standard_DS13_v2, "8", "56"),
-    ([VmSize]::Standard_K8S_v1, "4", "2"),
-    ([VmSize]::Standard_K8S2_v1, "2", "2"),
-    ([VmSize]::Standard_K8S3_v1, "4", "6")
+        # SizeName, vCPU, MemoryInGB
+    ("Default", "4", "4"),
+    ("Standard_A2_v2", "2", "4"),
+    ("Standard_A4_v2", "4", "8"),
+    ("Standard_D2s_v3", "2", "8"),
+    ("Standard_D4s_v3", "4", "16"),
+    ("Standard_D8s_v3", "8", "32"),
+    ("Standard_D16s_v3", "16", "64"),
+    ("Standard_D32s_v3", "32", "128"),
+    ("Standard_DS2_v2", "2", "7"),
+    ("Standard_DS3_v2", "2", "14"),
+    ("Standard_DS4_v2", "8", "28"),
+    ("Standard_DS5_v2", "16", "56"),
+    ("Standard_DS13_v2", "8", "56"),
+    ("Standard_K8S_v1", "4", "2"),
+    ("Standard_K8S2_v1", "2", "2"),
+    ("Standard_K8S3_v1", "4", "6")
     )
 
-    $vMSizeResult = @()
-    foreach ($definition in $vmSizes) {
-        $size = [ordered]@{'VmSize' = $definition[0]; 'CPU' = $definition[1]; 'MemoryGB' = $definition[2] }
-        $vMSizeResult += New-Object -TypeName PsObject -Property $size
+    $vMSizeResultDisplay = @()
+    foreach ($item in $vmSizeArray) {
+        $aksHciVmsize = [ordered]@{'SizeName' = $item[0]; 'vCPU' = $item[1]; 'MemoryInGB' = $item[2] }
+        $vMSizeResultDisplay += New-Object -TypeName PsObject -Property $aksHciVmsize
     }
 
     # Then get host information
@@ -115,10 +104,10 @@ configuration AKSHCIHost
 
     # Get Load Balancer node info
     $loadBalancerSize = ($loadBalancerSize).Split(" ", 2)[0]
-    foreach ($vmSize in $vMSizeResult) {
-        if ($vmSize.VmSize -eq $loadBalancerSize) {
-            $loadBalancerMemory = $vmSize.MemoryGB
-            $loadBalancerLogicalProcessors = $vmSize.CPU
+    foreach ($v in $vMSizeResultDisplay) {
+        if ($v.SizeName -eq $loadBalancerSize) {
+            $loadBalancerMemory = $v.MemoryInGB
+            $loadBalancerLogicalProcessors = $v.vCPU
             $loadBalancerMemory = [convert]::ToInt32($loadBalancerMemory)
             $loadBalancerOverheadMemory = (($loadBalancerMemory - 1) * 8) + 32
             [int]$loadBalancerMemory = ($loadBalancerMemory * 1024) + $loadBalancerOverheadMemory
@@ -129,10 +118,10 @@ configuration AKSHCIHost
     # Get Control Plane node info
 
     $controlPlaneNodeSize = ($controlPlaneNodeSize).Split(" ", 2)[0]
-    foreach ($vmSize in $vMSizeResult) {
-        if ($vmSize.VmSize -eq $controlPlaneNodeSize) {
-            $controlPlaneMemory = $vmSize.MemoryGB
-            $controlPlaneLogicalProcessors = $vmSize.CPU
+    foreach ($v in $vMSizeResultDisplay) {
+        if ($v.SizeName -eq $controlPlaneNodeSize) {
+            $controlPlaneMemory = $v.MemoryInGB
+            $controlPlaneLogicalProcessors = $v.vCPU
             $controlPlaneMemory = [convert]::ToInt32($controlPlaneMemory)
             $controlPlaneOverheadMemory = (($controlPlaneMemory - 1) * 8) + 32
             [int]$controlPlaneMemory = ($controlPlaneMemory * 1024) + $controlPlaneOverheadMemory
@@ -144,10 +133,10 @@ configuration AKSHCIHost
     # Get Linux Worker Node info
 
     $linuxWorkerNodeSize = ($linuxWorkerNodeSize).Split(" ", 2)[0]
-    foreach ($vmSize in $vMSizeResult) {
-        if ($vmSize.VmSize -eq $linuxWorkerNodeSize) {
-            $linuxWorkerMemory = $vmSize.MemoryGB
-            $linuxWorkerLogicalProcessors = $vmSize.CPU
+    foreach ($v in $vMSizeResultDisplay) {
+        if ($v.SizeName -eq $linuxWorkerNodeSize) {
+            $linuxWorkerMemory = $v.MemoryInGB
+            $linuxWorkerLogicalProcessors = $v.vCPU
             $linuxWorkerMemory = [convert]::ToInt32($linuxWorkerMemory)
             $linuxWorkerOverheadMemory = (($linuxWorkerMemory - 1) * 8) + 32
             [int]$linuxWorkerMemory = ($linuxWorkerMemory * 1024) + $linuxWorkerOverheadMemory
@@ -167,10 +156,10 @@ configuration AKSHCIHost
 
     if ($windowsWorkerNodes -gt 0) {
         $windowsWorkerNodeSize = ($windowsWorkerNodeSize).Split(" ", 2)[0]
-        foreach ($vmSize in $vMSizeResult) {
-            if ($vmSize.VmSize -eq $windowsWorkerNodeSize) {
-                $windowsWorkerMemory = $vmSize.MemoryGB
-                $windowsWorkerLogicalProcessors = $vmSize.CPU
+        foreach ($v in $vMSizeResultDisplay) {
+            if ($v.SizeName -eq $windowsWorkerNodeSize) {
+                $windowsWorkerMemory = $v.MemoryInGB
+                $windowsWorkerLogicalProcessors = $v.vCPU
                 $windowsWorkerMemory = [convert]::ToInt32($windowsWorkerMemory)
                 $windowsWorkerOverheadMemory = (($windowsWorkerMemory - 1) * 8) + 32
                 [int]$windowsWorkerMemory = ($windowsWorkerMemory * 1024) + $windowsWorkerOverheadMemory
@@ -290,19 +279,19 @@ configuration AKSHCIHost
 
         File "AksHciImagesfolder" {
             Type            = 'Directory'
-            DestinationPath = "$targetAksPath" + ":\Images"
+            DestinationPath = "$targetAksPath" + "\Images"
             DependsOn       = "[Script]FormatDisk"
         }
 
         File "AksHciWorkingfolder" {
             Type            = 'Directory'
-            DestinationPath = "$targetAksPath" + ":\WorkingDir"
+            DestinationPath = "$targetAksPath" + "\WorkingDir"
             DependsOn       = "[Script]FormatDisk"
         }
 
         File "AksHciConfigfolder" {
             Type            = 'Directory'
-            DestinationPath = "$targetAksPath" + ":\Config"
+            DestinationPath = "$targetAksPath" + "\Config"
             DependsOn       = "[Script]FormatDisk"
         }
 
@@ -799,12 +788,14 @@ configuration AKSHCIHost
             DependsOn   = '[cChocoInstaller]installChoco'
         }
 
-        cShortcut "Wac Shortcut"
-        {
-            Path      = 'C:\Users\Public\Desktop\Windows Admin Center.lnk'
-            Target    = 'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
-            Arguments = "https://$env:computerName"
-            Icon      = 'shell32.dll,34'
+        if ($installWAC -eq 'Yes') {
+            cShortcut "Wac Shortcut"
+            {
+                Path      = 'C:\Users\Public\Desktop\Windows Admin Center.lnk'
+                Target    = 'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
+                Arguments = "https://$env:computerName"
+                Icon      = 'shell32.dll,34'
+            }
         }
 
         #### STAGE 3c - Update Firewall
@@ -833,227 +824,27 @@ configuration AKSHCIHost
             Description = 'Allow Windows Admin Center'
         }
 
-        #### STAGE 4 - INSTALL AKS-HCI
-
-        # Initialize AKS-HCI
-
-        script "InitializeAksHci" {
-            GetScript  = {
-                $result = Test-Path -Path "C:\AksHciAutoDeploy\InitializeAksHci.txt"
-                return @{ 'Result' = $result }
-            }
-
-            SetScript  = {
-                try { 
-                    Initialize-AksHciNode
-                    New-item -Path C:\AksHciAutoDeploy\ -Name "InitializeAksHci.txt" -ItemType File -Force
-                }
-                catch { throw $_.Exception.Message }
-            }
-
-            TestScript = {
-                # Create and invoke a scriptblock using the $GetScript automatic variable, which contains a string representation of the GetScript.
-                $state = [scriptblock]::Create($GetScript).Invoke()
-                return $state.Result
-            }
-            DependsOn  = '[cChocoInstaller]installChoco'
-        }
-
-        # Define the networking config
-
-        script "SetNetworkSettings" {
-            GetScript  = {
-                $result = if (Get-Variable -Name vnet -ErrorAction SilentlyContinue) { $true } else { $false }
-                return @{ 'Result' = $result }
-            }
-        
-            SetScript  = {
-                if ($aksHciNetworking -eq "DHCP") {
-                    New-AksHciNetworkSetting -Name "akshci-main-network" -vSwitchName "InternalNAT" `
-                        -vipPoolStart "192.168.0.150" -vipPoolEnd "192.168.0.250"
-                } 
-                else {
-                    New-AksHciNetworkSetting -Name "akshci-main-network" -vSwitchName "InternalNAT" -gateway "192.168.0.1" -dnsservers "192.168.0.1" `
-                        -ipaddressprefix "192.168.0.0/16" -k8snodeippoolstart "192.168.0.3" -k8snodeippoolend "192.168.0.149" `
-                        -vipPoolStart "192.168.0.150" -vipPoolEnd "192.168.0.250"
-                }        
-            }
-            TestScript = {
-                # Create and invoke a scriptblock using the $GetScript automatic variable, which contains a string representation of the GetScript.
-                $state = [scriptblock]::Create($GetScript).Invoke()
-                return $state.Result
-            }
-            DependsOn  = '[script]InitializeAksHci'
-        }
-
-        # Set the AksHci Config
-
-        script "SetAksHciConfig" {
-            GetScript  = {
-                $result = Test-Path -Path "$Using:targetAksPath\WorkingDir\.AksHci\psconfig.json"
-                return @{ 'Result' = $result }
-            }
-                
-            SetScript  = {
-                $date = (Get-Date).ToString("MMddyy-HHmmss")
-                $clusterRoleName = "akshci-mgmt-cluster-$date"
-                $vnet = Get-AksHciClusterNetwork -name 'akshci-main-network'
-                Set-AksHciConfig -vnet $vnet -imageDir "$Using:targetAksPath\Images" -workingDir "$Using:targetAksPath\WorkingDir" `
-                    -cloudConfigLocation "$Using:targetAksPath\Config" -clusterRoleName $clusterRoleName -Verbose
-            }
-            TestScript = {
-                # Create and invoke a scriptblock using the $GetScript automatic variable, which contains a string representation of the GetScript.
-                $state = [scriptblock]::Create($GetScript).Invoke()
-                return $state.Result
-            }
-            DependsOn  = '[script]SetNetworkSettings'
-        }
-
-        # Finalize Registration
-
-        script "SetAksHciRegistration" {
-            GetScript  = {
-                $result = if (((Get-AksHciRegistration -ErrorAction SilentlyContinue).azureLocation) `
-                        -and ((Get-AksHciRegistration -ErrorAction SilentlyContinue).azureResourceGroup)) { $true } else { $false }
-                return @{ 'Result' = $result }
-            }
-                
-            SetScript  = {
-                Set-AksHciRegistration -SubscriptionId $Using:subId -ResourceGroupName $Using:rgName -TenantId $Using:tenantId -Credential $Using:spCreds
-            }
-            TestScript = {
-                # Create and invoke a scriptblock using the $GetScript automatic variable, which contains a string representation of the GetScript.
-                $state = [scriptblock]::Create($GetScript).Invoke()
-                return $state.Result
-            }
-            DependsOn  = '[script]SetAksHciConfig'
-        }
-
-        # Install AKS-HCI
-
-        script "InstallAksHci" {
-            GetScript  = {
-                $result = if (Get-AksHciBillingStatus -ErrorAction SilentlyContinue) { $true } else { $false }
-                return @{ 'Result' = $result }
-            }
-
-            SetScript  = {
-                try { Install-AksHci -Verbose } catch { throw $_.Exception.Message }
-            }
-
-            TestScript = {
-                # Create and invoke a scriptblock using the $GetScript automatic variable, which contains a string representation of the GetScript.
-                $state = [scriptblock]::Create($GetScript).Invoke()
-                return $state.Result
-            }
-            DependsOn  = '[script]SetAksHciRegistration'
-        }
-
-        # Create Target Cluster with Linux Nodes
-
-        script "CreateTargetCluster" {
-            GetScript  = {
-                $result = if (Get-AksHciCluster -Name "akshciclus001" -ErrorAction SilentlyContinue) { $true } else { $false }
-                return @{ 'Result' = $result }
-            }
-            SetScript  = {
-                if ($Using:kubernetesVersion -eq "Default") {
-                    # Need to check the AKS-HCI Mgmt Cluster version then set to that
-                    $getKvaVersion = Get-AksHciConfig
-                    $kubeVersion = $getKvaVersion.Kva.kvaK8sVersion
-                }
-                else {
-                    $kubeVersion = $Using:kubernetesVersion
-                }
-                New-AksHciCluster -Name "akshciclus001" -kubernetesVersion $kubeVersion `
-                    -controlPlaneNodeCount $Using:controlPlaneNodes -controlPlaneVmSize $Using:controlPlaneNodeSize `
-                    -loadBalancerVmSize $Using:loadBalancerSize -nodePoolName "linuxnodepool" -nodeCount $Using:linuxWorkerNodes `
-                    -osType linux -nodeVmSize $Using:linuxWorkerNodeSize
-            }
-            TestScript = {
-                # Create and invoke a scriptblock using the $GetScript automatic variable, which contains a string representation of the GetScript.
-                $state = [scriptblock]::Create($GetScript).Invoke()
-                return $state.Result
-            }
-            DependsOn  = '[script]InstallAksHci'
-        }
-
-        # Add a Windows Node Pool
-        if ($windowsWorkerNodes -gt 0) {
-            script "AddWindowsNodePool" {
-                GetScript  = {
-                    $result = if (Get-AksHciNodePool -clusterName "akshciclus001" -name "windowsnodepool" -ErrorAction SilentlyContinue) { $true } else { $false }
-                    return @{ 'Result' = $result }
-                }
-                    
-                SetScript  = {
-                    New-AksHciNodePool -clusterName "akshciclus001" -name "windowsnodepool" -count $Using:WindowsWorkerNodes `
-                        -osType windows -vmSize $Using:WindowsWorkerNodeSize
-                }
-                TestScript = {
-                    # Create and invoke a scriptblock using the $GetScript automatic variable, which contains a string representation of the GetScript.
-                    $state = [scriptblock]::Create($GetScript).Invoke()
-                    return $state.Result
-                }
-                DependsOn  = '[script]CreateTargetCluster'
-            }
-        }
-
-        # Set Windows Workers DependsOn
-
-        if ($windowsWorkerNodes -gt 0) {
-            $windowsWorkerDependsOn = "'[script]AddWindowsNodePool'"
-        }
-        else {
-            $windowsWorkerDependsOn = "'[script]CreateTargetCluster'"
-        }
-
-        # Connect to Azure Arc
-        script "ConnectToArc" {
-            GetScript  = {
-                $result = Test-Path -Path "C:\AksHciAutoDeploy\ArcEnabledAksHci.txt"
-                return @{ 'Result' = $result }
-            }
-
-            SetScript  = {
-                try {
-                    Connect-AzAccount -Credential $Using:spCreds -ServicePrincipal -Tenant $Using:tenantId -Subscription $Using:subId
-                    Enable-AksHciArcConnection -name "akshciclus001" -location $Using:location -subscriptionId $Using:subId `
-                        -resourceGroup $Using:rgName -credential $Using:spCreds -tenantId $Using:tenantId
-                }
-                catch { throw $_.Exception.Message }
-                New-item -Path C:\AksHciAutoDeploy\ -Name "ArcEnabledAksHci.txt" -ItemType File -Force
-            }
-
-            TestScript = {
-                # Create and invoke a scriptblock using the $GetScript automatic variable, which contains a string representation of the GetScript.
-                $state = [scriptblock]::Create($GetScript).Invoke()
-                return $state.Result
-            }
-            DependsOn  = $windowsWorkerDependsOn
-        }
-
-        #### STAGE 5 - SET RUN FLAG
+        #### STAGE 4 - SET RUN FLAG
 
         script "SetRunFlag" {
             GetScript  = {
                 $result = Test-Path -Path "C:\AksHciAutoDeploy\AksHciAzureEval.txt"
                 return @{ 'Result' = $result }
             }
-
+        
             SetScript  = {
                 #This is a simple flag to monitor number of runs
                 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
                 try { Invoke-WebRequest "http://bit.ly/AksHciAzureEval" -UseBasicParsing -DisableKeepAlive | Out-Null } catch { $_.Exception.Response.StatusCode.Value__ }
                 New-item -Path C:\AksHciAutoDeploy\ -Name "AksHciAzureEval.txt" -ItemType File -Force
             }
-
+        
             TestScript = {
                 # Create and invoke a scriptblock using the $GetScript automatic variable, which contains a string representation of the GetScript.
                 $state = [scriptblock]::Create($GetScript).Invoke()
                 return $state.Result
             }
-            DependsOn  = '[cChocoInstaller]installChoco'
+            DependsOn   = '[cChocoInstaller]installChoco'
         }
     }
 }
