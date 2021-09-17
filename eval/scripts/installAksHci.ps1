@@ -133,6 +133,8 @@ Log "Number of Linux Nodes = $linuxWorkerNodes of size: $linuxWorkerNodeSize"
 Log "Number of Windows Plane Nodes = $windowsWorkerNodes of size: $windowsWorkerNodeSize"
 Log "LB Size = $loadBalancerSize"
 
+<#
+
 try {
     Log "Starting deployment inside a separate PS Session and logfile..."
     Invoke-Command -Credential $domainCreds -Authentication Credssp -ComputerName $env:COMPUTERNAME -ScriptBlock {
@@ -224,100 +226,7 @@ catch {
     return
 }
 
-<#
-
-# Initialize AKS-HCI
-try {
-    $initialized = Test-Path -Path "C:\AksHciAutoDeploy\InitializeAksHci.txt"
-    if (!$initialized) {
-        Log "Node has not been previously initialized - initializing now"
-        Invoke-Command -Credential $domainCreds -Authentication Credssp -ComputerName $env:COMPUTERNAME -ScriptBlock {
-            Initialize-AksHciNode
-            New-item -Path C:\AksHciAutoDeploy\ -Name "InitializeAksHci.txt" -ItemType File -Force -Verbose
-        }
-        Log "Initialization completed"
-    }
-    else {
-        Log "Node has been previously initialized - Moving to next step"
-    }
-}
-catch {
-    Log "Something went wrong with running Initialize-AksHci. Please review the log file at $fullLogPath and redeploy your VM."
-    Set-Location $ScriptLocation
-    throw $_.Exception.Message
-    return
-}
-
-# Set AKS-HCI Config
-Log 'Defining the network and AKS-HCI configuration'
-try {
-    Invoke-Command -Credential $domainCreds -Authentication Credssp -ComputerName $env:COMPUTERNAME -ScriptBlock {
-        $date = (Get-Date).ToString("MMddyy-HHmmss")
-        $clusterRoleName = "akshci-mgmt-cluster-$date"
-        if ($Using:aksHciNetworking -eq "DHCP") {
-            $vnet = New-AksHciNetworkSetting -Name "akshci-main-network" -vSwitchName "InternalNAT" `
-                -vipPoolStart "192.168.0.150" -vipPoolEnd "192.168.0.250"
-        } 
-        else {
-            $vnet = New-AksHciNetworkSetting -Name "akshci-main-network" -vSwitchName "InternalNAT" -gateway "192.168.0.1" -dnsservers "192.168.0.1" `
-                -ipaddressprefix "192.168.0.0/16" -k8snodeippoolstart "192.168.0.3" -k8snodeippoolend "192.168.0.149" `
-                -vipPoolStart "192.168.0.150" -vipPoolEnd "192.168.0.250"
-        }
-        Set-AksHciConfig -vnet $vnet -imageDir "$Using:targetAksPath\Images" -workingDir "$Using:targetAksPath\WorkingDir" `
-            -cloudConfigLocation "$Using:targetAksPath\Config" -clusterRoleName $clusterRoleName -Verbose
-    }
-    Log "AKS-HCI Config successfully completed"
-}
-catch {
-    Log "Something went wrong with setting the AKS-HCI config. Please review the log file at $fullLogPath and redeploy your VM."
-    Set-Location $ScriptLocation
-    throw $_.Exception.Message
-    return
-}
-
-# Set AKS-HCI Reistration
-Log 'Register AKS-HCI'
-try {
-    $regTest = Test-Path -Path "C:\AksHciAutoDeploy\RegisterAksHci.txt"
-    if (!$regTest) {
-        Invoke-Command -Credential $domainCreds -Authentication Credssp -ComputerName $env:COMPUTERNAME -ScriptBlock {
-            Set-AksHciRegistration -SubscriptionId "$Using:subId" -ResourceGroupName "$Using:rgName" -TenantId "$Using:rgName" -Credential $Using:spCreds -Verbose
-            New-item -Path C:\AksHciAutoDeploy\ -Name "RegisterAksHci.txt" -ItemType File -Force -Verbose
-        }
-    }
-    else {
-        Log "AKS-HCI has been previously registered - Moving to next step"
-    }
-    Log "AKS-HCI registration successfully completed"
-}
-catch {
-    Log "Something went wrong with setting the AKS-HCI registration. Please review the log file at $fullLogPath and redeploy your VM."
-    Set-Location $ScriptLocation
-    throw $_.Exception.Message
-    return
-}
-
-# Install AKS-HCI
-Log 'Installing AKS-HCI'
-try {
-    $installTest = Test-Path -Path "C:\AksHciAutoDeploy\InstallAksHci.txt"
-    if (!$installTest) {
-        Invoke-Command -Credential $domainCreds -Authentication Credssp -ComputerName $env:COMPUTERNAME -ScriptBlock {
-            Install-AksHci -Verbose
-            New-item -Path C:\AksHciAutoDeploy\ -Name "InstallAksHci.txt" -ItemType File -Force -Verbose
-        }
-    }
-    else {
-        Log "AKS-HCI has been previously installed - Moving to next step"
-    }
-    Log "AKS-HCI installation successfully completed"
-}
-catch {
-    Log "Something went wrong with setting the AKS-HCI registration. Please review the log file at $fullLogPath and redeploy your VM."
-    Set-Location $ScriptLocation
-    throw $_.Exception.Message
-    return
-} #>
+#>
 
 $endTime = $(Get-Date).ToString("MMdd-HHmmss")
 Log "Logging stopped at $endTime"
