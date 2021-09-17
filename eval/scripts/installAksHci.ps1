@@ -109,7 +109,7 @@ Log "App ID = $appId"
 Log "Creating domain creds"
 $domainCreds = New-Object System.Management.Automation.PSCredential ("$domainName\$adminUsername", $strAdminPassword)
 Log "Creating node local creds"
-$nodeLocalCreds = New-Object System.Management.Automation.PSCredential ($adminUsername, $adminPassword)
+$nodeLocalCreds = New-Object System.Management.Automation.PSCredential ($adminUsername, $strAdminPassword)
 Log "Creating SP creds"
 $spCreds = New-Object System.Management.Automation.PSCredential ($appId, $strAppSecret)
 
