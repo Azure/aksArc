@@ -141,7 +141,7 @@ try {
     $initialized = Test-Path -Path "C:\AksHciAutoDeploy\InitializeAksHci.txt"
     if (!$initialized) {
         Log "Node has not been previously initialized - initializing now"
-        Invoke-Command -Credential $domainCreds -Authentication Credssp -ComputerName localhost -ScriptBlock {
+        Invoke-Command -Credential $domainCreds -Authentication Credssp -ComputerName $env:COMPUTERNAME -ScriptBlock {
             Initialize-AksHciNode
             New-item -Path C:\AksHciAutoDeploy\ -Name "InitializeAksHci.txt" -ItemType File -Force -Verbose
         }
@@ -184,7 +184,7 @@ catch {
 # Set AKS-HCI Config
 Log 'Defining the network and AKS-HCI configuration'
 try {
-    Invoke-Command -Credential $domainCreds -Authentication Credssp -ComputerName localhost -ScriptBlock {
+    Invoke-Command -Credential $domainCreds -Authentication Credssp -ComputerName $env:COMPUTERNAME -ScriptBlock {
         $date = (Get-Date).ToString("MMddyy-HHmmss")
         $clusterRoleName = "akshci-mgmt-cluster-$date"
         if ($Using:aksHciNetworking -eq "DHCP") {
