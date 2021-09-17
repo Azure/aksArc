@@ -120,7 +120,23 @@ $controlPlaneNodeSize = ($controlPlaneNodeSize).Split(" ", 2)[0]
 $linuxWorkerNodeSize = ($linuxWorkerNodeSize).Split(" ", 2)[0]
 $windowsWorkerNodeSize = ($windowsWorkerNodeSize).Split(" ", 2)[0]
 
-<# Initialize AKS-HCI
+Log "Current user is $(whoami)"
+Log "Resource group = $rgName"
+Log "Location = $location"
+Log "SubID = $subId"
+Log "tenantID = $tenantId"
+Log "Domain Name = $domainName"
+Log "Admin User = $adminUsername"
+Log "App ID = $appId"
+Log "Install WAC = $installWAC"
+Log "Networking config = $aksHciNetworking"
+Log "Kubernetes Version = $kubernetesVersion"
+Log "Number of Control Plane Nodes = $controlPlaneNodes of size: $controlPlaneNodeSize"
+Log "Number of Linux Nodes = $linuxWorkerNodes of size: $linuxWorkerNodeSize"
+Log "Number of Windows Plane Nodes = $windowsWorkerNodes of size: $windowsWorkerNodeSize"
+Log "LB Size = $loadBalancerSize"
+
+# Initialize AKS-HCI
 try {
     $initialized = Test-Path -Path "C:\AksHciAutoDeploy\InitializeAksHci.txt"
     if (!$initialized) {
@@ -138,23 +154,7 @@ catch {
     Set-Location $ScriptLocation
     throw $_.Exception.Message
     return
-} #>
-
-Log "Current user is $(whoami)"
-Log "Resource group = $rgName"
-Log "Location = $location"
-Log "SubID = $subId"
-Log "tenantID = $tenantId"
-Log "Domain Name = $domainName"
-Log "Admin User = $adminUsername"
-Log "App ID = $appId"
-Log "Install WAC = $installWAC"
-Log "Networking config = $aksHciNetworking"
-Log "Kubernetes Version = $kubernetesVersion"
-Log "Number of Control Plane Nodes = $controlPlaneNodes of size: $controlPlaneNodeSize"
-Log "Number of Linux Nodes = $linuxWorkerNodes of size: $linuxWorkerNodeSize"
-Log "Number of Windows Plane Nodes = $windowsWorkerNodes of size: $windowsWorkerNodeSize"
-Log "LB Size = $loadBalancerSize"
+}
 
 $endTime = $(Get-Date).ToString("MMdd-HHmmss")
 Log "Logging stopped at $endTime"
