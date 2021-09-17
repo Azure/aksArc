@@ -45,15 +45,6 @@ function Log($out) {
     Write-Output $out;
 }
 
-function DecodeParam($parameter) {
-    if ($parameter.StartsWith("base64:")) {
-        $encodedParameter = $parameter.Split(':', 2)[1]
-        $decodedArray = [System.Convert]::FromBase64String($encodedParameter);
-        $parameter = [System.Text.Encoding]::UTF8.GetString($decodedArray); 
-    }
-    return $parameter
-}
-
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $Global:VerbosePreference = "Continue"
 $Global:ErrorActionPreference = 'Stop'
@@ -82,23 +73,12 @@ Log "Log file stored at $fullLogPath"
 Log "Starting logging"
 Log "Log started at $runTime"
 
-### DECODING PARAMETERS
-Log "Decoding secure parameters passed from ARM template"
-$adminUsername = DecodeParam $adminUsername
-$adminPassword = DecodeParam $adminPassword
-$appId = DecodeParam $appId
-$appSecret = DecodeParam $appSecret
-
-### CREATE STRONG PASSWORDS ###
-Log "Configuring strong passwords for the user accounts"
-$strAdminPassword = ConvertTo-SecureString $adminPassword -Force -AsPlainText -Verbose
-$strAppSecret = ConvertTo-SecureString $appSecret -Force -AsPlainText -Verbose
 
 ### CREATE CREDENTIALS ###
 Log "Configuring credential objects"
-[System.Management.Automation.PSCredential]$domainCreds = New-Object System.Management.Automation.PSCredential ("${domainName}\$($adminUsername)", $strAdminPassword)
+[System.Management.Automation.PSCredential]$domainCreds = New-Object System.Management.Automation.PSCredential ("${domainName}\$($adminUsername)", $adminPassword)
 [System.Management.Automation.PSCredential]$nodeLocalCreds = New-Object System.Management.Automation.PSCredential ($adminUsername, $adminPassword)
-[System.Management.Automation.PSCredential]$spCreds = New-Object System.Management.Automation.PSCredential ($appId, $strAppSecret)
+[System.Management.Automation.PSCredential]$spCreds = New-Object System.Management.Automation.PSCredential ($appId, $appSecret)
 
 $targetDrive = "V"
 $targetAksPath = "$targetDrive" + ":\AKS-HCI"
