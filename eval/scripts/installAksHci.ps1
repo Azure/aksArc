@@ -106,11 +106,11 @@ Log "Domain Name = $domainName"
 Log "Admin User = $adminUsername"
 Log "App ID = $appId"
 Log "Creating domain creds"
-[System.Management.Automation.PSCredential]$domainCreds = New-Object System.Management.Automation.PSCredential ("${domainName}\$($adminUsername)", $strAdminPassword)
+$domainCreds = New-Object System.Management.Automation.PSCredential ("$domainName\$adminUsername", $strAdminPassword)
 Log "Creating node local creds"
-[System.Management.Automation.PSCredential]$nodeLocalCreds = New-Object System.Management.Automation.PSCredential ($adminUsername, $adminPassword)
+$nodeLocalCreds = New-Object System.Management.Automation.PSCredential ($adminUsername, $adminPassword)
 Log "Creating SP creds"
-[System.Management.Automation.PSCredential]$spCreds = New-Object System.Management.Automation.PSCredential ($appId, $strAppSecret)
+$spCreds = New-Object System.Management.Automation.PSCredential ($appId, $strAppSecret)
 
 $targetDrive = "V"
 $targetAksPath = "$targetDrive" + ":\AKS-HCI"
