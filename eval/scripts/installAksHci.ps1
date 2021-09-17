@@ -86,9 +86,13 @@ Log "Log started at $runTime"
 
 ### DECODING PARAMETERS
 Log "Decoding secure parameters passed from ARM template"
+Log "adminUsername"
 $adminUsername = DecodeParam $adminUsername
+Log "adminUsername"
 $adminPassword = DecodeParam $adminPassword
+Log "appId"
 $appId = DecodeParam $appId
+Log "appSecret"
 $appSecret = DecodeParam $appSecret
 
 ### CREATE STRONG PASSWORDS ###
