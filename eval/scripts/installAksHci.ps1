@@ -103,9 +103,6 @@ $strAppSecret = ConvertTo-SecureString $appSecret -Force -AsPlainText -Verbose
 
 ### CREATE CREDENTIALS ###
 Log "Configuring credential objects"
-Log "Domain Name = $domainName"
-Log "Admin User = $adminUsername"
-Log "App ID = $appId"
 Log "Creating domain creds"
 $domainCreds = New-Object System.Management.Automation.PSCredential ("$domainName\$adminUsername", $strAdminPassword)
 Log "Creating node local creds"
@@ -158,29 +155,6 @@ catch {
     return
 }
 
-<# Set Network Settings
-Log 'Setting the network configuration'
-try {
-    if ($aksHciNetworking -eq "DHCP") {
-        Log "$aksHciNetworking is the chosen network type - configuring network settings"
-        $vnet = New-AksHciNetworkSetting -Name "akshci-main-network" -vSwitchName "InternalNAT" `
-            -vipPoolStart "192.168.0.150" -vipPoolEnd "192.168.0.250"
-    } 
-    else {
-        Log "$aksHciNetworking is the chosen network type - configuring network settings"
-        $vnet = New-AksHciNetworkSetting -Name "akshci-main-network" -vSwitchName "InternalNAT" -gateway "192.168.0.1" -dnsservers "192.168.0.1" `
-            -ipaddressprefix "192.168.0.0/16" -k8snodeippoolstart "192.168.0.3" -k8snodeippoolend "192.168.0.149" `
-            -vipPoolStart "192.168.0.150" -vipPoolEnd "192.168.0.250"
-    }
-    Log "Network configuration completed"
-}
-catch {
-    Log "Something went wrong with configuring the network. Please review the log file at $fullLogPath and redeploy your VM."
-    Set-Location $ScriptLocation
-    throw $_.Exception.Message
-    return
-} #>
-
 # Set AKS-HCI Config
 Log 'Defining the network and AKS-HCI configuration'
 try {
@@ -203,6 +177,50 @@ try {
 }
 catch {
     Log "Something went wrong with setting the AKS-HCI config. Please review the log file at $fullLogPath and redeploy your VM."
+    Set-Location $ScriptLocation
+    throw $_.Exception.Message
+    return
+}
+
+# Set AKS-HCI Reistration
+Log 'Register AKS-HCI'
+try {
+    $regTest = Test-Path -Path "C:\AksHciAutoDeploy\RegisterAksHci.txt"
+    if (!$regTest) {
+        Invoke-Command -Credential $domainCreds -Authentication Credssp -ComputerName $env:COMPUTERNAME -ScriptBlock {
+            Set-AksHciRegistration -SubscriptionId "$Using:subId" -ResourceGroupName "$Using:rgName" -TenantId "$Using:rgName" -Credential $Using:spCreds -Verbose
+            New-item -Path C:\AksHciAutoDeploy\ -Name "RegisterAksHci.txt" -ItemType File -Force -Verbose
+        }
+    }
+    else {
+        Log "AKS-HCI has been previously registered - Moving to next step"
+    }
+    Log "AKS-HCI registration successfully completed"
+}
+catch {
+    Log "Something went wrong with setting the AKS-HCI registration. Please review the log file at $fullLogPath and redeploy your VM."
+    Set-Location $ScriptLocation
+    throw $_.Exception.Message
+    return
+}
+
+# Install AKS-HCI
+Log 'Installing AKS-HCI'
+try {
+    $installTest = Test-Path -Path "C:\AksHciAutoDeploy\InstallAksHci.txt"
+    if (!$installTest) {
+        Invoke-Command -Credential $domainCreds -Authentication Credssp -ComputerName $env:COMPUTERNAME -ScriptBlock {
+            Install-AksHci -Verbose
+            New-item -Path C:\AksHciAutoDeploy\ -Name "InstallAksHci.txt" -ItemType File -Force -Verbose
+        }
+    }
+    else {
+        Log "AKS-HCI has been previously installed - Moving to next step"
+    }
+    Log "AKS-HCI installation successfully completed"
+}
+catch {
+    Log "Something went wrong with setting the AKS-HCI registration. Please review the log file at $fullLogPath and redeploy your VM."
     Set-Location $ScriptLocation
     throw $_.Exception.Message
     return
