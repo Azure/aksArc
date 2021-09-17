@@ -134,6 +134,7 @@ Log "Number of Windows Plane Nodes = $windowsWorkerNodes of size: $windowsWorker
 Log "LB Size = $loadBalancerSize"
 
 try {
+    Log "Starting deployment inside a separate PS Session and logfile..."
     Invoke-Command -Credential $domainCreds -Authentication Credssp -ComputerName $env:COMPUTERNAME -ScriptBlock {
         ### DEFINE A FUNCTION ###
         function Log($out) {
@@ -211,7 +212,10 @@ try {
         Log "Enable the connection"
         Enable-AksHciArcConnection -name $targetClusterName -location $Using:location -subscriptionId $Using:subId `
             -resourceGroup $Using:rgName -credential $Using:spCreds -tenantId $Using:tenantId
+        Log "Cluster successfully onboarded"
+        Log "AKS-HCI has been successfully installed"
     }
+    Log "AKS-HCI has been successfully installed"
 }
 catch {
     Log "Something went wrong with the installation of AKS-HCI. Please review the log file at $fullLogPath and redeploy your VM."
