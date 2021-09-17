@@ -141,8 +141,10 @@ try {
     $initialized = Test-Path -Path "C:\AksHciAutoDeploy\InitializeAksHci.txt"
     if (!$initialized) {
         Log "Node has not been previously initialized - initializing now"
-        Initialize-AksHciNode
-        New-item -Path C:\AksHciAutoDeploy\ -Name "InitializeAksHci.txt" -ItemType File -Force -Verbose
+        Invoke-Command -Credential $domainCreds -Authentication Credssp -ComputerName localhost -ScriptBlock {
+            Initialize-AksHciNode
+            New-item -Path C:\AksHciAutoDeploy\ -Name "InitializeAksHci.txt" -ItemType File -Force -Verbose
+        }
         Log "Initialization completed"
     }
     else {
