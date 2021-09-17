@@ -158,7 +158,7 @@ catch {
     return
 }
 
-# Set Network Settings
+<# Set Network Settings
 Log 'Setting the network configuration'
 try {
     if ($aksHciNetworking -eq "DHCP") {
@@ -179,15 +179,28 @@ catch {
     Set-Location $ScriptLocation
     throw $_.Exception.Message
     return
-}
+} #>
 
 # Set AKS-HCI Config
-Log 'Defining the AKS-HCI configuration'
+Log 'Defining the network and AKS-HCI configuration'
 try {
-    $date = (Get-Date).ToString("MMddyy-HHmmss")
-    $clusterRoleName = "akshci-mgmt-cluster-$date"
-    Set-AksHciConfig -vnet $vnet -imageDir "$targetAksPath\Images" -workingDir "$targetAksPath\WorkingDir" `
-    -cloudConfigLocation "$targetAksPath\Config" -clusterRoleName $clusterRoleName -Verbose
+    Invoke-Command -Credential $domainCreds -Authentication Credssp -ComputerName localhost -ScriptBlock {
+        $date = (Get-Date).ToString("MMddyy-HHmmss")
+        $clusterRoleName = "akshci-mgmt-cluster-$date"
+        if ($Using:aksHciNetworking -eq "DHCP") {
+            Log "$Using:aksHciNetworking is the chosen network type - configuring network settings"
+            $vnet = New-AksHciNetworkSetting -Name "akshci-main-network" -vSwitchName "InternalNAT" `
+                -vipPoolStart "192.168.0.150" -vipPoolEnd "192.168.0.250"
+        } 
+        else {
+            Log "$Using:aksHciNetworking is the chosen network type - configuring network settings"
+            $vnet = New-AksHciNetworkSetting -Name "akshci-main-network" -vSwitchName "InternalNAT" -gateway "192.168.0.1" -dnsservers "192.168.0.1" `
+                -ipaddressprefix "192.168.0.0/16" -k8snodeippoolstart "192.168.0.3" -k8snodeippoolend "192.168.0.149" `
+                -vipPoolStart "192.168.0.150" -vipPoolEnd "192.168.0.250"
+        }
+        Set-AksHciConfig -vnet $vnet -imageDir "$Using:targetAksPath\Images" -workingDir "$Using:targetAksPath\WorkingDir" `
+            -cloudConfigLocation "$Using:targetAksPath\Config" -clusterRoleName $clusterRoleName -Verbose
+    }
     Log "AKS-HCI Config successfully completed"
 }
 catch {
