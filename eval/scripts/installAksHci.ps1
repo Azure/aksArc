@@ -94,6 +94,7 @@ Log "appId"
 $appId = DecodeParam $appId
 Log "appSecret"
 $appSecret = DecodeParam $appSecret
+Log "appSecret = $appSecret"
 
 ### CREATE STRONG PASSWORDS ###
 Log "Configuring strong passwords for the user accounts"
