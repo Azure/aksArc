@@ -173,7 +173,7 @@ try {
                 -vipPoolStart "192.168.0.150" -vipPoolEnd "192.168.0.250"
         }
         Set-AksHciConfig -vnet $vnet -imageDir "$Using:targetAksPath\Images" -workingDir "$Using:targetAksPath\WorkingDir" `
-            -cloudConfigLocation "$Using:targetAksPath\Config" -clusterRoleName $clusterRoleName -Verbose
+            -cloudConfigLocation "$Using:targetAksPath\Config" -clusterRoleName $clusterRoleName -kvaName $clusterRoleName -Verbose
         Log "AKS-HCI Config successfully completed"
 
         ### SET AKS-HCI REGISTRATION ### 
