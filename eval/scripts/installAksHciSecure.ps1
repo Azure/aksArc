@@ -14,11 +14,11 @@ param
     [Parameter(Mandatory)]
     [string]$adminUsername,
     [Parameter(Mandatory)]
-    [SecureString]$adminPassword,
+    [string]$adminPassword,
     [Parameter(Mandatory)]
     [string]$appId,
     [Parameter(Mandatory)]
-    [SecureString]$appSecret,
+    [string]$appSecret,
     [Parameter(Mandatory)]
     [string]$installWAC,
     [Parameter(Mandatory)]
@@ -76,9 +76,9 @@ Log "Log started at $runTime"
 
 ### CREATE CREDENTIALS ###
 Log "Configuring credential objects"
-[System.Management.Automation.PSCredential]$domainCreds = New-Object System.Management.Automation.PSCredential ("${domainName}\$($adminUsername)", $adminPassword)
-[System.Management.Automation.PSCredential]$nodeLocalCreds = New-Object System.Management.Automation.PSCredential ($adminUsername, $adminPassword)
-[System.Management.Automation.PSCredential]$spCreds = New-Object System.Management.Automation.PSCredential ($appId, $appSecret)
+#[System.Management.Automation.PSCredential]$domainCreds = New-Object System.Management.Automation.PSCredential ("${domainName}\$($adminUsername)", $adminPassword)
+#[System.Management.Automation.PSCredential]$nodeLocalCreds = New-Object System.Management.Automation.PSCredential ($adminUsername, $adminPassword)
+#[System.Management.Automation.PSCredential]$spCreds = New-Object System.Management.Automation.PSCredential ($appId, $appSecret)
 
 $targetDrive = "V"
 $targetAksPath = "$targetDrive" + ":\AKS-HCI"
