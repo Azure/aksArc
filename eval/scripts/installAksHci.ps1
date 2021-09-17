@@ -76,7 +76,7 @@ POWERCFG.EXE /S SCHEME_MIN
 
 ### START LOGGING ###
 $runTime = $(Get-Date).ToString("MMdd-HHmmss")
-$fullLogPath = "$logPath\InstallAksHci$runTime.txt"
+$fullLogPath = "$logPath\InstallAksHciInternal$runTime.txt"
 Start-Transcript -Path "$fullLogPath" -Append
 Log "Creating log folder"
 Log "Log folder has been created at $logPath"
@@ -132,6 +132,95 @@ Log "Number of Control Plane Nodes = $controlPlaneNodes of size: $controlPlaneNo
 Log "Number of Linux Nodes = $linuxWorkerNodes of size: $linuxWorkerNodeSize"
 Log "Number of Windows Plane Nodes = $windowsWorkerNodes of size: $windowsWorkerNodeSize"
 Log "LB Size = $loadBalancerSize"
+
+try {
+    Invoke-Command -Credential $domainCreds -Authentication Credssp -ComputerName $env:COMPUTERNAME -ScriptBlock {
+        ### DEFINE A FUNCTION ###
+        function Log($out) {
+            $out = [System.DateTime]::Now.ToString("yyyy.MM.dd hh:mm:ss") + " ---- " + $out;
+            Write-Output $out;
+        }
+
+        ### START LOGGING ###
+        $logPath = "$($env:SystemDrive)\InstallAksHciLog"
+        $runTime = $(Get-Date).ToString("MMdd-HHmmss")
+        $fullLogPath = "$logPath\InstallAksHciInternal$runTime.txt"
+        Start-Transcript -Path "$fullLogPath" -Append
+        Log "Log file for inside Invoke-Command stored at $fullLogPath"
+        Log "Starting logging"
+        Log "Log started at $runTime"
+
+        ### INITIALIZE AKS-HCI ###
+        Log 'Initializing AKS-HCI'
+        Initialize-AksHciNode
+        Log "Initialization completed"
+
+        ### DEFINE AKS-HCI CONFIG ###
+        Log 'Defining the network and AKS-HCI configuration'
+        $date = (Get-Date).ToString("MMddyy-HHmmss")
+        $clusterRoleName = "akshci-mgmt-cluster-$date"
+        $targetClusterName = "akshciclus-$date"
+        if ($Using:aksHciNetworking -eq "DHCP") {
+            $vnet = New-AksHciNetworkSetting -Name "akshci-main-network" -vSwitchName "InternalNAT" `
+                -vipPoolStart "192.168.0.150" -vipPoolEnd "192.168.0.250"
+        } 
+        else {
+            $vnet = New-AksHciNetworkSetting -Name "akshci-main-network" -vSwitchName "InternalNAT" -gateway "192.168.0.1" -dnsservers "192.168.0.1" `
+                -ipaddressprefix "192.168.0.0/16" -k8snodeippoolstart "192.168.0.3" -k8snodeippoolend "192.168.0.149" `
+                -vipPoolStart "192.168.0.150" -vipPoolEnd "192.168.0.250"
+        }
+        Set-AksHciConfig -vnet $vnet -imageDir "$Using:targetAksPath\Images" -workingDir "$Using:targetAksPath\WorkingDir" `
+            -cloudConfigLocation "$Using:targetAksPath\Config" -clusterRoleName $clusterRoleName -Verbose
+        Log "AKS-HCI Config successfully completed"
+
+        ### SET AKS-HCI REGISTRATION ### 
+        Log 'Registering AKS-HCI'
+        Set-AksHciRegistration -SubscriptionId "$Using:subId" -ResourceGroupName "$Using:rgName" -TenantId "$Using:tenantID" -Credential $Using:spCreds -Verbose
+        Log "AKS-HCI registration successfully completed"
+
+        ### INSTALL AKS-HCI ###
+        Log 'Installing AKS-HCI'
+        Install-AksHci -Verbose
+        Log "AKS-HCI installation successfully completed"
+
+        ### CREATE TARGET CLUSTER ###
+        Log "Creating a target cluster with $Using:controlPlaneNodes and $Using:linuxWorkerNodes Linux worker nodes"
+        if ($Using:kubernetesVersion -eq "Default") {
+            # Need to check the AKS-HCI Mgmt Cluster version then set to that
+            $getKvaVersion = Get-AksHciConfig
+            $kubeVersion = $getKvaVersion.Kva.kvaK8sVersion
+        }
+        else {
+            $kubeVersion = $Using:kubernetesVersion
+        }
+        New-AksHciCluster -Name $targetClusterName -kubernetesVersion $kubeVersion -controlPlaneNodeCount $Using:controlPlaneNodes `
+            -controlPlaneVmSize $Using:controlPlaneNodeSize -loadBalancerVmSize $Using:loadBalancerSize -nodePoolName "linuxnodepool" -nodeCount $Using:linuxWorkerNodes -osType linux -nodeVmSize $Using:linuxWorkerNodeSize
+        Log "Target cluster deployment successfully completed"
+
+        ### CREATE WINDOWS NODEPOOL ###
+        if ($windowsWorkerNodes -gt 0) {
+            Log "Adding $Using:windowsWorkerNodes windows worker node(s) to the target cluster"
+            New-AksHciNodePool -clusterName $targetClusterName -name "windowsnodepool" -count $Using:WindowsWorkerNodes `
+                -osType windows -vmSize $Using:WindowsWorkerNodeSize
+            Log "Successfully added a Windows node pool"
+        }
+
+        ### ARC CONNECTION ###
+        Log "Connecting the cluster to Azure Arc - first, log into Azure"
+        Connect-AzAccount -Credential $Using:spCreds -ServicePrincipal -Tenant $Using:tenantId -Subscription $Using:subId
+        Log "Enable the connection"
+        Enable-AksHciArcConnection -name $targetClusterName -location $Using:location -subscriptionId $Using:subId `
+            -resourceGroup $Using:rgName -credential $Using:spCreds -tenantId $Using:tenantId
+    }
+}
+catch {
+    Log "Something went wrong with the installation of AKS-HCI. Please review the log file at $fullLogPath and redeploy your VM."
+    Set-Location $ScriptLocation
+    throw $_.Exception.Message
+    return
+}
+
+<#
 
 # Initialize AKS-HCI
 try {
@@ -224,7 +313,7 @@ catch {
     Set-Location $ScriptLocation
     throw $_.Exception.Message
     return
-}
+} #>
 
 $endTime = $(Get-Date).ToString("MMdd-HHmmss")
 Log "Logging stopped at $endTime"
