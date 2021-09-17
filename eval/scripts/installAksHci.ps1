@@ -188,12 +188,10 @@ try {
         $date = (Get-Date).ToString("MMddyy-HHmmss")
         $clusterRoleName = "akshci-mgmt-cluster-$date"
         if ($Using:aksHciNetworking -eq "DHCP") {
-            Log "$Using:aksHciNetworking is the chosen network type - configuring network settings"
             $vnet = New-AksHciNetworkSetting -Name "akshci-main-network" -vSwitchName "InternalNAT" `
                 -vipPoolStart "192.168.0.150" -vipPoolEnd "192.168.0.250"
         } 
         else {
-            Log "$Using:aksHciNetworking is the chosen network type - configuring network settings"
             $vnet = New-AksHciNetworkSetting -Name "akshci-main-network" -vSwitchName "InternalNAT" -gateway "192.168.0.1" -dnsservers "192.168.0.1" `
                 -ipaddressprefix "192.168.0.0/16" -k8snodeippoolstart "192.168.0.3" -k8snodeippoolend "192.168.0.149" `
                 -vipPoolStart "192.168.0.150" -vipPoolEnd "192.168.0.250"
