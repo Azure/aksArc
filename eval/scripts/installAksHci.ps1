@@ -156,6 +156,45 @@ catch {
     return
 }
 
+# Set Network Settings
+Log 'Setting the network configuration'
+try {
+    if ($aksHciNetworking -eq "DHCP") {
+        Log "$aksHciNetworking is the chosen network type - configuring network settings"
+        $vnet = New-AksHciNetworkSetting -Name "akshci-main-network" -vSwitchName "InternalNAT" `
+            -vipPoolStart "192.168.0.150" -vipPoolEnd "192.168.0.250"
+    } 
+    else {
+        Log "$aksHciNetworking is the chosen network type - configuring network settings"
+        $vnet = New-AksHciNetworkSetting -Name "akshci-main-network" -vSwitchName "InternalNAT" -gateway "192.168.0.1" -dnsservers "192.168.0.1" `
+            -ipaddressprefix "192.168.0.0/16" -k8snodeippoolstart "192.168.0.3" -k8snodeippoolend "192.168.0.149" `
+            -vipPoolStart "192.168.0.150" -vipPoolEnd "192.168.0.250"
+    }
+    Log "Network configuration completed"
+}
+catch {
+    Log "Something went wrong with configuring the network. Please review the log file at $fullLogPath and redeploy your VM."
+    Set-Location $ScriptLocation
+    throw $_.Exception.Message
+    return
+}
+
+# Set AKS-HCI Config
+Log 'Defining the AKS-HCI configuration'
+try {
+    $date = (Get-Date).ToString("MMddyy-HHmmss")
+    $clusterRoleName = "akshci-mgmt-cluster-$date"
+    Set-AksHciConfig -vnet $vnet -imageDir "$targetAksPath\Images" -workingDir "$targetAksPath\WorkingDir" `
+    -cloudConfigLocation "$targetAksPath\Config" -clusterRoleName $clusterRoleName -Verbose
+    Log "AKS-HCI Config successfully completed"
+}
+catch {
+    Log "Something went wrong with setting the AKS-HCI config. Please review the log file at $fullLogPath and redeploy your VM."
+    Set-Location $ScriptLocation
+    throw $_.Exception.Message
+    return
+}
+
 $endTime = $(Get-Date).ToString("MMdd-HHmmss")
 Log "Logging stopped at $endTime"
 Stop-Transcript -ErrorAction SilentlyContinue
