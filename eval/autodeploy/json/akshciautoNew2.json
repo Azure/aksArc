@@ -804,11 +804,13 @@
                         "autoUpgradeMinorVersion": true,
                         "settings": {
                             "fileUris": [
-                                "[uri(variables('artifactsLocation'), concat('scripts/installAksHci.ps1'))]"
+                                //"[uri(variables('artifactsLocation'), concat('scripts/installAksHci.ps1'))]"
+                                "[uri(variables('artifactsLocation'), concat('scripts/installAksHciSecure.ps1'))]"
                             ]
                         },
                         "protectedSettings": {
-                            "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File installAksHci.ps1',variables('scriptParameters'))]"
+                            //"commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File installAksHci.ps1',variables('scriptParameters'))]"
+                            "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File installAksHciSecure.ps1',variables('scriptParameters'))]"
                         }
                     }
                 }
