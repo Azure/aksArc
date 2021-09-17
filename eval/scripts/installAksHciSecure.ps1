@@ -14,6 +14,8 @@ param
     [Parameter(Mandatory)]
     [string]$adminUsername,
     [Parameter(Mandatory)]
+    [string]$userName,
+    [Parameter(Mandatory)]
     [string]$adminPassword,
     [Parameter(Mandatory)]
     [string]$appId,
