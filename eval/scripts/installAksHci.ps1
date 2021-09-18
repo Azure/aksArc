@@ -133,8 +133,6 @@ Log "Number of Linux Nodes = $linuxWorkerNodes of size: $linuxWorkerNodeSize"
 Log "Number of Windows Plane Nodes = $windowsWorkerNodes of size: $windowsWorkerNodeSize"
 Log "LB Size = $loadBalancerSize"
 
-<#
-
 try {
     Log "Starting deployment inside a separate PS Session and logfile..."
     Invoke-Command -Credential $domainCreds -Authentication Credssp -ComputerName $env:COMPUTERNAME -ScriptBlock {
@@ -225,8 +223,6 @@ catch {
     throw $_.Exception.Message
     return
 }
-
-#>
 
 $endTime = $(Get-Date).ToString("MMdd-HHmmss")
 Log "Logging stopped at $endTime"
