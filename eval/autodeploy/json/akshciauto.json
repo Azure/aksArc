@@ -684,7 +684,7 @@
                         "autoUpgradeMinorVersion": true,
                         "settings": {
                             "fileUris": [
-                                "[uri(variables('artifactsLocation'), concat('scripts/installWac.ps1'))]"
+                                "[uri(variables('artifactsLocation'), concat('autodeploy/scripts/installWac.ps1'))]"
                             ]
                         },
                         "protectedSettings": {
@@ -708,7 +708,7 @@
                         "retentionInterval": "P1D",
                         "timeout": "PT30M",
                         "arguments": "[format(' -resourceGroupName {0} -vmName {1} -subscriptionId {2} -tenantId {3} -appId {4} -appSecret {5}', resourceGroup().name, parameters('virtualMachineName'), variables('subId'), variables('tenantId'),parameters('AKS-HCIAppId'), variables('ps_appSecret'))]",
-                        "primaryScriptURI": "https://raw.githubusercontent.com/Azure/aks-hci/automated/eval/scripts/removeCustomScript.ps1"
+                        "primaryScriptURI": "https://raw.githubusercontent.com/Azure/aks-hci/automated/eval/autodeploy/scripts/removeCustomScript.ps1"
                     }
                 },
                 {
@@ -821,7 +821,7 @@
                         "autoUpgradeMinorVersion": true,
                         "settings": {
                             "fileUris": [
-                                "[uri(variables('artifactsLocation'), concat('scripts/installAksHci.ps1'))]"
+                                "[uri(variables('artifactsLocation'), concat('autodeploy/scripts/installAksHci.ps1'))]"
                             ]
                         },
                         "protectedSettings": {
