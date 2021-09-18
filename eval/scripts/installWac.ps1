@@ -1,7 +1,7 @@
 $ProgressPreference = "SilentlyContinue"
 
 mkdir -Path "C:\WAC"
-<#
+
 ## Download the MSI file
 Invoke-WebRequest -UseBasicParsing -Uri 'https://aka.ms/WACDownload' -OutFile "C:\WAC\WindowsAdminCenter.msi"
 #Invoke-WebRequest -UseBasicParsing -Uri 'https://download.microsoft.com/download/1/0/5/1059800B-F375-451C-B37E-758FFC7C8C8B/WindowsAdminCenter2103.2.msi' -OutFile "C:\WAC\WindowsAdminCenter.msi"
