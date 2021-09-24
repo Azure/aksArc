@@ -138,7 +138,7 @@ For reference, the Standard_E8s_v4 VM size costs approximately US $0.50 per hour
 
 In order to deploy this solution, the **User Account** that you wish to use to deploy this Azure VM sandbox needs to have the following permissions:
 
-* Must be able to create a **Resource Group**, deploy a **Virtual Machine** and register **resource providers** within a subscription. For those reasons, for the chosen subscription, the user account should be configured as one of the following roles:
+* Must be able to create a **Resource Group**, deploy a **Virtual Machine** and register **Resource Providers** within a specific subscription. For those reasons, for the chosen subscription, the user account should be configured as one of the following roles:
   * **Owner**
   * **Contributer**
 
@@ -210,11 +210,15 @@ Write-Host "App Secret: $secret"
 
 From the above output, you have the **Application ID** and the **secret** for use when deploying the automated AKS on Azure Stack HCI sandbox, so take a note of those and store them safely.
 
-With that created, in the **Azure portal**, under **Subscriptions**, **Access **Control****, and then **Role Assignments**, you should see your new Service Principal.
+With that created, in the **Azure portal**, under **Subscriptions**, **Access Control**, and then **Role Assignments**, you should see your new Service Principal.
 
 ![Service principal shown in Azure](/eval/media/akshci-spcreated.png "Service principal shown in Azure")
 
-With your service principal created and assigned, and user account permissions verified
+With the Service Principal created, you can verify that the Service Principal has the appropriate permissions in Azure Active Directory by logging into the **Azure portal**, under **Azure Active Directory**, **App Registrations**, and then **All Applications**, you should see your new Service Principal listed. Click on your Service Principal, then click on **Roles and administrators**. The Service Principal should have the built-in **Cloud application administrator** role, as shown in the scren below.
+
+![Service principal permissions shown in Azure AD](/eval/media/akshci-spaad.png "Service principal permissions shown in Azure AD")
+
+With your service principal created and assigned, and user account permissions verified, the final step to check is to ensure you have registered the appropriate Kubernetes Resource Providers for your chosen subscription.
 
 ### Register the Kubernetes resource providers ###
 
