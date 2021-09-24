@@ -407,19 +407,19 @@ $dataDiskType = "StandardSSD_LRS"
 $dataDiskSize = "32"
 $adminUsername = "azureuser"
 $adminPassword = ConvertTo-SecureString 'P@ssw0rd123!' -AsPlainText -Force
-$akshciNetworking = "DHCP" # Or Static #
-$customRdpPort = "3389" # Between 0 and 65535 #
+$akshciNetworking = "DHCP" # Or Static
+$customRdpPort = "3389" # Between 0 and 65535
 $akshciAppId = "Service_Principal_App_ID"
 $akshciAppSecret = ConvertTo-SecureString 'ServicePrincipalSecret' -AsPlainText -Force
 $kubernetesVersion = "Match Management Cluster" # Or v1.19.9, v1.19.11, v1.20.5, v1.20.7, v1.21.1, v1.21.2 - check https://github.com/Azure/aks-hci/releases
 $controlPlanNodes = "1" # 1, 3 or 5
-$controlPlaneNodeSize = "Standard_A4_v2 (4vCPU, 8GB RAM)"
-$loadBalancerSize = "Standard_A4_v2 (4vCPU, 8GB RAM)"
+$controlPlaneNodeSize = "Standard_A4_v2 (4vCPU, 8GB RAM)" # See below for more sizes
+$loadBalancerSize = "Standard_A4_v2 (4vCPU, 8GB RAM)" # See below for more sizes
 $linuxWorkerNodes = "1" # 1, 2, 3, 4 or 5"
-$linuxWorkerNodeSize = "Standard_K8S3_v1 (4vCPU, 6GB RAM)"
+$linuxWorkerNodeSize = "Standard_K8S3_v1 (4vCPU, 6GB RAM)" # See below for more sizes
 $windowsWorkerNodes = "0" # 0, 1, 2, 3, 4 or 5
-$windowsWorkerNodeSize = "Standard_K8S3_v1 (4vCPU, 6GB RAM)"
-$autoShutdownStatus = "Enabled" # Or Disabled #
+$windowsWorkerNodeSize = "Standard_K8S3_v1 (4vCPU, 6GB RAM)" # See below for more sizes
+$autoShutdownStatus = "Enabled" # Or Disabled
 $autoShutdownTime = "00:00"
 $autoShutdownTimeZone = (Get-TimeZone).Id # To list timezones, run [System.TimeZoneInfo]::GetSystemTimeZones() |ft -AutoSize
 $existingWindowsServerLicense = "No" # See NOTE 2 below on Azure Hybrid Benefit
@@ -470,7 +470,7 @@ $getIp | Select-Object Name,IpAddress,@{label='FQDN';expression={$_.DnsSettings.
 
 *******************************************************************************************************
 
-### Available AKS-HCI VM Sizes ###
+#### Available AKS-HCI VM Sizes ####
 Here's a list of VM sizes that you can use for your PowerShell-based deployment. The size you select should be copied exactly how it shows below, including the (info between the brackets)
 
 * Default (4vCPU, 4GB RAM)
