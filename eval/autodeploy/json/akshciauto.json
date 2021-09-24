@@ -148,9 +148,9 @@
 
         "KubernetesVersion": {
             "type": "string",
-            "defaultValue": "Default",
+            "defaultValue": "Match Management Cluster",
             "allowedValues": [
-                "Default",
+                "Match Management Cluster",
                 "v1.21.2",
                 "v1.21.1",
                 "v1.20.7",
@@ -159,7 +159,7 @@
                 "v1.19.9"
             ],
             "metadata": {
-                "description": "Enter the Kubernetes version for your target cluster"
+                "description": "Enter the Kubernetes version for your target cluster. Choosing 'Match Management Cluster' will result in a faster deployment"
             }
         },
         "ControlPlaneNodes": {

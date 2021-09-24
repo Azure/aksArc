@@ -186,7 +186,7 @@ try {
 
         ### CREATE TARGET CLUSTER ###
         Log "Creating a target cluster with $Using:controlPlaneNodes and $Using:linuxWorkerNodes Linux worker nodes"
-        if ($Using:kubernetesVersion -eq "Default") {
+        if ($Using:kubernetesVersion -eq "Match Management Cluster") {
             # Need to check the AKS-HCI Mgmt Cluster version then set to that
             $getKvaVersion = Get-AksHciConfig
             $kubeVersion = $getKvaVersion.Kva.kvaK8sVersion

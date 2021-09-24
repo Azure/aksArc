@@ -282,15 +282,23 @@ To keep things simple, and graphical to begin with, we'll show you how to deploy
 
 Firstly, the **Visualize** button will launch the ARMVIZ designer view, where you will see a graphic representing the core components of the deployment, including the VM, NIC, disk and more. If you want to open this in a new tab, **hold CTRL** when you click the button.
 
-[![Visualize your template deployment](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.png)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Faks-hci%2Fmain%2Feval%2Fjson%2Fakshcihost.json "Visualize your template deployment")
+[![Visualize your template deployment](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.png)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Faks-hci%2Fmain%2Feval%2Fautodeploy%2Fjson%2Fakshciauto.json "Visualize your template deployment")
 
 Secondly, the **Deploy to Azure** button, when clicked, will take you directly to the Azure portal, and upon login, provide you with a form to complete. If you want to open this in a new tab, **hold CTRL** when you click the button.
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Faks-hci%2Fmain%2Feval%2Fjson%2Fakshcihost.json "Deploy to Azure")
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Faks-hci%2Fmain%2Feval%2Fautodeploy%2Fjson%2Fakshciauto.json "Deploy to Azure")
 
-Upon clicking the **Deploy to Azure** button, enter the details, which should look something similar to those shown below, and click **Purchase**.
+Upon clicking the **Deploy to Azure** button, enter the details, which should look something similar to those shown below. Once completed, click **Review + Create**.
 
-![Custom template deployment in Azure](/eval/media/azure_vm_custom_template_new.png "Custom template deployment in Azure")
+![Custom template deployment in Azure](/eval/media/azure_vm_custom_template_new_auto.png "Custom template deployment in Azure")
+
+Please be aware of some of the important parameters that you must provide for deploying the template. Specifically:
+
+* **AKS-HCI App Id** - This is your Service Principal ID which you created earlier
+* **AKS-HCI App Secret** - this is the corresponding secret for the Service Principal
+* **Kubernetes Version** - this is the preferred version of your Kubernetes target cluster. "Match Management Cluster" will select the same version as the KVA for the AKS-HCI management cluster, which you can check here: https://github.com/Azure/aks-hci/releases. This will result in fewer images downloaded, and a faster deployment time, but it may not be the very latest Kubernetes version for your clusters.
+
+Finally, be aware of the **size** and **number** of control plane/worker nodes you are deploying. Your Azure VM has a finite size, and choosing to deploy multiple workers and control plane nodes, of a large size will result in a deployment failure of the AKS-HCI sandbox.  You can read more about this below.
 
 *******************************************************************************************************
 
@@ -298,7 +306,9 @@ Upon clicking the **Deploy to Azure** button, enter the details, which should lo
 
 *******************************************************************************************************
 
-The custom template will be validated, and if all of your entries are correct, you can click **Create**. Within a few minutes, your VM will be created.
+The custom template will be validated, and if all of your entries are correct, you can click **Purchase**.
+
+The **deployment of the sandbox should take between 40 and 60 minutes**, depending on the number of control planes, node pools and worker nodes you have chosen to deploy.
 
 ![Custom template deployment in Azure completed](/eval/media/azure_vm_custom_template_completed.png "Custom template deployment in Azure completed")
 
@@ -315,7 +325,7 @@ You'll now be notified when the VM has been successfully shut down as the reques
 With that completed, skip on to [connecting to your Azure VM](#connect-to-your-azure-vm)
 
 #### Deployment errors ####
-If your Azure VM fails to deploy successfully, and the error relates to the **AKSHCIHost001/ConfigureAksHciHost** PowerShell DSC extension, please refer to the [troubleshooting steps below](#troubleshooting).
+If your Azure VM fails to deploy successfully, please refer to the [troubleshooting steps below](#troubleshooting).
 
 ### Option 2 - Creating the Azure VM with PowerShell ###
 For simplicity and speed, can also use PowerShell on our local workstation to deploy the Windows Server 2019 VM to Azure using the ARM template described earlier. As an alternative, you can take the following commands, edit them, and run them directly in [PowerShell in Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/quickstart-powershell "PowerShell in Azure Cloud Shell").  For the purpose of this guide, we'll assume you're using the PowerShell console/ISE or Windows Terminal locally on your workstation.
