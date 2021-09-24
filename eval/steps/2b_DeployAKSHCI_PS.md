@@ -82,7 +82,7 @@ Now, seeing as you're deploying this evaluation in Azure, it assumes you already
 
 #### Optional - Create a new Service Principal ####
 
-If you need to create a new Service Principal, the following steps will create a new Service Principal, with the built-in **Microsoft.Kubernetes connected cluster role** and set the scope at the subscription level.
+If you need to create a new Service Principal, the following steps will create a new Service Principal, with the built-in **Kubernetes Cluster - Azure Arc Onboarding** role and set the scope at the subscription level.
 
 ```powershell
 # Login to Azure
