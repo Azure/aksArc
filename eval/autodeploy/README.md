@@ -306,7 +306,7 @@ Finally, be aware of the **size** and **number** of control plane/worker nodes y
 
 *******************************************************************************************************
 
-The custom template will be validated, and if all of your entries are correct, you can click **Purchase**.
+The custom template will be validated, and if all of your entries are correct, you can click **Create**.
 
 The **deployment of the sandbox should take between 40 and 60 minutes**, depending on the number of control planes, node pools and worker nodes you have chosen to deploy.
 
@@ -490,7 +490,7 @@ Here's a list of VM sizes that you can use for your PowerShell-based deployment.
 * Standard_K8S2_v1 (2vCPU, 2GB RAM)
 * Standard_K8S3_v1 (4vCPU, 6GB RAM)
 
-Once you've made your size and region selection, based on the information provided earlier, run the PowerShell script and wait around 10 minutes for your VM deployment to complete.
+Once you've made your size and region selection, based on the information provided earlier, run the PowerShell script. The **deployment of the sandbox should take between 40 and 60 minutes**, depending on the number of control planes, node pools and worker nodes you have chosen to deploy.
 
 ![Virtual machine successfully deployed with PowerShell](/eval/media/powershell_vm_deployed.png "Virtual machine successfully deployed with PowerShell")
 
@@ -514,7 +514,7 @@ You'll now be notified when the VM has been successfully shut down as the reques
 ![Enable VM auto-shutdown in Azure](/eval/media/auto_shutdown.png "Enable VM auto-shutdown in Azure")
 
 #### Deployment errors ####
-If your Azure VM fails to deploy successfully, and the error relates to the **AKSHCIHost001/ConfigureAksHciHost** PowerShell DSC extension, please refer to the [troubleshooting steps below](#troubleshooting).
+If your Azure VM fails to deploy successfully, please refer to the [troubleshooting steps below](#troubleshooting).
 
 Access your Azure VM
 -----------
@@ -544,42 +544,28 @@ In this guide, you've successfully created and automatically configured your AKS
 
 Troubleshooting
 -----------
+
+Occasionally, deployments will fail. Here's some common failures that we see from testing:
+
+![Azure VM deployment error](/eval/media/vm_deployment_error_auto.png "Azure VM deployment error")
+
+### Not enough memory inside Azure VM ###
+If you specify too many worker nodes/control plane VMs, or the Kubernetes VM sizes that you choose are too large, deployment will fail with an error message containing the following information:
+
+*Insufficient memory capacity to deploy the target cluster. Total estimated free memory on the host after AKS-HCI management cluster deployment = 53.91GB, yet your target cluster with 1 Standard_A4_v2 Load Balancer, 5 Standard_A4_v2 control plane node(s) and 5 Standard_K8S3_v1 worker node(s) requires 78.89GB memory. Please redeploy using a larger Azure VM, or a smaller target cluster.*
+
+### Not enough vCPUs inside Azure VM ###
+When you create your VM in Azure, it will be created with a specific number of vCPUs available to the guest OS. When you deploy AKS-HCI inside this Azure VM, you cannot create a nested AKS-HCI VM with more nested vCPUs, than exists vCPUs in the Azure VM.
+
+For example, if you deploy your Azure VM with size: **Standard_E16s_v4 (16 vCPUs)**, this means that inside the Azure VM, you **cannot create any AKS-HCI VMs with more vCPUs than 16**. if you try, the deployment will fail with an error message containing the following information:
+
+*Your target cluster Linux worker node size (Standard_D32s_v3) has more vCPUs (32) than the number of logical processors in your Azure VM Hyper-V host (20). Ensure all sizes for your target cluster VMs (Load Balancer, Control Planes, Worker Nodes) have less than 20 vCPUs in your ARM template for this specific Azure VM size.*
+
+### Transient deployment issues ###
+
 From time to time, a transient, random deployment error may cause the Azure VM to show a failed deployment. This is typically caused by reboots and timeouts within the VM as part of the PowerShell DSC configuration process, in particular, when the Hyper-V role is enabled and the system reboots multiple times in quick succession. We've also seen instances where changes with Chocolatey Package Manager cause deployment issues.
 
-![Azure VM deployment error](/eval/media/vm_deployment_error.png "Azure VM deployment error")
-
-If the error is related to the **AKSHCIHost001/ConfigureAksHciHost**, most likely the installation did complete successfully in the end, but to double check, you can perform these steps:
-
-1. Follow the steps above to [connect to your Azure VM](#connect-to-your-azure-vm)
-2. Once successfully connected, open a **PowerShell console as administrator** and run the following command to confirm the status of the last run:
-
-```powershell
-# Check for last run
-Get-DscConfigurationStatus
-```
-![Result of Get-DscConfigurationStatus](/eval/media/get-dscconfigurationstatus.png "Result of Get-DscConfigurationStatus")
-
-3. As you can see, in this particular case, the PowerShell DSC configuration **status appears to have been successful**, however your results may show a different result. Just for good measure, you can re-apply the configuration by **running the following commands**:
-
-```powershell
-cd "C:\Packages\Plugins\Microsoft.Powershell.DSC\*\DSCWork\akshcihost.0\AKSHCIHost"
-Start-DscConfiguration -Path . -Wait -Force -Verbose
-```
-
-4. If all goes well, you should see the DSC configuration reapplied without issues. If you then re-run the following PowerShell command, you should see success:
-
-```powershell
-# Check for last run
-Get-DscConfigurationStatus
-```
-
-![Result of Get-DscConfigurationStatus](/eval/media/get-dscconfigurationstatus2.png "Result of Get-DscConfigurationStatus")
-
-*******************************************************************************************************
-
-**NOTE** - If this doesn't fix your issue, consider redeploying your Azure VM. If the issue persists, please **raise an issue!**
-
-*******************************************************************************************************
+If the error is related to the **AKSHCIHost001/ConfigureAksHciHost**, because the installation of AKS-HCI depends on this step completing successfully, it is recommended that your **redeploy** your Azure VM from the template.
 
 Product improvements
 -----------

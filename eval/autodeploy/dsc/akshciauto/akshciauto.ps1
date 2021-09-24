@@ -176,16 +176,16 @@ configuration AksHciAutoDeploy
     # Calculate CPU limits
     $hostLogicalProcessors = (Get-CimInstance -ClassName Win32_Processor).NumberOfLogicalProcessors
     if ($hostLogicalProcessors -lt $loadBalancerLogicalProcessors) {
-        throw "Your target cluster control plane node size ($loadBalancerSize) has more vCPUs ($loadBalancerLogicalProcessors) than the number of logical processors in your Hyper-V host ($hostLogicalProcessors). Ensure all sizes for your target cluster VMs (Load Balancer, Control Planes, Worker Nodes) have less than $hostLogicalProcessors vCPUs in your ARM template."
+        throw "Your target cluster Load Balancer size ($loadBalancerSize) has more vCPUs ($loadBalancerLogicalProcessors) than the number of logical processors in your Azure VM Hyper-V host ($hostLogicalProcessors). Ensure all sizes for your target cluster VMs (Load Balancer, Control Planes, Worker Nodes) have less than $hostLogicalProcessors vCPUs in your ARM template for your chosen Azure VM size."
     }
     elseif ($hostLogicalProcessors -lt $controlPlaneLogicalProcessors) {
-        throw "Your target cluster control plane node size ($controlPlaneNodeSize) has more vCPUs ($controlPlaneLogicalProcessors) than the number of logical processors in your Hyper-V host ($hostLogicalProcessors). Ensure all sizes for your target cluster VMs (Load Balancer, Control Planes, Worker Nodes) have less than $hostLogicalProcessors vCPUs in your ARM template."
+        throw "Your target cluster control plane node size ($controlPlaneNodeSize) has more vCPUs ($controlPlaneLogicalProcessors) than the number of logical processors in your Azure VM Hyper-V host ($hostLogicalProcessors). Ensure all sizes for your target cluster VMs (Load Balancer, Control Planes, Worker Nodes) have less than $hostLogicalProcessors vCPUs in your ARM template for your chosen Azure VM size."
     }
     elseif ($hostLogicalProcessors -lt $linuxWorkerLogicalProcessors) {
-        throw "Your target cluster control plane node size ($linuxWorkerNodeSize) has more vCPUs ($linuxWorkerLogicalProcessors) than the number of logical processors in your Hyper-V host ($hostLogicalProcessors). Ensure all sizes for your target cluster VMs (Load Balancer, Control Planes, Worker Nodes) have less than $hostLogicalProcessors vCPUs in your ARM template."
+        throw "Your target cluster Linux worker node size ($linuxWorkerNodeSize) has more vCPUs ($linuxWorkerLogicalProcessors) than the number of logical processors in your Azure VM Hyper-V host ($hostLogicalProcessors). Ensure all sizes for your target cluster VMs (Load Balancer, Control Planes, Worker Nodes) have less than $hostLogicalProcessors vCPUs in your ARM template for your chosen Azure VM size."
     }
     elseif (($hostLogicalProcessors -lt $windowsWorkerLogicalProcessors) -and ($windowsWorkerNodes -gt 0)) {
-        throw "Your target cluster control plane node size ($windowsWorkerNodeSize) has more vCPUs ($windowsWorkerLogicalProcessors) than the number of logical processors in your Hyper-V host ($hostLogicalProcessors). Ensure all sizes for your target cluster VMs (Load Balancer, Control Planes, Worker Nodes) have less than $hostLogicalProcessors vCPUs in your ARM template."
+        throw "Your target cluster Windows worker node size ($windowsWorkerNodeSize) has more vCPUs ($windowsWorkerLogicalProcessors) than the number of logical processors in your Azure VM Hyper-V host ($hostLogicalProcessors). Ensure all sizes for your target cluster VMs (Load Balancer, Control Planes, Worker Nodes) have less than $hostLogicalProcessors vCPUs in your ARM template for your chosen Azure VM size."
     }
     else {
         Write-Host "All target cluster VMs (Load Balancer, Control Planes, Worker Nodes) are suitable for deployment on this Hyper-V host"
