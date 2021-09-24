@@ -146,7 +146,7 @@
             }
         },
 
-        "KubernetesVersion": {
+        "kubernetesVersion": {
             "type": "string",
             "defaultValue": "Match Management Cluster",
             "allowedValues": [
@@ -162,7 +162,7 @@
                 "description": "Enter the Kubernetes version for your target cluster. Choosing 'Match Management Cluster' will result in a faster deployment"
             }
         },
-        "ControlPlaneNodes": {
+        "controlPlaneNodes": {
             "type": "int",
             "defaultValue": 1,
             "allowedValues": [
@@ -174,7 +174,7 @@
                 "description": "Enter the number of control plane nodes for this target cluster"
             }
         },
-        "ControlPlaneNodeSize": {
+        "controlPlaneNodeSize": {
             "type": "string",
             "defaultValue": "Standard_A4_v2 (4vCPU, 8GB RAM)",
             "allowedValues": [
@@ -199,7 +199,7 @@
                 "description": "Choose the VM size for your control plane nodes for this target cluster. Visit this link for more information about VM sizes: https://docs.microsoft.com/en-us/azure-stack/aks-hci/reference/ps/get-akshcivmsize"
             }
         },
-        "LoadBalancerSize": {
+        "loadBalancerSize": {
             "type": "string",
             "defaultValue": "Standard_A4_v2 (4vCPU, 8GB RAM)",
             "allowedValues": [
@@ -684,7 +684,7 @@
                         "autoUpgradeMinorVersion": true,
                         "settings": {
                             "fileUris": [
-                                "[uri(variables('artifactsLocation'), concat('autodeploy/scripts/installWac.ps1'))]"
+                                "[uri(variables('artifactsLocation'), concat('scripts/installWac.ps1'))]"
                             ]
                         },
                         "protectedSettings": {
@@ -708,7 +708,7 @@
                         "retentionInterval": "P1D",
                         "timeout": "PT30M",
                         "arguments": "[format(' -resourceGroupName {0} -vmName {1} -subscriptionId {2} -tenantId {3} -appId {4} -appSecret {5}', resourceGroup().name, parameters('virtualMachineName'), variables('subId'), variables('tenantId'),parameters('AKS-HCIAppId'), variables('ps_appSecret'))]",
-                        "primaryScriptURI": "https://raw.githubusercontent.com/Azure/aks-hci/automated/eval/autodeploy/scripts/removeCustomScript.ps1"
+                        "primaryScriptURI": "[uri(variables('artifactsLocation'), concat('autodeploy/scripts/removeCustomScript.ps1'))]"
                     }
                 },
                 {
