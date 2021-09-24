@@ -3,7 +3,7 @@ AKS on Azure Stack HCI in Azure - Full Auto Edition
 
 Have you already walked through the deployment of AKS on Azure Stack HCI both with PowerShell and Windows Admin Center? If so, and you don't want to walk through those steps again for future deployments...fear not, we have a solution!
 
-The **AKS on Azure Stack HCI in Azure - Full Auto Edition** saves you time, and effort in deploying AKS on Azure Stack HCI in an Azure VM, for evaluation purposes. Simply provide some paramters via the Azure Portal or PowerShell, wait around 45 minutes, and you'll have a complete AKS-HCI infrastructure, including a target cluster, integrated with Azure Arc! BOOM!
+The **AKS on Azure Stack HCI in Azure - Full Auto Edition** saves you time, and effort in deploying AKS on Azure Stack HCI in an Azure VM, for evaluation purposes. Simply provide some parameters via the Azure Portal or PowerShell, wait around 45 minutes, and you'll have a complete AKS-HCI infrastructure, including a target cluster, integrated with Azure Arc! BOOM!
 
 This guide will walk you through all the pre-requisites you need, and the steps you need to perform to configure your end-to-end deployment of AKS-HCI.
 
@@ -37,7 +37,12 @@ If you're interested in learning more about what AKS on Azure Stack HCI is, make
 Why follow this guide?
 -----------
 
-This evaluation guide will walk you through automating the deployment of a sandboxed, isolated AKS on Azure Stack HCI environment using **nested virtualization** in Azure. Whilst not designed as a production scenario, the important takeaway here is, by following this guide, you'll lay down a solid foundation on to which you can explore additional AKS on Azure Stack HCI scenarios in the future, so keep checking back for additional scenarios over time.
+This evaluation guide will walk you through **automating** the deployment of a sandboxed, isolated AKS on Azure Stack HCI environment using **nested virtualization** in Azure. Whilst not designed as a production scenario, the important takeaway here is, by following this guide, you'll lay down a solid foundation on to which you can explore additional AKS on Azure Stack HCI scenarios in the future, so keep checking back for additional scenarios over time.
+
+**if you haven't deployed AKS on Azure Stack HCI before, it's worthwhile going through the manual deployment steps first, just to ensure you understand what's happening under the covers:**
+
+* * [**Part 2a** - Deploy your AKS-HCI infrastructure with Windows Admin Center **(Choose 2a or 2b)**](/eval/steps/2a_DeployAKSHCI_WAC.md "Deploy your AKS-HCI infrastructure with Windows Admin Center")
+* [**Part 2b** - Deploy your AKS-HCI infrastructure with PowerShell **(Choose 2a or 2b)**](/eval/steps/2b_DeployAKSHCI_PS.md "Deploy your AKS-HCI infrastructure with PowerShell")
 
 Evaluate AKS on Azure Stack HCI using Nested Virtualization
 -----------
@@ -46,12 +51,12 @@ As with any infrastructure technology, in order to test, validate and evaluate t
 
 If you're not familiar with nested virtualization, at a high level, it allows a virtualization platform, such as Hyper-V, or VMware ESXi, to run virtual machines that, within those virtual machines, run a virtualization platform. It may be easier to think about this in an architectural view.
 
-![Nested virtualization architecture](media/nested_virt.png "Nested virtualization architecture")
+![Nested virtualization architecture](/eval/media/nested_virt.png "Nested virtualization architecture")
 
 *******************************************************************************************************
 
 ### Important Note ###
-The use of nested virtualization in this evaluation guide is aimed at providing flexibility for **evaluating AKS on Azure Stack HCI in test environment**, and it shouldn't be seen as a substitute for real-world deployments, performance and scale testing etc. With each level of nesting, comes the trade-off of performance, hence for **production** use, **AKS on Azure Stack HCI should be deployed on validated physical hardware**, of which you can find a vast array of choices on the [Azure Stack HCI 20H2 Catalog](https://aka.ms/azurestackhcicatalog "Azure Stack HCI 20H2 Catalog") or the [Windows Server Catalog](https://www.windowsservercatalog.com/results.aspx?bCatID=1283&cpID=0&avc=126&ava=0&avq=0&OR=1&PGS=25 "Windows Server Catalog") for systems running Windows Server 2019 Datacenter edition.
+The use of nested virtualization in this evaluation guide is aimed at providing flexibility for **evaluating AKS on Azure Stack HCI in test environment**, and it shouldn't be seen as a substitute for real-world deployments, performance and scale testing etc. With each level of nesting, comes the trade-off of performance, hence for **production** use, **AKS on Azure Stack HCI should be deployed on validated physical hardware**, of which you can find a vast array of choices on the [Azure Stack HCI Catalog](https://aka.ms/azurestackhcicatalog "Azure Stack HCI Catalog") or the [Windows Server Catalog](https://www.windowsservercatalog.com/results.aspx?bCatID=1283&cpID=0&avc=126&ava=0&avq=0&OR=1&PGS=25 "Windows Server Catalog") for systems running Windows Server 2019 Datacenter edition.
 
 *******************************************************************************************************
 
@@ -59,7 +64,7 @@ Deployment Overview
 -----------
 This guide will focus on the end-to-end, automated deployment of AKS on Azure Stack HCI, running on a single Azure VM, using the power of **nested virtualization**. If you've not yet experienced walking through a deployment of AKS-HCI, either with PowerShell, or Windows Admin Center, it's recommended you start there to better understand what this automated deployment will handle for you.
 
-![Architecture diagram for AKS on Azure Stack HCI nested in Azure](media/nested_virt_arch_ga2.png "Architecture diagram for AKS on Azure Stack HCI nested in Azure")
+![Architecture diagram for AKS on Azure Stack HCI nested in Azure](/eval/media/nested_virt_arch_ga2.png "Architecture diagram for AKS on Azure Stack HCI nested in Azure")
 
 In this configuration, you'll take advantage of the nested virtualization support provided within certain Azure VM sizes. By following these steps, the ARM template will first deploy a single Azure VM running Windows Server 2019 Datacenter, and then begin the automated customization inside this VM, including all the necessary roles and features, before moving on to automatically installing AKS-HCI, creating a target cluster, and integrating with Azure Arc. All of this, in a single Azure VM!
 
@@ -131,9 +136,118 @@ For reference, the Standard_E8s_v4 VM size costs approximately US $0.50 per hour
 
 ### Validate your User Permissions ###
 
+In order to deploy this solution, the **User Account** that you wish to use to deploy this Azure VM sandbox needs to have the following permissions:
+
+* Must be able to create a **Resource Group**, deploy a **Virtual Machine** and register **resource providers** within a subscription. For those reasons, for the chosen subscription, the user account should be configured as one of the following roles:
+  * **Owner**
+  * **Contributer**
+
+To view more information on assigning roles in Azure, [read our documentation on assigning roles in Azure](https://docs.microsoft.com/en-us/azure/role-based-access-control/role-assignments-portal "Assign Azure RBAC roles")
+
+In addition to the chosen user account needing the permissions above, you must also be able to create/have access to a **Service Principal** (described below).
+
 ### Create a Service Principal with required permissions ###
 
+In addition to having the correct permissions for your user account that you wish to use to deploy the sandbox environment, the automated deployment **requires** the creation and use of a **Service Principal** in order to perform some of the automated tasks in the deployment. One of the uses of the Service Principal is to connect your AKS on Azure Stack HCI environment with Azure, and integrate with Azure Arc.
+
+Note that only subscription **owners** can create service principals with the right role assignment. You can check your access level by navigating to your subscription, clicking on **Access control (IAM)** on the left hand side of the Azure portal and then clicking on **View my access**.
+
+Firstly, install and import the following Azure PowerShell modules on the machine you wish to create the Service Principal from.
+
+```powershell
+Install-Module -Name Az.Accounts -Repository PSGallery
+Import-Module Az.Accounts 
+Install-Module -Name Az.Resources -Repository PSGallery
+Import-Module Az.Resources
+Install-Module -Name AzureAD -Repository PSGallery
+Import-Module AzureAD
+```
+
+**Close all PowerShell windows** and reopen a new administrative session.
+
+The following commands will following commands will create a new Service Principal, with the built-in **Kubernetes Cluster - Azure Arc Onboarding** role and set the scope at the subscription level. The script will also assign the Service Principal the **Virtual Machine Contributer** role, which is required specifically for the automated deployment of this sandbox, and not for AKS-HCI itself.
+
+You can optionally adjust **$spName** to a more preferred name for your Service Principal.
+
+```powershell
+# Login to Azure
+Connect-AzAccount
+
+# Optional - if you wish to switch to a different subscription
+# First, get all available subscriptions as the currently logged in user
+$subList = Get-AzSubscription
+# Display those in a grid, select the chosen subscription, then press OK.
+if (($subList).count -gt 1) {
+    $subList | Out-GridView -OutputMode Single | Set-AzContext
+}
+
+# Retrieve the current subscription ID
+$sub = (Get-AzContext).Subscription.Id
+
+# Create a unique name for the Service Principal
+$date = (Get-Date).ToString("MMddyy-HHmmss")
+$spName = "AksHci-SP-$date"
+
+# Create the Service Principal
+
+$sp = New-AzADServicePrincipal -DisplayName $spName `
+    -Role 'Kubernetes Cluster - Azure Arc Onboarding' `
+    -Scope "/subscriptions/$sub"
+
+New-AzRoleAssignment -ObjectId $sp.ObjectId `
+    -RoleDefinitionName "Virtual Machine Contributor" `
+    -Scope "/subscriptions/$sub"
+
+# Retrieve the password for the Service Principal
+
+$secret = [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR(
+    [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($sp.Secret)
+)
+
+Write-Host "Application ID: $($sp.ApplicationId)"
+Write-Host "App Secret: $secret"
+```
+
+From the above output, you have the **Application ID** and the **secret** for use when deploying the automated AKS on Azure Stack HCI sandbox, so take a note of those and store them safely.
+
+With that created, in the **Azure portal**, under **Subscriptions**, **Access **Control****, and then **Role Assignments**, you should see your new Service Principal.
+
+![Service principal shown in Azure](/eval/media/akshci-spcreated.png "Service principal shown in Azure")
+
+With your service principal created and assigned, and user account permissions verified
+
 ### Register the Kubernetes resource providers ###
+
+Ahead of the deployment process, you need to register the appropriate resource providers in Azure for AKS on Azure Stack HCI integration. **You only need to perform this task once, per subscription**. To do that, run the following PowerShell commands:
+
+```powershell
+# Login to Azure
+Connect-AzAccount
+
+# Optional - if you wish to switch to a different subscription
+# First, get all available subscriptions as the currently logged in user
+
+$subList = Get-AzSubscription
+
+# Display those in a grid, select the chosen subscription, then press OK.
+if (($subList).count -gt 1) {
+    $subList | Out-GridView -OutputMode Single | Set-AzContext
+}
+
+Register-AzResourceProvider -ProviderNamespace Microsoft.Kubernetes
+Register-AzResourceProvider -ProviderNamespace Microsoft.KubernetesConfiguration
+```
+
+This registration process can take up to 10 minutes, so please be patient. It only needs to be performed once on a particular subscription. To validate the registration process, run the following PowerShell command:
+
+```powershell
+Get-AzResourceProvider -ProviderNamespace Microsoft.Kubernetes
+Get-AzResourceProvider -ProviderNamespace Microsoft.KubernetesConfiguration
+```
+
+![Resource Provider enabled in Azure](/eval/media/akshci_rp_enable.png "Resource Provider enabled Azure")
+
+With that completed, you're ready to deploy your automated AKS-HCI environment!
 
 Deploying the Azure VM
 -----------
