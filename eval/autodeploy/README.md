@@ -41,7 +41,7 @@ This evaluation guide will walk you through **automating** the deployment of a s
 
 **if you haven't deployed AKS on Azure Stack HCI before, it's worthwhile going through the manual deployment steps first, just to ensure you understand what's happening under the covers:**
 
-* * [**Part 2a** - Deploy your AKS-HCI infrastructure with Windows Admin Center **(Choose 2a or 2b)**](/eval/steps/2a_DeployAKSHCI_WAC.md "Deploy your AKS-HCI infrastructure with Windows Admin Center")
+* [**Part 2a** - Deploy your AKS-HCI infrastructure with Windows Admin Center **(Choose 2a or 2b)**](/eval/steps/2a_DeployAKSHCI_WAC.md "Deploy your AKS-HCI infrastructure with Windows Admin Center")
 * [**Part 2b** - Deploy your AKS-HCI infrastructure with PowerShell **(Choose 2a or 2b)**](/eval/steps/2b_DeployAKSHCI_PS.md "Deploy your AKS-HCI infrastructure with PowerShell")
 
 Evaluate AKS on Azure Stack HCI using Nested Virtualization
@@ -275,7 +275,7 @@ As part of the deployment, the following will be **automated for you**:
 10. A target cluster consisting of a user-defined number and size of Linux and Windows worker nodes will be deployed
 11. The target cluster will be integrated with Azure Arc, and all resources will reside in the original resource group used for deployment
 
-This automated deployment **should take around 40-60 minutes** depending on how many worker nodes, Kubernetes versions etc.
+This automated deployment **should take around 35-60 minutes** depending on how many worker nodes, Kubernetes versions etc.
 
 ### Option 1 - Creating the VM with an Azure Resource Manager JSON Template ###
 To keep things simple, and graphical to begin with, we'll show you how to deploy your VM via an Azure Resource Manager template.  To simplify things further, we'll use the following buttons.
