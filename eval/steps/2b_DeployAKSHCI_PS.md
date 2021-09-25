@@ -82,7 +82,7 @@ Now, seeing as you're deploying this evaluation in Azure, it assumes you already
 
 #### Optional - Create a new Service Principal ####
 
-If you need to create a new Service Principal, the following steps will create a new Service Principal, with the built-in **Microsoft.Kubernetes connected cluster role** and set the scope at the subscription level.
+If you need to create a new Service Principal, the following steps will create a new Service Principal, with the built-in **Kubernetes Cluster - Azure Arc Onboarding** role and set the scope at the subscription level.
 
 ```powershell
 # Login to Azure
@@ -106,12 +106,12 @@ $spName = "AksHci-SP-$date"
 # Create the Service Principal
 
 $sp = New-AzADServicePrincipal -DisplayName $spName `
-    -Role 'Microsoft.Kubernetes connected cluster role' `
+    -Role 'Kubernetes Cluster - Azure Arc Onboarding' `
     -Scope "/subscriptions/$sub"
 
 # Retrieve the password for the Service Principal
 
-$secret = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto(
+$secret = [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR(
     [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($sp.Secret)
 )
 
