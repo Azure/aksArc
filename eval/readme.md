@@ -27,6 +27,7 @@ Contents
 - [Deployment Overview](#deployment-overview)
 - [Deployment Workflow](#deployment-workflow)
 - [Get started](#get-started)
+- [Fully automated deployment](#fully-automated-deployment)
 - [Product improvements](#product-improvements)
 - [Raising issues](#raising-issues)
 - [Contributions & Legal](#contributions--legal)
@@ -93,6 +94,10 @@ Get started
 * [**Part 2a** - Deploy your AKS-HCI infrastructure with Windows Admin Center **(Choose 2a or 2b)**](/eval/steps/2a_DeployAKSHCI_WAC.md "Deploy your AKS-HCI infrastructure with Windows Admin Center")
 * [**Part 2b** - Deploy your AKS-HCI infrastructure with PowerShell **(Choose 2a or 2b)**](/eval/steps/2b_DeployAKSHCI_PS.md "Deploy your AKS-HCI infrastructure with PowerShell")
 * [**Part 3** - Explore the AKS on Azure Stack HCI Environment](/eval/steps/3_ExploreAKSHCI.md "Explore the AKS on Azure Stack HCI Environment")
+
+Fully automated deployment
+-----------
+If you've already gained experienced deploying AKS on Azure Stack HCI, and would like to fully automate the deployment inside an Azure VM sandbox, [**head on over to our fully automated deployment**](/eval/autodeploy/README.md "Fully automated deployment") to speed things up!
 
 Product improvements
 -----------
