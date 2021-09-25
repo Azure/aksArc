@@ -308,11 +308,15 @@ Finally, be aware of the **size** and **number** of control plane/worker nodes y
 
 The custom template will be validated, and if all of your entries are correct, you can click **Create**.
 
-The **deployment of the sandbox should take between 40 and 60 minutes**, depending on the number of control planes, node pools and worker nodes you have chosen to deploy.
+The **deployment of the sandbox should take between 35 and 60 minutes**, depending on the number of control planes, node pools and worker nodes you have chosen to deploy.
 
-![Custom template deployment in Azure completed](/eval/media/azure_vm_custom_template_completed.png "Custom template deployment in Azure completed")
+![Custom template deployment in Azure completed](/eval/media/azure_autovm_custom_template_completed.png "Custom template deployment in Azure completed")
 
-If you chose to **enable** the auto-shutdown for the VM, and supplied a time, and time zone, but want to also add a notification alert, simply click on the **Go to resource group** button and then perform the following steps:
+Once completed, you can check the artifacts that have been deployed by clicking on the **Resource Group** name. You'll see all of the Azure VM artifacts, alongside the Arc-enabled Kubernetes objects that have been integrated with Azure during the deployment.
+
+![Custom template deployment in Azure completed](/eval/media/azure_autovm_artifacts.png "Custom template deployment in Azure completed")
+
+Finally, if you chose to **enable** the auto-shutdown for the VM, and supplied a time, and time zone, but want to also add a notification alert, simply click on the **Go to resource group** button and then perform the following steps:
 
 1. In the **Resource group** overview blade, click the **AKSHCIHost001** virtual machine
 2. Once on the overview blade for your VM, **scroll down on the left-hand navigation**, and click on **Auto-shutdown**
