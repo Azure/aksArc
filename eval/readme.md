@@ -14,7 +14,7 @@ In this guide, we'll walk you deploying the [Azure Kubernetes Service (AKS) on A
 
 Version
 -----------
-This guide has been tested and validated with the **July 2021 release** of AKS on Azure Stack HCI.
+This guide has been tested and validated with the **August 2021 release** of AKS on Azure Stack HCI.
 
 Contents
 -----------
@@ -27,6 +27,7 @@ Contents
 - [Deployment Overview](#deployment-overview)
 - [Deployment Workflow](#deployment-workflow)
 - [Get started](#get-started)
+- [Fully automated deployment](#fully-automated-deployment)
 - [Product improvements](#product-improvements)
 - [Raising issues](#raising-issues)
 - [Contributions & Legal](#contributions--legal)
@@ -97,6 +98,10 @@ Get started
 * [**Part 3** - Explore the AKS on Azure Stack HCI Environment](/eval/steps/3_ExploreAKSHCI.md "Explore the AKS on Azure Stack HCI Environment")
 * [**Part 4** - Deploy Hybrid Solutions on the AKS on Azure Stack HCI Environment](/eval/steps/4_Solutions.md "Deploy Hybrid Solutions on the AKS on Azure Stack HCI Environment")
 
+
+Fully automated deployment
+-----------
+If you've already gained experienced deploying AKS on Azure Stack HCI, and would like to fully automate the deployment inside an Azure VM sandbox, [**head on over to our fully automated deployment**](/eval/autodeploy/README.md "Fully automated deployment") to speed things up!
 
 Product improvements
 -----------

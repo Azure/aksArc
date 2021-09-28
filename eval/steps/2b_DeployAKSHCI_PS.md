@@ -47,28 +47,16 @@ Before you deploy AKS on Azure Stack HCI, there are a few steps required to prep
 Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
 Install-PackageProvider -Name NuGet -Force 
 Install-Module -Name PowershellGet -Force
-```
-
-2. Still in the **administrative PowerShell console**, run the following to uninstall previous modules and unregister any preview powershell repositories:
-
-```powershell
-Uninstall-Module -Name AksHci -AllVersions -Force -ErrorAction:SilentlyContinue 
-Uninstall-Module -Name Kva -AllVersions -Force -ErrorAction:SilentlyContinue 
-Uninstall-Module -Name Moc -AllVersions -Force -ErrorAction:SilentlyContinue 
-Uninstall-Module -Name MSK8SDownloadAgent -AllVersions -Force -ErrorAction:SilentlyContinue 
-Unregister-PSRepository -Name WSSDRepo -ErrorAction:SilentlyContinue 
-Unregister-PSRepository -Name AksHciPSGallery -ErrorAction:SilentlyContinue 
-Unregister-PSRepository -Name AksHciPSGalleryPreview -ErrorAction:SilentlyContinue
 Exit
 ```
 
-3. Open a new **administrative PowerShell console**, and run the following to install the required PowerShell module and dependencies:
+2. Open a new **administrative PowerShell console**, and run the following to install the required PowerShell module and dependencies:
 
 ```powershell
 Install-Module -Name AksHci -Repository PSGallery -AcceptLicense -Force
 ```
 
-4. Once complete, if you haven't already, make sure you **close all PowerShell windows**
+3. Once complete, if you haven't already, make sure you **close all PowerShell windows**
 
 Optional - Enable/Disable DHCP
 -----------
@@ -94,7 +82,7 @@ Now, seeing as you're deploying this evaluation in Azure, it assumes you already
 
 #### Optional - Create a new Service Principal ####
 
-If you need to create a new Service Principal, the following steps will create a new Service Principal, with the built-in **Microsoft.Kubernetes connected cluster role** and set the scope at the subscription level.
+If you need to create a new Service Principal, the following steps will create a new Service Principal, with the built-in **Kubernetes Cluster - Azure Arc Onboarding** role and set the scope at the subscription level.
 
 ```powershell
 # Login to Azure
@@ -118,12 +106,12 @@ $spName = "AksHci-SP-$date"
 # Create the Service Principal
 
 $sp = New-AzADServicePrincipal -DisplayName $spName `
-    -Role 'Microsoft.Kubernetes connected cluster role' `
+    -Role 'Kubernetes Cluster - Azure Arc Onboarding' `
     -Scope "/subscriptions/$sub"
 
 # Retrieve the password for the Service Principal
 
-$secret = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto(
+$secret = [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR(
     [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($sp.Secret)
 )
 
@@ -339,7 +327,7 @@ Get-AksHciCluster
 
 ____________
 
-**NOTE** - If you use the new parameter sets in New-AksHciCluster to deploy a cluster and then run Get-AksHciCluster to get the cluster information, the fields WindowsNodeCount and LinuxNodeCount in the output will return 0. To get the accurate number of nodes in each node pool, please use the command Get-AksHciNodePool with the specified cluster name:
+**NOTE** - For more information about the node pool, please use the command Get-AksHciNodePool with the specified cluster name:
 
 ```powershell
 Get-AksHciNodePool -clusterName akshciclus001
