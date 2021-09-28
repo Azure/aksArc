@@ -41,8 +41,8 @@ This evaluation guide will walk you through **automating** the deployment of a s
 
 **If you haven't deployed AKS on Azure Stack HCI before, it's worthwhile going through documentation, to ensure you understand what's happening under the covers:**
 
-* Deploy AKS-HCI with Windows Admin Center](https://docs.microsoft.com/azure-stack/aks-hci/setup) 
-* Deploy AKS-HCI with PowerShell](https://docs.microsoft.com/azure-stack/aks-hci/kubernetes-walkthrough-powershell)
+* [Deploy AKS-HCI with Windows Admin Center](https://docs.microsoft.com/azure-stack/aks-hci/setup) 
+* [Deploy AKS-HCI with PowerShell](https://docs.microsoft.com/azure-stack/aks-hci/kubernetes-walkthrough-powershell)
 
 Evaluate AKS on Azure Stack HCI using Nested Virtualization
 -----------
@@ -140,7 +140,8 @@ For reference, the Standard_E8s_v4 VM size costs approximately US $0.50 per hour
 
 In addition to having the correct permissions for your user account that you wish to use to deploy the sandbox environment, the automated deployment **requires** the creation and use of a **Service Principal** in order to perform some of the automated tasks in the deployment. One of the uses of the Service Principal is to connect your AKS on Azure Stack HCI environment with Azure, and integrate with Azure Arc.
 
-Note that only subscription **owners** can create service principals with the right role assignment. You can check your access level by navigating to your subscription, clicking on **Access control (IAM)** on the left hand side of the Azure portal and then clicking on **View my access**. If you do not have **owner** access on your subscription, skip creating a service principal and ask your subscription admin to create a service principal following the steps below.
+Note that only subscription **owner** can create service principals with the right role assignment. You can check your access level by navigating to your subscription, clicking on **Access control (IAM)** on the left hand side of the Azure portal and then clicking on **View my access**. 
+If you do not have **owner** access on your subscription, skip creating a service principal and ask your subscription admin to create a service principal for you by following the steps below.
 
 The following commands will create a new Service Principal, with the built-in **Kubernetes Cluster - Azure Arc Onboarding** role and set the scope at the subscription level. The script will also assign the Service Principal the **Virtual Machine Contributer** role, which is required specifically for the automated deployment of this sandbox, and not for AKS-HCI itself.
 
