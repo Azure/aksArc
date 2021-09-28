@@ -24,6 +24,8 @@ param
     [Parameter(Mandatory)]
     [string]$installWAC,
     [Parameter(Mandatory)]
+    [string]$enableArc,
+    [Parameter(Mandatory)]
     [string]$aksHciNetworking,
     [Parameter(Mandatory)]
     [string]$kubernetesVersion,
@@ -126,6 +128,7 @@ Log "Domain Name = $domainName"
 Log "Admin User = $adminUsername"
 Log "App ID = $appId"
 Log "Install WAC = $installWAC"
+Log "Enable Arc Integration = $enableArc"
 Log "Networking config = $aksHciNetworking"
 Log "Kubernetes Version = $kubernetesVersion"
 Log "Number of Control Plane Nodes = $controlPlaneNodes of size: $controlPlaneNodeSize"
@@ -206,14 +209,18 @@ try {
             Log "Successfully added a Windows node pool"
         }
 
-        ### ARC CONNECTION ###
-        Log "Connecting the cluster to Azure Arc - first, log into Azure"
-        Connect-AzAccount -Credential $Using:spCreds -ServicePrincipal -Tenant $Using:tenantId -Subscription $Using:subId
-        Log "Enable the connection"
-        Enable-AksHciArcConnection -name $targetClusterName -location $Using:location -subscriptionId $Using:subId `
-            -resourceGroup $Using:rgName -credential $Using:spCreds -tenantId $Using:tenantId
-        Log "Cluster successfully onboarded"
-        Log "AKS-HCI has been successfully installed"
+        if ($Using:enableArc -eq "Yes") {
+            ### ARC CONNECTION ###
+            Log "Connecting the cluster to Azure Arc - first, log into Azure"
+            Connect-AzAccount -Credential $Using:spCreds -ServicePrincipal -Tenant $Using:tenantId -Subscription $Using:subId
+            Log "Enable the connection"
+            Enable-AksHciArcConnection -name $targetClusterName -location $Using:location -subscriptionId $Using:subId `
+                -resourceGroup $Using:rgName -credential $Using:spCreds -tenantId $Using:tenantId
+            Log "Cluster successfully onboarded in Azure Arc"
+        }
+        else {
+            Log "User has chosen not to integrate with Azure Arc"
+        }
     }
     Log "AKS-HCI has been successfully installed"
 }
