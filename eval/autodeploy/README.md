@@ -39,10 +39,10 @@ Why follow this guide?
 
 This evaluation guide will walk you through **automating** the deployment of a sandboxed, isolated AKS on Azure Stack HCI environment using **nested virtualization** in Azure. Whilst not designed as a production scenario, the important takeaway here is, by following this guide, you'll lay down a solid foundation on to which you can explore additional AKS on Azure Stack HCI scenarios in the future, so keep checking back for additional scenarios over time.
 
-**If you haven't deployed AKS on Azure Stack HCI before, it's worthwhile going through documentation, to ensure you understand what's happening under the covers:**
+**if you haven't deployed AKS on Azure Stack HCI before, it's worthwhile going through the manual deployment steps first, just to ensure you understand what's happening under the covers:**
 
-* [Deploy AKS-HCI with Windows Admin Center](https://docs.microsoft.com/azure-stack/aks-hci/setup) 
-* [Deploy AKS-HCI with PowerShell](https://docs.microsoft.com/azure-stack/aks-hci/kubernetes-walkthrough-powershell)
+* [**Part 2a** - Deploy your AKS-HCI infrastructure with Windows Admin Center **(Choose 2a or 2b)**](/eval/steps/2a_DeployAKSHCI_WAC.md "Deploy your AKS-HCI infrastructure with Windows Admin Center")
+* [**Part 2b** - Deploy your AKS-HCI infrastructure with PowerShell **(Choose 2a or 2b)**](/eval/steps/2b_DeployAKSHCI_PS.md "Deploy your AKS-HCI infrastructure with PowerShell")
 
 Evaluate AKS on Azure Stack HCI using Nested Virtualization
 -----------
@@ -82,14 +82,13 @@ Before you start the deployment of your automated AKS-HCI configuration, there's
 
 ### Get an Azure subscription ###
 
-To evaluate AKS on Azure Stack HCI in Azure, you'll need an Azure subscription on which you're an **owner** or **contributor**. To check your access level, navigate to your subscription, click **Access control (IAM)** on the left-hand side of the Azure portal, and then click **View my access**.
+To evaluate AKS on Azure Stack HCI in Azure, you'll need an Azure subscription.  If you already have one provided by your company, you can skip this step, but if not, you have a couple of options.
 
-If you already have a subscription with the above access levels provided by your company, you can skip this step. If not, you have a couple of options:
+The first option would apply to Visual Studio subscribers, where you can use Azure at no extra charge. With your monthly Azure DevTest individual credit, Azure is your personal sandbox for dev/test. You can provision virtual machines, cloud services, and other Azure resources. Credit amounts vary by subscription level, but if you manage your AKS on Azure Stack HCI Host VM run-time efficiently, you can test the scenario well within your subscription limits.
 
-- The first option would apply to Visual Studio subscribers, where you can use Azure at no extra charge. With your monthly Azure DevTest individual credit, Azure is your personal sandbox for dev/test. You can provision virtual machines, cloud services, and other Azure resources. Credit amounts vary by subscription level, but if you manage your AKS on Azure Stack HCI Host VM run-time efficiently, you can test the scenario well within your subscription limits.
+The second option would be to sign up for a [free trial](https://azure.microsoft.com/en-us/free/ "Azure free trial link"), which gives you $200 credit for the first 30 days, and 12 months of popular services for free. The credit for the first 30 days will give you plenty of headroom to validate AKS on Azure Stack HCI.
 
-- The second option would be to sign up for a [free trial](https://azure.microsoft.com/en-us/free/ "Azure free trial link"), which gives you $200 credit for the first 30 days, and 12 months of popular services for free. The credit for the first 30 days will give you plenty of headroom to validate AKS on Azure Stack HCI.
-
+You can also use this same Azure subscription to integrate with Azure Arc, once the deployment is completed.
 
 ### Azure VM Size Considerations ###
 
@@ -135,15 +134,38 @@ For reference, the Standard_E8s_v4 VM size costs approximately US $0.50 per hour
 
 *******************************************************************************************************
 
+### Validate your User Permissions ###
+
+In order to deploy this solution, the **User Account** that you wish to use to deploy this Azure VM sandbox needs to have the following permissions:
+
+* Must be able to create a **Resource Group**, deploy a **Virtual Machine** and register **Resource Providers** within a specific subscription. For those reasons, for the chosen subscription, the user account should be configured as one of the following roles:
+  * **Owner**
+  * **Contributer**
+
+To view more information on assigning roles in Azure, [read our documentation on assigning roles in Azure](https://docs.microsoft.com/en-us/azure/role-based-access-control/role-assignments-portal "Assign Azure RBAC roles")
+
+In addition to the chosen user account needing the permissions above, you must also be able to create/have access to a **Service Principal** (described below).
 
 ### Create a Service Principal with required permissions ###
 
 In addition to having the correct permissions for your user account that you wish to use to deploy the sandbox environment, the automated deployment **requires** the creation and use of a **Service Principal** in order to perform some of the automated tasks in the deployment. One of the uses of the Service Principal is to connect your AKS on Azure Stack HCI environment with Azure, and integrate with Azure Arc.
 
-Note that only subscription **owner** can create service principals with the right role assignment. You can check your access level by navigating to your subscription, clicking on **Access control (IAM)** on the left hand side of the Azure portal and then clicking on **View my access**. 
-If you do not have **owner** access on your subscription, skip creating a service principal and ask your subscription admin to create a service principal for you by following the steps below.
+Note that only subscription **owners** can create service principals with the right role assignment. You can check your access level by navigating to your subscription, clicking on **Access control (IAM)** on the left hand side of the Azure portal and then clicking on **View my access**.
 
-The following commands will create a new Service Principal, with the built-in **Kubernetes Cluster - Azure Arc Onboarding** role and set the scope at the subscription level. The script will also assign the Service Principal the **Virtual Machine Contributer** role, which is required specifically for the automated deployment of this sandbox, and not for AKS-HCI itself.
+Firstly, install and import the following Azure PowerShell modules on the machine you wish to create the Service Principal from.
+
+```powershell
+Install-Module -Name Az.Accounts -Repository PSGallery
+Import-Module Az.Accounts 
+Install-Module -Name Az.Resources -Repository PSGallery
+Import-Module Az.Resources
+Install-Module -Name AzureAD -Repository PSGallery
+Import-Module AzureAD
+```
+
+**Close all PowerShell windows** and reopen a new administrative session.
+
+The following commands will following commands will create a new Service Principal, with the built-in **Kubernetes Cluster - Azure Arc Onboarding** role and set the scope at the subscription level. The script will also assign the Service Principal the **Virtual Machine Contributer** role, which is required specifically for the automated deployment of this sandbox, and not for AKS-HCI itself.
 
 You can optionally adjust **$spName** to a more preferred name for your Service Principal.
 
@@ -151,14 +173,23 @@ You can optionally adjust **$spName** to a more preferred name for your Service 
 # Login to Azure
 Connect-AzAccount
 
-# Set the subscription on which you have "owner" access AND want to use for deploying AKS-HCI:
-$sub = "<my Azure subscription on which I'm an owner>"
+# Optional - if you wish to switch to a different subscription
+# First, get all available subscriptions as the currently logged in user
+$subList = Get-AzSubscription
+# Display those in a grid, select the chosen subscription, then press OK.
+if (($subList).count -gt 1) {
+    $subList | Out-GridView -OutputMode Single | Set-AzContext
+}
+
+# Retrieve the current subscription ID
+$sub = (Get-AzContext).Subscription.Id
 
 # Create a unique name for the Service Principal
 $date = (Get-Date).ToString("MMddyy-HHmmss")
 $spName = "AksHci-SP-$date"
 
 # Create the Service Principal
+
 $sp = New-AzADServicePrincipal -DisplayName $spName `
     -Role 'Kubernetes Cluster - Azure Arc Onboarding' `
     -Scope "/subscriptions/$sub"
@@ -168,6 +199,7 @@ New-AzRoleAssignment -ObjectId $sp.ObjectId `
     -Scope "/subscriptions/$sub"
 
 # Retrieve the password for the Service Principal
+
 $secret = [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR(
     [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($sp.Secret)
 )
@@ -195,7 +227,16 @@ Ahead of the deployment process, you need to register the appropriate resource p
 ```powershell
 # Login to Azure
 Connect-AzAccount
-Set-AzContext -subscription "<Subscription ID of the subscription you want to deploy AKS-HCI into (must match the subscription you created a service principal for above)>"
+
+# Optional - if you wish to switch to a different subscription
+# First, get all available subscriptions as the currently logged in user
+
+$subList = Get-AzSubscription
+
+# Display those in a grid, select the chosen subscription, then press OK.
+if (($subList).count -gt 1) {
+    $subList | Out-GridView -OutputMode Single | Set-AzContext
+}
 
 Register-AzResourceProvider -ProviderNamespace Microsoft.Kubernetes
 Register-AzResourceProvider -ProviderNamespace Microsoft.KubernetesConfiguration
@@ -254,7 +295,7 @@ Upon clicking the **Deploy to Azure** button, enter the details, which should lo
 Please be aware of some of the important parameters that you must provide for deploying the template. Specifically:
 
 * **AKS-HCI App Id** - This is your Service Principal ID which you created earlier
-* **AKS-HCI App Secret** - this is the corresponding secret/password for the Service Principal
+* **AKS-HCI App Secret** - this is the corresponding secret for the Service Principal
 * **Kubernetes Version** - this is the preferred version of your Kubernetes target cluster. "Match Management Cluster" will select the same version as the KVA for the AKS-HCI management cluster, which you can check here: https://github.com/Azure/aks-hci/releases. This will result in fewer images downloaded, and a faster deployment time, but it may not be the very latest Kubernetes version for your clusters.
 
 Finally, be aware of the **size** and **number** of control plane/worker nodes you are deploying. Your Azure VM has a finite size, and choosing to deploy multiple workers and control plane nodes, of a large size will result in a deployment failure of the AKS-HCI sandbox.  You can read more about this below.
