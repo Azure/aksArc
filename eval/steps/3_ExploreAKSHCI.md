@@ -10,7 +10,8 @@ Contents
 - [Contents](#contents)
 - [Deploying a simple Linux application](#deploying-a-simple-linux-application)
 - [Expose a nested application to the internet](#expose-a-nested-application-to-the-internet)
-- [Integrating with Azure Arc](#integrating-with-azure-arc)
+- [Deploy hybrid E2E solutions on the AKS on Azure Stack HCI environment](#deploy-hybrid-e2e-solutions-on-the-aks-on-azure-stack-hci-environment)
+    * [Solutions](#Solutions)
 - [Shutting down the environment](#shutting-down-the-environment)
 - [Congratulations!](#congratulations)
 - [Product improvements](#product-improvements)
@@ -146,21 +147,35 @@ Add-NetNatStaticMapping -NatName "AKSHCINAT" -Protocol TCP -ExternalIPAddress '0
 
 **NOTE** - This process creates a NAT static mapping that's specific to that External IP and Port of that specific Kubernetes service you have deployed in the environment. You will need to repeat the process for additional applications. To learn more about PowerShell NetNat commands, [visit the official documentation](https://docs.microsoft.com/en-us/powershell/module/netnat "Official documentation for NetNat").
 
-Integrating with Azure Arc
+Deploy Hybrid E2E Solutions on the AKS on Azure Stack HCI Environment
 -----------
-If you chose to deploy your AKS on Azure Stack environment with PowerShell, at this stage, you can only manage your cluster with local tools, such as kubectl. If however, you wish to explore the funcionality that Azure Arc can provide, there are some additional steps that must be performed.
 
-**NOTE** - If you deployed your AKS on Azure Stack HCI environment with Windows Admin Center, and chose to integrate with Azure Arc as part of the deployment process, you can skip this step.
+Now that you are knowledgeable on how to interact with various aspects of your AKS on the Azure Stack HCI cluster, it is time to experiment with various hybrid solutions that can help you get started in using your AKS on the Azure Stack HCI cluster. These hybrid solutions use AKS on Azure Stack HCI capabilities in combination with other Azure Services to enable complex hybrid use cases.
 
-* [Connect an AKS on Azure Stack HCI cluster to Azure Arc](https://docs.microsoft.com/en-us/azure-stack/aks-hci/connect-to-arc "Connect an AKS on Azure Stack HCI cluster to Azure Arc")
+## Solutions
 
-With your Kubernetes cluster integrated with Azure Arc, there are a number of other useful tutorials that you can follow, including tutorials that cover using GitOps, and Azure Policy.
+These samples demonstrate how to quickly get started developing various hybrid solutions, using AKS on Azure Stack HCI and other Azure Services. Each sample solution is self-contained and may require extra Azure resources for its operations.
 
-* [Deploy configurations using GitOps on Arc enabled Kubernetes cluster](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/use-gitops-connected-cluster "Deploy configurations using GitOps on Arc enabled Kubernetes cluster")
-* [Use Azure Policy to apply cluster configurations at scale](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/use-azure-policy "Use Azure Policy to apply cluster configurations at scale")
-* [Enable monitoring of Azure Arc enabled Kubernetes cluster](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/container-insights-enable-arc-enabled-clusters "Enable monitoring of Azure Arc enabled Kubernetes cluster")
+### AI Video Analytics at the Edge (Vision on Edge)
+*******************************************************************************************************
+Vision on Edge (VoE) is an open-source end-to-end solution for AKS on Azure Stack HCI that simplifies the customer journey in creating and deploying vision-based AI analytics at the edge using a combination of various Azure services and open-source software. Vision on Edge takes advantage of:
+* Azure Custom Vision
+* Azure IoT Hub/Azure IoT Edge
 
-In addition to these resources, it's certainly worth exploring additional scenarios around Azure Arc, on the [Azure Arc jumpstart website](https://azurearcjumpstart.io "Azure Arc jumpstart website").  Here, you can explore scenarios around [Azure Arc enabled Kubernetes](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/ "Azure Arc enabled Kubernetes"), and [Azure Arc enabled data services](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/ "Azure Arc enabled data services").
+To help you to:
+* Go from zero to PoC by deploying our pre-built use-case scenarios such as defect detection and people counting in manufacturing and retail industries, respectively, on your own camera feeds
+* Go from PoC to MVP by creating your very own custom AI model capable of detecting your desired objects from data gathered from your cameras easily through VoE UI
+* Go from MVP to Production by deploying your custom AI solution/model, accelerated to 10+ cameras in parallel
+
+
+
+<img src="../media/VoEBox.gif" height="500" />
+
+
+**Deployment Steps**
+
+Please follow the [instructions given here](https://github.com/penorouzi/azure-intelligent-edge-patterns/blob/master/factory-ai-vision/Tutorial/K8s_helm_deploy.md) to install VoE on Kubernetes (AKS/AKS-HCI) using VoE Helm chart.
+
 
 Shutting down the environment
 -----------
