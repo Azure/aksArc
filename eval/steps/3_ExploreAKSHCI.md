@@ -157,7 +157,7 @@ Now that you are knowledgeable on how to interact with various aspects of your A
 These samples demonstrate how to quickly get started developing various hybrid solutions, using AKS on Azure Stack HCI and other Azure Services. Each sample solution is self-contained and may require extra Azure resources for its operations.
 
 ### AI Video Analytics at the Edge (Vision on Edge)
-*******************************************************************************************************
+
 Vision on Edge (VoE) is an open-source end-to-end solution for AKS on Azure Stack HCI that simplifies the customer journey in creating and deploying vision-based AI analytics at the edge using a combination of various Azure services and open-source software. Vision on Edge takes advantage of:
 * Azure Custom Vision
 * Azure IoT Hub/Azure IoT Edge
@@ -167,10 +167,9 @@ To help you to:
 * Go from PoC to MVP by creating your very own custom AI model capable of detecting your desired objects from data gathered from your cameras easily through VoE UI
 * Go from MVP to Production by deploying your custom AI solution/model, accelerated to 10+ cameras in parallel
 
-
-
-<img src="../media/VoEBox.gif" height="500" />
-
+<p align="center">
+   <img src="../media/VoEBox.gif" height="450"/>
+</p>
 
 **Deployment Steps**
 
