@@ -10,8 +10,8 @@ Contents
 - [Contents](#contents)
 - [Deploying a simple Linux application](#deploying-a-simple-linux-application)
 - [Expose a nested application to the internet](#expose-a-nested-application-to-the-internet)
-- [Deploy hybrid E2E solutions on the AKS on Azure Stack HCI environment](#deploy-hybrid-e2e-solutions-on-the-aks-on-azure-stack-hci-environment)
-    * [Solutions](#Solutions)
+- [Deploy hybrid end-to-end solutions on AKS-HCI](#deploy-hybrid-end-to-end-solutions-on-aks-hci)
+- [Continue your learning](#continue-your-learning)
 - [Shutting down the environment](#shutting-down-the-environment)
 - [Congratulations!](#congratulations)
 - [Product improvements](#product-improvements)
@@ -147,14 +147,12 @@ Add-NetNatStaticMapping -NatName "AKSHCINAT" -Protocol TCP -ExternalIPAddress '0
 
 **NOTE** - This process creates a NAT static mapping that's specific to that External IP and Port of that specific Kubernetes service you have deployed in the environment. You will need to repeat the process for additional applications. To learn more about PowerShell NetNat commands, [visit the official documentation](https://docs.microsoft.com/en-us/powershell/module/netnat "Official documentation for NetNat").
 
-Deploy Hybrid E2E Solutions on the AKS on Azure Stack HCI Environment
+Deploy hybrid end-to-end solutions on AKS-HCI
 -----------
 
-Now that you are knowledgeable on how to interact with various aspects of your AKS on the Azure Stack HCI cluster, it is time to experiment with various hybrid solutions that can help you get started in using your AKS on the Azure Stack HCI cluster. These hybrid solutions use AKS on Azure Stack HCI capabilities in combination with other Azure Services to enable complex hybrid use cases.
+Now that you are knowledgeable on how to interact with various aspects of AKS on Azure Stack HCI,it's a good time to build your knowledge by experimenting with more advanced hybrid solutions that run on AKS-HCI. These hybrid solutions use AKS on Azure Stack HCI capabilities in combination with other Azure Services to enable more complex hybrid use cases.
 
-## Solutions
-
-These samples demonstrate how to quickly get started developing various hybrid solutions, using AKS on Azure Stack HCI and other Azure Services. Each sample solution is self-contained and may require extra Azure resources for its operations.
+The following samples demonstrate how to quickly get started developing various hybrid solutions, using AKS on Azure Stack HCI and other Azure Services. Each sample solution is self-contained and may require extra Azure resources for its operations.
 
 ### AI Video Analytics at the Edge (Vision on Edge)
 
@@ -175,6 +173,15 @@ To help you to:
 
 Please follow the [instructions given here](https://github.com/penorouzi/azure-intelligent-edge-patterns/blob/master/factory-ai-vision/Tutorial/K8s_helm_deploy.md) to install VoE on Kubernetes (AKS/AKS-HCI) using VoE Helm chart.
 
+Continue your learning
+-----------
+In addition to the scenarios covered, there are a number of other useful tutorials that you can follow to help grow your knowledge around Kubernetes, including tutorials that cover using GitOps, and Azure Policy.
+
+* [Deploy configurations using GitOps on Arc enabled Kubernetes cluster](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/use-gitops-connected-cluster "Deploy configurations using GitOps on Arc enabled Kubernetes cluster")
+* [Use Azure Policy to apply cluster configurations at scale](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/use-azure-policy "Use Azure Policy to apply cluster configurations at scale")
+* [Enable monitoring of Azure Arc enabled Kubernetes cluster](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/container-insights-enable-arc-enabled-clusters "Enable monitoring of Azure Arc enabled Kubernetes cluster")
+
+In addition to these resources, it's certainly worth exploring additional scenarios around Azure Arc, on the [Azure Arc jumpstart website](https://azurearcjumpstart.io "Azure Arc jumpstart website").  Here, you can explore scenarios around [Azure Arc enabled Kubernetes](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/ "Azure Arc enabled Kubernetes"), and [Azure Arc enabled data services](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/ "Azure Arc enabled data services").
 
 Shutting down the environment
 -----------
