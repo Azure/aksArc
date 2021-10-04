@@ -78,7 +78,7 @@ Now, seeing as you're deploying this evaluation in Azure, it assumes you already
 
 * An Azure subscription with **at least one** of the following:
    1. A user account with the built-in **Owner** role 
-   2. A Service Principal with either the built-in **Microsoft.Kubernetes connected cluster role** (Minimum), built-in **Contributer** role or built-in **Owner** role
+   2. A Service Principal with either the built-in **Kubernetes Cluster - Azure Arc Onboarding** (Minimum), built-in **Contributer** role or built-in **Owner** role
 
 #### Optional - Create a new Service Principal ####
 
@@ -314,7 +314,16 @@ To get a list of available VM sizes, run **Get-AksHciVmSize**
 
 ____________________
 
+### Node Pools, Taints and Max Pod Counts ###
+
 If you're not familiar with the concept of **node pools**, a node pool is a **group of nodes**, or virtual machines that run your applications, within a Kubernetes cluster that have the same configuration, giving you more granular control over your clusters. You can deploy multiple Windows node pools and multiple Linux node pools of different sizes, within the same Kubernetes cluster.
+
+Another configuration option that can be applied to a node pool is the concept of **taints**. A taint can be specified for a particular node pool at both cluster and node pool creation time, and essential allow you to prevent pods being placed on specific nodes based on characteristics that you specify. You can learn more about [taints here](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/ "Information about taints").
+
+This guide doesn't require you to specify a taint, but if you do wish to explore the commands for adding a taint to a node pool, make sure you read the [official docs](https://docs.microsoft.com/en-us/azure-stack/aks-hci/use-node-pools#specify-a-taint-for-a-node-pool "Official docs on taints").
+
+In addition to taints, we have recently added suport for configuring the **maximum number of pods** that can run on a node, with the **-nodeMaxPodCount** parameter. You can specify this parameter when creating a cluster, or when creating a new node pool.
+
 _____________________
 
 The deployment of this Kubernetes workload cluster should take a few minutes, and once complete, should present information about the deployment, however you can verify the details by running the following command:
@@ -323,7 +332,7 @@ The deployment of this Kubernetes workload cluster should take a few minutes, an
 Get-AksHciCluster
 ```
 
-![Output of Get-AksHciCluster](/eval/media/get_akshcicluster_july.png "Output of Get-AksHciCluster")
+![Output of Get-AksHciCluster](/eval/media/get_akshcicluster_sept.png "Output of Get-AksHciCluster")
 
 ____________
 
@@ -333,7 +342,7 @@ ____________
 Get-AksHciNodePool -clusterName akshciclus001
 ```
 
-![Output of Get-AksHciNodePool](/eval/media/get_akshcinodepool.png "Output of Get-AksHciNodePool")
+![Output of Get-AksHciNodePool](/eval/media/get_akshcinodepool_sept.png "Output of Get-AksHciNodePool")
 
 ____________
 
@@ -355,7 +364,7 @@ With your cluster scaled out, you can check the node pool status by running:
 Get-AksHciNodePool -clusterName akshciclus001
 ```
 
-![Output of Get-AksHciNodePool](/eval/media/get_akshcinodepool2.png "Output of Get-AksHciNodePool")
+![Output of Get-AksHciNodePool](/eval/media/get_akshcinodepool2_sept.png "Output of Get-AksHciNodePool")
 
 *******************************************************************************************************
 
@@ -375,18 +384,18 @@ Set-AksHciCluster –Name akshciclus001 -controlPlaneNodeCount 3
 Get-AksHciCluster
 ```
 
-![Output of Get-AksHciCluster](/eval/media/get_akshcicluster_july_2.png "Output of Get-AksHciCluster")
+![Output of Get-AksHciCluster](/eval/media/get_akshcicluster_sept2.png "Output of Get-AksHciCluster")
 
 To access this **akshciclus001** cluster using **kubectl** (which was installed on your host as part of the overall installation process), you'll first need the **kubeconfig file**.
 
 6. To retrieve the kubeconfig file for the akshciclus001 cluster, you'll need to run the following command from your **administrative PowerShell** and accept the prompt when prompted:
 
 ```powershell
-Get-AksHciCredential -Name akshciclus001
+Get-AksHciCredential -Name akshciclus001 -Confirm:$false
 dir $env:USERPROFILE\.kube
 ```
 
-![Output of Get-AksHciCredential](/eval/media/get_akshcicred_2.png "Output of Get-AksHciCredential")
+![Output of Get-AksHciCredential](/eval/media/get_akshcicred_sept.png "Output of Get-AksHciCredential")
 
 The **default** output of this command is to create the kubeconfig file in **%USERPROFILE%\\.kube.** folder, and will name the file **config**. This **config** file will overwrite the previous kubeconfig file retrieved earlier. You can also specify a custom location by using **-configPath c:\myfiles\kubeconfig**
 
