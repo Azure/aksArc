@@ -329,7 +329,16 @@ Get-AksHciCluster
 
 ____________________
 
+### Node Pools, Taints and Max Pod Counts ###
+
 If you're not familiar with the concept of **node pools**, a node pool is a **group of nodes**, or virtual machines that run your applications, within a Kubernetes cluster that have the same configuration, giving you more granular control over your clusters. You can deploy multiple Windows node pools and multiple Linux node pools of different sizes, within the same Kubernetes cluster.
+
+Another configuration option that can be applied to a node pool is the concept of **taints**. A taint can be specified for a particular node pool at cluster and node pool creation time, and essential allow you to prevent pods being placed on specific nodes based on characteristics that you specify. You can learn more about [taints here](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/ "Information about taints").
+
+This guide doesn't require you to specify a taint, but if you do wish to explore the commands for adding a taint to a node pool, make sure you read the [official docs](https://docs.microsoft.com/en-us/azure-stack/aks-hci/use-node-pools#specify-a-taint-for-a-node-pool "Official docs on taints").
+
+In addition to taints, we have recently added suport for configuring the **maximum number of pods** that can run on a node with PowerShell, with the **-nodeMaxPodCount** parameter. You can specify this parameter when creating a cluster, or when creating a new node pool.
+
 _____________________
 
 First, you can confirm your node pool names and details by running the following command:
@@ -357,7 +366,7 @@ Set-AksHciCluster –Name akshciclus001 -controlPlaneNodeCount 3
 
 *******************************************************************************************************
 
-4. Once these steps have been completed, you can verify the details by running the following command:
+1. Once these steps have been completed, you can verify the details by running the following command:
 
 ```powershell
 Get-AksHciCluster
@@ -370,7 +379,7 @@ To access this **akshciclus001** cluster using **kubectl** (which was installed 
 5. To retrieve the kubeconfig file for the akshciclus001 cluster, you'll need to run the following command from your **administrative PowerShell**:
 
 ```powershell
-Get-AksHciCredential -Name akshciclus001
+Get-AksHciCredential -Name akshciclus001 -Confirm:$false
 dir $env:USERPROFILE\.kube
 ```
 

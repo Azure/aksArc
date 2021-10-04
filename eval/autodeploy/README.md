@@ -9,7 +9,7 @@ This guide will walk you through all the pre-requisites you need, and the steps 
 
 Version
 -----------
-This guide has been tested and validated with the **August 2021 release** of AKS on Azure Stack HCI.
+This guide has been tested and validated with the **September 2021 release** of AKS on Azure Stack HCI.
 
 Contents
 -----------
@@ -200,7 +200,7 @@ $sp = New-AzADServicePrincipal -DisplayName $spName `
     -Role 'Kubernetes Cluster - Azure Arc Onboarding' `
     -Scope "/subscriptions/$sub"
 
-New-AzRoleAssignment -ObjectId $sp.ObjectId `
+New-AzRoleAssignment -ObjectId $sp.Id `
     -RoleDefinitionName "Virtual Machine Contributor" `
     -Scope "/subscriptions/$sub"
 
