@@ -6,7 +6,6 @@
         "xPSDesiredStateConfiguration",
         "xHyper-v",
         "xDhcpServer",
-        "xDNSServer",
         "DnsServerDsc",
         "cChoco",
         "DSCR_Shortcut",
