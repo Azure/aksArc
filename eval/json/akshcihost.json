@@ -441,7 +441,7 @@
                     "imageReference": {
                         "publisher": "MicrosoftWindowsServer",
                         "offer": "WindowsServer",
-                        "sku": "[if(equals(parameters('virtualMachineGeneration'), 'Generation 2'), '2019-datacenter-gensecond', '2019-Datacenter')]",
+                        "sku": "[if(equals(parameters('virtualMachineGeneration'), 'Generation 2'), '2022-datacenter-g2', '2022-datacenter')]",
                         "version": "latest"
                     },
                     "osDisk": {
