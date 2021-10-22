@@ -64,6 +64,17 @@
                 "Standard_E64-32ds_v4"
             ]
         },
+        "virtualMachineOS": {
+            "type": "string",
+            "defaultValue": "Windows Server 2022",
+            "allowedValues": [
+                "Windows Server 2019",
+                "Windows Server 2022"
+            ],
+            "metadata": {
+                "description": "Select your Azure VM OS, ideally Windows Server 2022."
+            }
+        },
         "virtualMachineGeneration": {
             "type": "string",
             "defaultValue": "Generation 2",
@@ -300,8 +311,8 @@
     },
     "variables": {
         "dataDisksCount": 8,
-        "dscUri": "https://github.com/Azure/aks-hci/raw/main/eval/dsc/akshcihost.zip",
-        "artifactsLocation": "https://raw.githubusercontent.com/Azure/aks-hci/main/eval/",
+        "dscUri": "https://github.com/Azure/aks-hci/raw/october_eval/eval/dsc/akshcihost.zip",
+        "artifactsLocation": "https://raw.githubusercontent.com/Azure/aks-hci/october_eval/eval/",
         "randomGUID": "[substring(uniqueString(subscription().subscriptionId, resourceGroup().id, parameters('virtualMachineName')),0,6)]",
         "dnsNameForPublicIP": "[toLower(concat(parameters('virtualMachineName'), variables('randomGUID')))]",
         "environment": "Workgroup",
@@ -316,13 +327,15 @@
         "publicIpAddressType": "Dynamic",
         "publicIpAddressSku": "Basic",
         "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
-        "subnetRef": "[concat(variables('vnetId'), '/subnets/', variables('subnetName'))]"
+        "subnetRef": "[concat(variables('vnetId'), '/subnets/', variables('subnetName'))]",
+        "vmSkuGen1": "[if(equals(parameters('virtualMachineOS'), 'Windows Server 2022'), '2022-datacenter', '2019-datacenter')]",
+        "vmSkuGen2": "[if(equals(parameters('virtualMachineOS'), 'Windows Server 2022'), '2022-datacenter-g2', '2019-datacenter-gensecond')]"
     },
     "resources": [
         {
             "name": "[variables('publicIpAddressName')]",
             "type": "Microsoft.Network/publicIpAddresses",
-            "apiVersion": "2020-07-01",
+            "apiVersion": "2020-11-01",
             "location": "[resourceGroup().location]",
             "sku": {
                 "name": "[variables('publicIpAddressSku')]"
@@ -336,7 +349,7 @@
         },
         {
             "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2020-06-01",
+            "apiVersion": "2021-04-01",
             "name": "[variables('virtualNetworkName')]",
             "properties": {
                 "mode": "Incremental",
@@ -366,7 +379,7 @@
         {
             "name": "[variables('networkInterfaceName')]",
             "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2020-05-01",
+            "apiVersion": "2020-11-01",
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[variables('virtualNetworkName')]",
@@ -397,7 +410,7 @@
         {
             "name": "[variables('networkSecurityGroupName')]",
             "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "2020-05-01",
+            "apiVersion": "2020-11-01",
             "location": "[resourceGroup().location]",
             "properties": {
                 "securityRules": [
@@ -420,7 +433,7 @@
         {
             "name": "[parameters('virtualMachineName')]",
             "type": "Microsoft.Compute/virtualMachines",
-            "apiVersion": "2020-06-01",
+            "apiVersion": "2021-03-01",
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
@@ -441,7 +454,7 @@
                     "imageReference": {
                         "publisher": "MicrosoftWindowsServer",
                         "offer": "WindowsServer",
-                        "sku": "[if(equals(parameters('virtualMachineGeneration'), 'Generation 2'), '2022-datacenter-g2', '2022-datacenter')]",
+                        "sku": "[if(equals(parameters('virtualMachineGeneration'), 'Generation 2'), variables('vmSkuGen2'), variables('vmSkuGen1'))]",
                         "version": "latest"
                     },
                     "osDisk": {
@@ -485,7 +498,7 @@
                 {
                     "type": "extensions",
                     "name": "InstallWAC",
-                    "apiVersion": "2018-06-01",
+                    "apiVersion": "2021-03-01",
                     "location": "[resourceGroup().location]",
                     "dependsOn": [
                         "[parameters('virtualMachineName')]"
@@ -508,7 +521,7 @@
                 {
                     "type": "extensions",
                     "name": "ConfigureAksHciHost",
-                    "apiVersion": "2020-06-01",
+                    "apiVersion": "2021-03-01",
                     "location": "[resourceGroup().location]",
                     "dependsOn": [
                         "[parameters('virtualMachineName')]",
@@ -565,7 +578,7 @@
         },
         {
             "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2020-06-01",
+            "apiVersion": "2021-04-01",
             "name": "[concat(variables('virtualNetworkName'),'-UpdateDNS')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('virtualMachineName'), 'ConfigureAksHciHost')]"
