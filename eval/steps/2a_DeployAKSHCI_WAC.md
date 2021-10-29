@@ -2,7 +2,7 @@ Deploy your AKS-HCI infrastructure with Windows Admin Center
 ==============
 Overview
 -----------
-With your Windows Server 2019 Hyper-V host up and running, it's now time to deploy AKS on Azure Stack HCI. You'll first use Windows Admin Center to deploy the AKS on Azure Stack HCI management cluster onto your Windows Server 2019 Hyper-V host, and finally, deploy a target cluster, onto which you can test deployment of a workload.
+With your Windows Server Hyper-V host up and running, it's now time to deploy AKS on Azure Stack HCI. You'll first use Windows Admin Center to deploy the AKS on Azure Stack HCI management cluster onto your Windows Server Hyper-V host, and finally, deploy a target cluster, onto which you can test deployment of a workload.
 
 Contents
 -----------
@@ -127,13 +127,13 @@ In order to successfully deploy AKS on Azure Stack HCI with Windows Admin Center
 
 5. Switch back to the **Windows Admin Center tab** and click on **Windows Admin Center** in the top-left corner to return to the home page
 
-You'll notice that your AKSHCIHOST001 is already under management, so at this stage, you're ready to proceed to deploy the AKS on Azure Stack HCI management cluster onto your Windows Server 2019 Hyper-V host.
+You'll notice that your AKSHCIHOST001 is already under management, so at this stage, you're ready to proceed to deploy the AKS on Azure Stack HCI management cluster onto your Windows Server Hyper-V host.
 
 ![AKSHCIHOST001 under management in Windows Admin Center](/eval/media/akshcihost_in_wac.png "AKSHCIHOST001 under management in Windows Admin Center")
 
 Optional - Enable/Disable DHCP
 -----------
-Static IP configurations are supported for deployment of the management cluster and workload clusters. When you deployed your Azure VM, DHCP was installed and configured automatically for you, but you had the chance to control whether it was enabled or disabled on your Windows Server 2019 OS. If you want to adjust DHCP now, make changes to the **$dhcpState** below and run the following **PowerShell command as administrator**:
+Static IP configurations are supported for deployment of the management cluster and workload clusters. When you deployed your Azure VM, DHCP was installed and configured automatically for you, but you had the chance to control whether it was enabled or disabled on your Windows Server host OS. If you want to adjust DHCP now, make changes to the **$dhcpState** below and run the following **PowerShell command as administrator**:
 
 ```powershell
 # Check current DHCP state for Active/Inactive
@@ -145,19 +145,19 @@ Set-DhcpServerv4Scope -ScopeId 192.168.0.0 -State $dhcpState -Verbose
 
 Deploying AKS on Azure Stack HCI management cluster
 -----------
-The next section will walk through configuring the AKS on Azure Stack HCI management cluster, on your single node Windows Server 2019 host.
+The next section will walk through configuring the AKS on Azure Stack HCI management cluster, on your single node Windows Server Hyper-V host.
 
 1. From the Windows Admin Center homepage, click on your **akshcihost001.akshci.local \[Gateway\]** machine.
 2. You'll be presented with a rich array of information about your akshcihost001 machine, of which you can feel free to explore the different options and metrics. When you're ready, on the left-hand side, click **Azure Kubernetes Service**
 
 ![Ready to deploy AKS-HCI with Windows Admin Center](/eval/media/aks_extension.png "Ready to deploy AKS-HCI with Windows Admin Center")
 
-You'll notice the terminology used refers to the **Azure Kubernetes Service Runtime on Windows Server​​** - the naming differs depending on if you're running the installation of AKS on a Windows Server 2019 Hyper-V platform, or the newer Azure Stack HCI 20H2 platform. The overall deployment experience is the same regardless of underlying platform.
+You'll notice the terminology used refers to the **Azure Kubernetes Service Runtime on Windows Server​​** - the naming differs depending on if you're running the installation of AKS on a Windows Server Hyper-V platform, or the newer Azure Stack HCI 21H2 platform. The overall deployment experience is the same regardless of underlying platform.
 
 3. Click on **Set up** to start the deployment process
 4. Firstly, review the prerequisites - your Azure VM environment will meet all the prerequisites, so you should be fine to click **Next: System checks**
 5. On the **System checks** page, enter the password for your **azureuser** account and when successfully validated, click on the **Install** button to **install the required PowerShell modules**
-6. During the system checks stage, Windows Admin Center will begin to validate it's own configuration, and the configuration of your target nodes, which in this case, is the Windows Server 2019 Hyper-V host (running in your Azure VM)
+6. During the system checks stage, Windows Admin Center will begin to validate it's own configuration, and the configuration of your target nodes, which in this case, is the Windows Server Hyper-V host (running in your Azure VM)
 
 ![System checks performed by Windows Admin Center](/eval/media/wac_system_checks.png "System checks performed by Windows Admin Center")
 
@@ -249,7 +249,7 @@ There are two ways to create a Kubernetes cluster in Windows Admin Center.
 Whichever option you chose, you will now be at the start of the **Create kubernetes cluster** wizard.
 
 1. Firstly, review the prerequisites - your Azure VM environment will meet all the prerequisites, so you should be fine to click **Next: Basics**
-2. On the **Basics** page, firstly, choose whether you wish to **optionally** integrate with Azure Arc enabled Kubernetes. You can click the link on the page to learn more about Azure Arc. If you do wish to integrate, select the **Enabled** radio button, then use the drop downs to select the **subscription**,  **resource group** and **region**. Alternatively, you can create a new resource group, in a specific region, exclusively for the Azure Arc integration resource.
+2. On the **Basics** page, firstly, choose whether you wish to **optionally** integrate with Azure Arc enabled Kubernetes. You can click the link on the page to learn more about Azure Arc. If you do wish to integrate, select the **Enabled** radio button, then use the drop downs to select the **subscription**, **resource group** and **region**. Alternatively, you can create a new resource group, in a specific region, exclusively for the Azure Arc integration resource.
 
 ![Enable Arc integration with Windows Admin Center](/eval/media/aks_basics_arc.png "Enable Arc integration with Windows Admin Center")
 
@@ -267,11 +267,13 @@ Whichever option you chose, you will now be at the start of the **Create kuberne
    2. **OS type**: Linux
    3. **Node size**: Default (4 GB Memory, 4 CPU)
    4. **Node count**: 1
+   5. **Max pods per node**: Leave the default
 7. Optionally, repeat step 6, to add a **Windows node** and the following info, then click **Add**
    1. **Node pool name**: windowsnodepool
    2. **OS type**: Windows
    3. **Node size**: Default (4 GB Memory, 4 CPU)
    4. **Node count**: 1
+   5. **Max pods per node**: Leave the default
 
 ![AKS node pools in Windows Admin Center](/eval/media/aks_node_pools.png "AKS node pools in Windows Admin Center")
 
@@ -337,7 +339,7 @@ Another configuration option that can be applied to a node pool is the concept o
 
 This guide doesn't require you to specify a taint, but if you do wish to explore the commands for adding a taint to a node pool, make sure you read the [official docs](https://docs.microsoft.com/en-us/azure-stack/aks-hci/use-node-pools#specify-a-taint-for-a-node-pool "Official docs on taints").
 
-In addition to taints, we have recently added suport for configuring the **maximum number of pods** that can run on a node with PowerShell, with the **-nodeMaxPodCount** parameter. You can specify this parameter when creating a cluster, or when creating a new node pool.
+In addition to taints, we have recently added suport for configuring the **maximum number of pods** that can run on a node, with the **-nodeMaxPodCount** parameter. You can specify this parameter when creating a cluster, or when creating a new node pool, **and the number has to be greater than 50**.
 
 _____________________
 

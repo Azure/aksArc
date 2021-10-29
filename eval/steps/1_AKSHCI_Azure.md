@@ -6,9 +6,9 @@ With the introduction of [nested virtualization support in Azure](https://azure.
 
 In this guide, you'll walk through the steps to stand up an AKS on Azure Stack HCI infrastructure. At a high level, this will consist of the following:
 
-* Deploy an Azure VM, running Windows Server 2019, to act as your main Hyper-V host - this will be automatically configured with the relevant roles and features needed for your evaluation
-* On the Windows Server 2019 VM, deploy the AKS on Azure Stack HCI management cluster
-* On the Windows Server 2019 VM, deploy the AKS on Azure Stack HCI target clusters, for running workloads
+* Deploy an Azure VM, running Windows Server 2019 or 2022, to act as your main Hyper-V host - this will be automatically configured with the relevant roles and features needed for your evaluation
+* On the Windows Server VM, deploy the AKS on Azure Stack HCI management cluster
+* On the Windows Server VM, deploy the AKS on Azure Stack HCI target clusters, for running workloads
 
 Contents
 -----------
@@ -32,13 +32,13 @@ From an architecture perspective, the following graphic showcases the different 
 
 ![Architecture diagram for AKS on Azure Stack HCI in Azure](/eval/media/nested_virt_arch_ga2.png "Architecture diagram for AKS on Azure Stack HCI in Azure")
 
-The outer box represents the Azure Resource Group, which will contain all of the artifacts deployed in Azure, including the virtual machine itself, and accompaying network adapter, storage and so on. You'll deploy an Azure VM running Windows Server 2019 Datacenter. Once deployed, you'll perform some host configuration, and then begin to deploy the other key components. Firstly, on the left hand side, you'll deploy the management cluster. This provides the the core orchestration mechanism and interface for deploying and managing one or more target clusters, which are shown on the right of the diagram. These target, or workload clusters contain worker nodes and are where application workloads run. These are managed by a management cluster. If you're interested in learning more about the building blocks of the Kubernetes infrastructure, you can [read more here](https://docs.microsoft.com/en-us/azure-stack/aks-hci/kubernetes-concepts "Kubernetes core concepts for Azure Kubernetes Service on Azure Stack HCI").
+The outer box represents the Azure Resource Group, which will contain all of the artifacts deployed in Azure, including the virtual machine itself, and accompaying network adapter, storage and so on. You'll deploy an Azure VM running Windows Server 2019 or 2022 Datacenter. Once deployed, you'll perform some host configuration, and then begin to deploy the other key components. Firstly, on the left hand side, you'll deploy the management cluster. This provides the the core orchestration mechanism and interface for deploying and managing one or more target clusters, which are shown on the right of the diagram. These target, or workload clusters contain worker nodes and are where application workloads run. These are managed by a management cluster. If you're interested in learning more about the building blocks of the Kubernetes infrastructure, you can [read more here](https://docs.microsoft.com/en-us/azure-stack/aks-hci/kubernetes-concepts "Kubernetes core concepts for Azure Kubernetes Service on Azure Stack HCI").
 
 *******************************************************************************************************
 
 Important Note
 -----------
-The steps outlined in this evaluation guide are **specific to running inside an Azure VM**, running a single Windows Server 2019 OS, without a domain environment configured. If you plan to use these steps in an alternative environment, such as one nested/physical on-premises, or in a domain-joined environment, the steps may differ and certain procedures may not work. If that is the case, please refer to the [official documentation to deploy AKS on Azure Stack HCI](https://docs.microsoft.com/en-us/azure-stack/aks-hci/ "official documentation to deploy AKS on Azure Stack HCI").
+The steps outlined in this evaluation guide are **specific to running inside an Azure VM**, running a single Windows Server 2019 or 2022 OS, without a domain environment configured. If you plan to use these steps in an alternative environment, such as one nested/physical on-premises, or in a domain-joined environment, the steps may differ and certain procedures may not work. If that is the case, please refer to the [official documentation to deploy AKS on Azure Stack HCI](https://docs.microsoft.com/en-us/azure-stack/aks-hci/ "official documentation to deploy AKS on Azure Stack HCI").
 
 *******************************************************************************************************
 
@@ -113,7 +113,7 @@ The guidance below provides 2 main options for deploying the Azure VM.  In both 
 ### Deployment detail ###
 As part of the deployment, the following steps will be **automated for you**:
 
-1. A Windows Server 2019 Datacenter VM will be deployed in Azure
+1. A Windows Server 2019 or 2022 Datacenter VM will be deployed in Azure
 2. 8 x 32GiB (by default) Azure Managed Disks will be attached and provisioned with a Simple Storage Space for optimal nested VM performance
 3. The Hyper-V role and management tools, including Failover Clustering tools will be installed and configured
 4. An Internal vSwitch will be created and NAT configured to enable outbound networking
@@ -165,7 +165,7 @@ With that completed, skip on to [connecting to your Azure VM](#connect-to-your-a
 If your Azure VM fails to deploy successfully, and the error relates to the **AKSHCIHost001/ConfigureAksHciHost** PowerShell DSC extension, please refer to the [troubleshooting steps below](#troubleshooting).
 
 ### Option 2 - Creating the Azure VM with PowerShell ###
-For simplicity and speed, can also use PowerShell on our local workstation to deploy the Windows Server 2019 VM to Azure using the ARM template described earlier. As an alternative, you can take the following commands, edit them, and run them directly in [PowerShell in Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/quickstart-powershell "PowerShell in Azure Cloud Shell").  For the purpose of this guide, we'll assume you're using the PowerShell console/ISE or Windows Terminal locally on your workstation.
+For simplicity and speed, can also use PowerShell on our local workstation to deploy the Windows Server VM to Azure using the ARM template described earlier. As an alternative, you can take the following commands, edit them, and run them directly in [PowerShell in Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/quickstart-powershell "PowerShell in Azure Cloud Shell").  For the purpose of this guide, we'll assume you're using the PowerShell console/ISE or Windows Terminal locally on your workstation.
 
 #### Update the Execution Policy ####
 In this step, you'll update your PowerShell execution policy to RemoteSigned
@@ -332,7 +332,7 @@ Select **RDP**. On the newly opened Connect blade, ensure the **Public IP** is s
 
 ![Configure RDP settings for Azure VM](/eval/media/connect_to_vm_properties.png "Configure RDP settings for Azure VM")
 
-Once downloaded, locate the .rdp file on your local machine, and double-click to open it. Click **connect** and when prompted, enter the credentials you supplied when creating the VM earlier. Accept any certificate prompts, and within a few moments, you should be successfully logged into the Windows Server 2019 VM.
+Once downloaded, locate the .rdp file on your local machine, and double-click to open it. Click **connect** and when prompted, enter the credentials you supplied when creating the VM earlier. Accept any certificate prompts, and within a few moments, you should be successfully logged into the Windows Server VM.
 
 ### Optional - Update your Azure VM ###
 
