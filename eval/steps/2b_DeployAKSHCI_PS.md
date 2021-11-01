@@ -2,7 +2,7 @@ Deploy your AKS-HCI infrastructure with PowerShell
 ==============
 Overview
 -----------
-With your Windows Server 2019 Hyper-V host up and running, it's now time to deploy AKS on Azure Stack HCI. You'll first deploy the AKS management cluster onto your Windows Server 2019 Hyper-V host, then deploy a target cluster, onto which you can test deployment of a workload.
+With your Windows Server Hyper-V host up and running, it's now time to deploy AKS on Azure Stack HCI. You'll first deploy the AKS management cluster onto your Windows Server Hyper-V host, then deploy a target cluster, onto which you can test deployment of a workload.
 
 Contents
 -----------
@@ -14,6 +14,7 @@ Contents
 - [Enable Azure integration](#enable-azure-integration)
 - [Deploying AKS on Azure Stack HCI management cluster](#deploying-aks-on-azure-stack-hci-management-cluster)
 - [Create a Kubernetes cluster (Target cluster)](#create-a-kubernetes-cluster-target-cluster)
+- [Integrate with Azure Arc](#integrate-with-azure-arc)
 - [Next Steps](#next-steps)
 - [Product improvements](#product-improvements)
 - [Raising issues](#raising-issues)
@@ -60,7 +61,7 @@ Install-Module -Name AksHci -Repository PSGallery -AcceptLicense -Force
 
 Optional - Enable/Disable DHCP
 -----------
-Static IP configurations are supported for deployment of the management cluster and workload clusters. When you deployed your Azure VM, DHCP was installed and configured automatically for you, but you had the chance to control whether it was enabled or disabled on your Windows Server 2019 OS. If you want to adjust DHCP now, make changes to the **$dhcpState** below and run the following **PowerShell command as administrator**:
+Static IP configurations are supported for deployment of the management cluster and workload clusters. When you deployed your Azure VM, DHCP was installed and configured automatically for you, but you had the chance to control whether it was enabled or disabled on your Windows Server host OS. If you want to adjust DHCP now, make changes to the **$dhcpState** below and run the following **PowerShell command as administrator**:
 
 ```powershell
 # Check current DHCP state for Active/Inactive
@@ -153,11 +154,11 @@ Get-AzResourceProvider -ProviderNamespace Microsoft.KubernetesConfiguration
 
 ![Resource Provider enabled in Azure](/eval/media/akshci_rp_enable.png "Resource Provider enabled Azure")
 
-With those steps completed, you're ready to deploy the AKS management cluster, onto your Windows Server 2019 Hyper-V host.
+With those steps completed, you're ready to deploy the AKS management cluster, onto your Windows Server Hyper-V host.
 
 Deploying AKS on Azure Stack HCI management cluster
 -----------
-You're now ready to deploy the AKS on Azure Stack HCI management cluster onto your Windows Server 2019 host.
+You're now ready to deploy the AKS on Azure Stack HCI management cluster onto your Windows Server Hyper-V host.
 
 1. Open **PowerShell as Administrator** and run the following command to import the new modules, and list their functions. If you receive an error while running these commands, ensure you **closed all PowerShell windows earlier** and run them in a fresh administrative PowerShell console.
 
@@ -282,8 +283,7 @@ With the management cluster deployed successfully, you're ready to move on to de
 1. Open **PowerShell as Administrator** and run the following command to check the available versions of Kubernetes that are currently available:
 
 ```powershell
-# Allow PowerShell to show more than 4 versions in the output
-$FormatEnumerationLimit = -1
+# Show available Kubernetes versions
 Get-AksHciKubernetesVersion
 ```
 
@@ -310,7 +310,7 @@ This is fine for evaluation purposes to begin with. There are a number of option
 * **-loadBalancerVmSize** - Size of your load balancer VM. Default is Standard_A2_V2
 * **-nodeVmSize** - Size of your worker node VM. Default is Standard_K8S3_v1
 
-To get a list of available VM sizes, run **Get-AksHciVmSize**
+For more parameters that you can use with New-AksHciCluster, refer to the [official documentation](https://docs.microsoft.com/en-us/azure-stack/aks-hci/reference/ps/new-akshcicluster "official documentation"). To get a list of available VM sizes, run **Get-AksHciVmSize**
 
 ____________________
 
@@ -322,7 +322,7 @@ Another configuration option that can be applied to a node pool is the concept o
 
 This guide doesn't require you to specify a taint, but if you do wish to explore the commands for adding a taint to a node pool, make sure you read the [official docs](https://docs.microsoft.com/en-us/azure-stack/aks-hci/use-node-pools#specify-a-taint-for-a-node-pool "Official docs on taints").
 
-In addition to taints, we have recently added suport for configuring the **maximum number of pods** that can run on a node, with the **-nodeMaxPodCount** parameter. You can specify this parameter when creating a cluster, or when creating a new node pool.
+In addition to taints, we have recently added suport for configuring the **maximum number of pods** that can run on a node, with the **-nodeMaxPodCount** parameter. You can specify this parameter when creating a cluster, or when creating a new node pool, **and the number has to be greater than 50**.
 
 _____________________
 
@@ -399,12 +399,55 @@ dir $env:USERPROFILE\.kube
 
 The **default** output of this command is to create the kubeconfig file in **%USERPROFILE%\\.kube.** folder, and will name the file **config**. This **config** file will overwrite the previous kubeconfig file retrieved earlier. You can also specify a custom location by using **-configPath c:\myfiles\kubeconfig**
 
+Integrate with Azure Arc
+-----------
+With your target cluster deployed and scaled, you can quickly and easily integrate this cluster with Azure Arc.
+
+When an Azure Kubernetes Service on Azure Stack HCI cluster is attached to Azure Arc, it will get an Azure Resource Manager representation. Clusters are attached to standard Azure subscriptions, are located in a resource group, and can receive tags just like any other Azure resource. Also the Azure Arc-enabled Kubernetes representation allows for extending the following capabilities on to your Kubernetes cluster:
+
+* Management services - Configurations (GitOps), Azure Monitor for containers, Azure Policy (Gatekeeper)
+* Data Services - SQL Managed Instance, PostgreSQL Hyperscale
+* Application services - App Service, Functions, Event Grid, Logic Apps, API Management
+
+To connect a Kubernetes cluster to Azure, the cluster administrator needs to deploy agents. These agents run in a Kubernetes namespace named `azure-arc` and are standard Kubernetes deployments. The agents are responsible for connectivity to Azure, collecting Azure Arc logs and metrics, and enabling above-mentioned scenarios on the cluster.
+
+Azure Arc-enabled Kubernetes supports industry-standard SSL to secure data in transit. Also, data is stored encrypted at rest in an Azure Cosmos DB database to ensure data confidentiality.
+
+### Before you begin ###
+If you didn't earlier, make sure you double-check the [requirements for integrating with Azure](#before-you-begin "Requirements for integrating with Azure").
+
+### Enabling Azure Arc integration ###
+In order to integrate your target cluster with Azure Arc, run the following commands.
+
+```powershell
+# Login to Azure
+Connect-AzAccount
+
+# Integrate your target cluster with Azure Arc
+Enable-AksHciArcConnection -name akshciclus001
+```
+
+****************
+**NOTE** - This example connects your target cluster to Azure Arc using the subscription ID and resource group passed in the **Set-AksHciRegistration** command when deploying AKS on Azure Stack HCI. If you wish to use alternative settings, [review the official documentation](https://docs.microsoft.com/en-us/azure-stack/aks-hci/reference/ps/enable-akshciarcconnection "review the official documentation for Enable-AksHciArcConnection")
+****************
+
+### Verify connected cluster
+
+You can view your Kubernetes cluster resource on the [Azure portal](https://portal.azure.com/). Once you have the portal open in your browser, navigate to the resource group and the Azure Arc-enabled Kubernetes resource that's based on the resource name and resource group name inputs used earlier in the [Enable-AksHciArcConnection](https://docs.microsoft.com/en-us/azure-stack/aks-hci/reference/ps/enable-akshciarcconnection) PowerShell command.
+
+**************
+**NOTE** - After connecting the cluster, it may take between five to ten minutes for the cluster metadata (cluster version, agent version, number of nodes) to surface on the overview page of the Azure Arc-enabled Kubernetes resource in Azure portal.
+
+**************
+
+To learn more about integrating with Azure Arc, head over to the [official documentation](https://docs.microsoft.com/en-us/azure-stack/aks-hci/connect-to-arc)
+
 ### Updates and Cleanup ###
 To learn more about **updating**, **redeploying** or **uninstalling** AKS on Azure Stack HCI, you can [read the official documentation here.](https://docs.microsoft.com/en-us/azure-stack/aks-hci/create-kubernetes-cluster-powershell#step-3-upgrade-kubernetes-version "Official documentation on updating, redeploying and uninstalling AKS on Azure Stack HCI")
 
 Next Steps
 -----------
-In this step, you've successfully deployed the AKS on Azure Stack HCI management cluster, and subsequently, deployed and scaled a Kubernetes cluster that you can move forward with to the next stage, in which you can deploy your applications, and optionally, integrate with Azure Arc.
+In this step, you've successfully deployed the AKS on Azure Stack HCI management cluster, deployed and scaled a Kubernetes cluster and integrated with Azure Arc. You can now move forward to the next stage, in which you can deploy a sample application.
 
 * [**Part 3** - Explore AKS on Azure Stack HCI](/eval/steps/3_ExploreAKSHCI.md "Explore AKS on Azure Stack HCI")
 
