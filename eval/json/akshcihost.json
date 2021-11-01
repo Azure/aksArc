@@ -311,8 +311,8 @@
     },
     "variables": {
         "dataDisksCount": 8,
-        "dscUri": "https://github.com/Azure/aks-hci/raw/october_eval/eval/dsc/akshcihost.zip",
-        "artifactsLocation": "https://raw.githubusercontent.com/Azure/aks-hci/october_eval/eval/",
+        "dscUri": "https://github.com/Azure/aks-hci/raw/main/eval/dsc/akshcihost.zip",
+        "artifactsLocation": "https://raw.githubusercontent.com/Azure/aks-hci/main/eval/",
         "randomGUID": "[substring(uniqueString(subscription().subscriptionId, resourceGroup().id, parameters('virtualMachineName')),0,6)]",
         "dnsNameForPublicIP": "[toLower(concat(parameters('virtualMachineName'), variables('randomGUID')))]",
         "environment": "Workgroup",
