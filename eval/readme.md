@@ -5,11 +5,11 @@ AKS on Azure Stack HCI in Azure - Eval Guide
 
 In this guide, we'll walk you deploying the [Azure Kubernetes Service (AKS) on Azure Stack HCI in an Azure VM](https://docs.microsoft.com/en-us/azure-stack/aks-hci/overview "link to the What is Azure Kubernetes Service on Azure Stack HCI documentation landing page"), and set the foundation for you to explore in your own time.  You'll cover aspects such as:
 
-* Deploying and configuring a Windows Server 2019 Azure VM to host the infrastructure
+* Deploying and configuring a Windows Server 2019 or 2022 Azure VM to host the infrastructure
 * Deployment of the AKS on Azure Stack HCI management cluster with Windows Admin Center and/or PowerShell
 * Deployment of the AKS on Azure Stack HCI target/workload clusters with Windows Admin Center and/or PowerShell
-* Deployment of a simple test application and exposing the app externally
 * Integrating with Azure Arc
+* Deployment of a simple test application and exposing the app externally
 * and more...!
 
 Version
