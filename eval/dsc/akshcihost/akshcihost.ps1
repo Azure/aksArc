@@ -511,7 +511,7 @@ configuration AKSHCIHost
                     IsSingleInstance = 'Yes'
                     IPAddresses      = $existingDns
                     UseRootHint      = $True
-                    DependsOn     = "[DnsServerPrimaryZone]SetReverseLookupZone"
+                    DependsOn        = "[DnsServerPrimaryZone]SetReverseLookupZone"
                 }
             }
         }
@@ -574,6 +574,45 @@ configuration AKSHCIHost
                     @{Ensure = if ((Get-Item WSMan:\localhost\Client\TrustedHosts).Value -contains "*.$Using:DomainName") { 'Present' } Else { 'Absent' } }
                 }
                 DependsOn  = "[xCredSSP]Client"
+            }
+        }
+
+        #### Update WAC Extensions ####
+
+        script "WACupdater" {
+            GetScript  = {
+                # Specify the WAC gateway
+                $wac = "https://$env:COMPUTERNAME"
+        
+                # Add the module to the current session
+                $module = "$env:ProgramFiles\Windows Admin Center\PowerShell\Modules\ExtensionTools\ExtensionTools.psm1"
+        
+                Import-Module -Name $module -Verbose -Force
+                        
+                # List the WAC extensions
+                $extensions = Get-Extension $wac | Where-Object { $_.isLatestVersion -like 'False' }
+                        
+                $result = if ($extensions.count -gt 0) { $false } else { $true }
+        
+                return @{
+                    Wac        = $WAC
+                    extensions = $extensions
+                    result     = $result
+                }
+            }
+            TestScript = {
+                # Create and invoke a scriptblock using the $GetScript automatic variable, which contains a string representation of the GetScript.
+                $state = [scriptblock]::Create($GetScript).Invoke()
+                return $state.Result
+            }
+            SetScript  = {
+                $state = [scriptblock]::Create($GetScript).Invoke()
+                $date = get-date -f yyyy-MM-dd
+                $logFile = Join-Path -Path "C:\Users\Public" -ChildPath $('WACUpdateLog-' + $date + '.log')
+                New-Item -Path $logFile -ItemType File -Force
+                ForEach ($extension in $state.extensions) {    
+                    Update-Extension $state.wac -ExtensionId $extension.Id -Verbose | Out-File -Append -FilePath $logFile -Force
+                }
             }
         }
 
