@@ -20,29 +20,19 @@ NVIDIA Software. The software may include components developed and owned by NVID
 * Some manual configuration steps are needed to configure the Linux workernodes once the target cluster is set up.
 * **This preview requires a clean install.**
 
-## New AKS-HCI deployment ##
+## New AKS-HCI deployment ##w
 ## Before you begin
-Uninstall AKS-HCI completely
+Uninstall AKS-HCI completely!
 
 ```powershell
 PS C:\> Uninstall-AksHci
-```
->**[NOTE]** The below steps might not be needed. Use them if after uninstall and closing/re-opening PowerShell you still see the old version.
-```powershell
-PS C:\> Uninstall-Module -Name AksHci -AllVersions -Force -ErrorAction:SilentlyContinue 
-PS C:\> Uninstall-Module -Name Kva -AllVersions -Force -ErrorAction:SilentlyContinue 
-PS C:\> Uninstall-Module -Name Moc -AllVersions -Force -ErrorAction:SilentlyContinue 
-PS C:\> Uninstall-Module -Name MSK8SDownloadAgent -AllVersions -Force -ErrorAction:SilentlyContinue 
-PS C:\> Uninstall-Module -Name DownloadSDK -AllVersions -Force -ErrorAction:SilentlyContinue 
-PS C:\> Unregister-PSRepository -Name WSSDRepo -ErrorAction:SilentlyContinue 
-PS C:\> Unregister-PSRepository -Name AksHciPSGallery -ErrorAction:SilentlyContinue 
-PS C:\> Unregister-PSRepository -Name AksHciPSGalleryPreview -ErrorAction:SilentlyContinue
 ```
 ### Verify prerequisites for GPU support ###
 1.	Use PowerShell to verify NVIDIA Tesla T4 GPU is available on all physical nodes in the system. You might have to install the driver (on all physical nodes).
 ```powershell
 PS C:\> Get-PnpDevice -class Display
 ```
+
 In addition to above GPU prerequisites 
 
 - Make sure you have satisfied all the prerequisites on the [system requirements](https://docs.microsoft.com/en-us/azure-stack/aks-hci/system-requirements) page. 
@@ -57,128 +47,27 @@ In addition to above GPU prerequisites
    > **[NOTE]**
    > **We recommend having a 2-4 node Azure Stack HCI cluster.** If you don't have any of the above, follow instructions on the [Azure Stack HCI registration page](https://azure.microsoft.com/products/azure-stack/hci/hci-download/).
 
-## Install the Azure PowerShell and AksHci PowerShell modules for a new AKS-HCI deployment ##
-**If you are using remote PowerShell, you must use CredSSP.**
+## Update to the deployment steps ##
 
-1. **Close all open PowerShell windows**, open a new PowerShell window as an administrator, and run the following command:
+The Azure Kubernetes Service on Azure Stack HCI October update has all GPU required driver packages installed. 
 
-   ```powershell
-   PS C:\> Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
-   PS C:\> Install-PackageProvider -Name NuGet -Force 
-   PS C:\> Install-Module -Name PowershellGet -Force -Confirm:$false -SkipPublisherCheck
-   ```
-
-2. Close all existing PowerShell windows and open a fresh PowerShell window as an administrator and run the following commands to install the Azure PowerShell modules:
- 
-   ```powershell
-   PS C:\> Install-Module -Name Az.Accounts -Repository PSGallery -RequiredVersion 2.2.4
-   PS C:\> Install-Module -Name Az.Resources -Repository PSGallery -RequiredVersion 3.2.0
-   PS C:\> Install-Module -Name AzureAD -Repository PSGallery -RequiredVersion 2.0.2.128
-   PS C:\> Install-Module -Name AksHci -Repository PSGallery
-   ```
-
-   ```powershell
-   PS C:\> Import-Module Az.Accounts
-   PS C:\> Import-Module Az.Resources
-   PS C:\> Import-Module AzureAD
-   PS C:\> Import-Module AksHci
-   ```
-
-3. To check if you have the latest version of the PowerShell module, close all PowerShell windows, reopen a new administrative session, and run the following command: 
-  
-   ```powershell
-   PS C:\> Get-Command -Module AksHci
-   ```
-
-To view the complete list of AksHci PowerShell commands, see [AksHci PowerShell](https://docs.microsoft.com/en-us/azure-stack/aks-hci/akshci).
-
-### Register the resource provider to your subscription
-Before the registration process, you need to enable the appropriate resource provider in Azure for AKS on Azure Stack HCI registration. To do that, run the following PowerShell commands.
-
-To log in to Azure, run the [Connect-AzAccount](https://docs.microsoft.com/en-us/powershell/module/az.accounts/connect-azaccount) PowerShell command: 
+1. Deploy the AKS Host according to the [public documentation](https://docs.microsoft.com/en-us/azure-stack/aks-hci/kubernetes-walkthrough-powershell)
+2. Enable the Preview Channel
 ```powershell
-PS C:\> Connect-AzAccount
+PS C:\> Enable-AksHciPreview
 ```
-If you want to switch to a different subscription, run the [Set-AzContext](https://docs.microsoft.com/en-us/powershell/module/az.accounts/set-azcontext?view=azps-5.9.0&preserve-view=true) PowerShell command:
-
-```powershell
-PS C:\> Set-AzContext -Subscription "xxxx-xxxx-xxxx-xxxx"
+3. Update the current deployment
+``` powershell
+PS C:\> Get-AksHciUpdates
+PS C:\> Uppdate-AksHci
 ```
+This will install the preview bits and enable updates for the preview channel.
 
-Run the following command to register your Azure subscription to Azure Arc enabled Kubernetes resource providers. This registration process can take up to 10 minutes, but it only needs to be performed once on a specific subscription.
-   
-```PowerShell
-PS C:\> Register-AzResourceProvider -ProviderNamespace Microsoft.Kubernetes
-PS C:\> Register-AzResourceProvider -ProviderNamespace Microsoft.KubernetesConfiguration
-```
-
-To validate the registration process, run the following PowerShell command:
-
-```powershell
-PS C:\> Get-AzResourceProvider -ProviderNamespace Microsoft.Kubernetes
-PS C:\> Get-AzResourceProvider -ProviderNamespace Microsoft.KubernetesConfiguration
-```
-
-## Step 1: Prepare your machine(s) for deployment
-
-Run checks on every physical node to see if all the requirements are satisfied to install Azure Kubernetes Service on Azure Stack HCI. Open PowerShell as an administrator and run the following [Initialize-AksHciNode](https://docs.microsoft.com/en-us/azure-stack/aks-hci/initialize-akshcinode) command.
-
-```powershell
-PS C:\> Initialize-AksHciNode
-```
-
-## Step 2: Create a virtual network
-
-To get the names of your available switches, run the following command. Make sure the `SwitchType` of your VM switch is "External".
-
-```powershell
-PS C:\> Get-VMSwitch
-```
-
-Sample Output:
-
-```output
-Name        SwitchType     NetAdapterInterfaceDescription
-----        ----------     ------------------------------
-extSwitch   External       Mellanox ConnectX-3 Pro Ethernet Adapter
-```
-
-To create a virtual network for the nodes in your deployment to use, create an environment variable with the **New-AksHciNetworkSetting** PowerShell command. This will be used later to configure a deployment that uses static IP. If you want to configure your AKS deployment with DHCP, visit [New-AksHciNetworkSetting](.\new-akshcinetworksetting) for examples. You can also review some [networking node concepts](https://docs.microsoft.com/en-us/azure-stack/aks-hci/concepts-node-networking).
-
-```powershell
-#static IP
-PS C:\> $vnet = New-AksHciNetworkSetting -name myvnet -vSwitchName "extSwitch" -macPoolName myMacPool -k8sNodeIpPoolStart "172.16.10.0" -k8sNodeIpPoolEnd "172.16.10.255" -vipPoolStart "172.16.255.0" -vipPoolEnd "172.16.255.254" -ipAddressPrefix "172.16.0.0/16" -gateway "172.16.0.1" -dnsServers "172.16.0.1" -vlanId 9
-```
-
-> **[NOTE]**
-> The values given in this example command will need to be customized for your environment.
-
-## Step 3: Configure your deployment
-
-Set the configuration settings for the Azure Kubernetes Service host using the [Set-AksHciConfig](https://docs.microsoft.com/en-us/azure-stack/aks-hci/set-akshciconfig) command. You must specify the `imageDir` and `cloudConfigLocation` parameters. If you want to reset your config details, run the command again with new parameters.
-
-Configure your deployment with the following commands 
-
-### Configure a new AKS-HCI deployment ###
-1.	Follow the public documentation for 'Set-AksHciConfig' to setup and configure AKS-HCI. Add the '-ring "GPUPreview" -catalog "aks-hci-stable-catalogs-ext"' parameters.
+4. Create a new AKS-HCI target cluster
 > **[NOTE]** Do not change the VMSize when running the command.
-
-Example command:
-```powershell
-PS C:\> Set-AksHciConfig  -ring “GPUPreview” -catalog “aks-hci-stable-catalogs-ext” -imageDir c:\clusterstorage\volume1\Images -cloudConfigLocation c:\clusterstorage\volume1\Config -workingDir c:\clusterstorage\volume1\AksHci -vnet $vnet -cloudServiceCidr 172.16.0.5/16 
-```
-1. Register AKS-HCI with Azure
-```powershell
-PS C:\> Set-AksHciRegistration -SubscriptionId <YOUR_AZURE_SUBSCRIPTION_ID> -ResourceGroupName <YOUR_AZURE_RESOURCE_GROUP> -UseDeviceAuthentication
-```
-2.	Install the AKS-HCI management cluster
-```powershell
-PS C:\> Install-AksHci
-```
-3. Create a new AKS-HCI target cluster
-> **[NOTE]** Do not change the VMSize when running the command.
+> **[NOTE]** the updated Kubernetes version!
 ```powershell	
-PS C:\> New-AksHciCluster -name gpuwl -linuxNodeVmSize "Standard_NK6" -kubernetesVersion v1.19.9
+PS C:\> New-AksHciCluster -name gpuwl -linuxNodeVmSize "Standard_NK6" -kubernetesVersion v1.19.13
 ```
 > **[NOTE]** The Kubernetes version must be v1.19.9!
 
