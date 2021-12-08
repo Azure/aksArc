@@ -119,9 +119,8 @@ version = 2
   [plugins."io.containerd.runtime.v1.linux"]
     runtime = "nvidia"
 ```
-If you had to change a setting in the above file you will need to restart containerD.
 
-3.	(optional) Reload containerD
+3.	Reload containerD
 ```bash
 $ sudo systemctl restart containerd
 ```
