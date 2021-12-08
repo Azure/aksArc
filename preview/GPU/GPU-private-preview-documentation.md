@@ -47,7 +47,7 @@ In addition to above GPU prerequisites
    > **[NOTE]**
    > **We recommend having a 2-4 node Azure Stack HCI cluster.** If you don't have any of the above, follow instructions on the [Azure Stack HCI registration page](https://azure.microsoft.com/products/azure-stack/hci/hci-download/).
 
-## Update to the deployment steps ##
+## Enabling GPU features in AKS on Azure Stack HCI ##
 
 The Azure Kubernetes Service on Azure Stack HCI October update has all GPU required driver packages installed. 
 
@@ -61,15 +61,16 @@ PS C:\> Enable-AksHciPreview
 PS C:\> Get-AksHciUpdates
 PS C:\> Uppdate-AksHci
 ```
-This will install the preview bits and enable updates for the preview channel.
+This will install the required preview bits and enable updates for the preview channel.
 
 4. Create a new AKS-HCI target cluster
 > **[NOTE]** Do not change the VMSize when running the command.
-> **[NOTE]** the updated Kubernetes version!
+> **[NOTE]** GPU is now supported on the latest Kubernetes version available in AKS on Azure Stack HCI.
+> 
 ```powershell	
-PS C:\> New-AksHciCluster -name gpuwl -linuxNodeVmSize "Standard_NK6" -kubernetesVersion v1.19.13
+PS C:\> New-AksHciCluster -name gpuwl -linuxNodeVmSize "Standard_NK6"
 ```
-> **[NOTE]** The Kubernetes version must be v1.19.9!
+Once the AKS cluster is deployed you need to configure a few things to ensure GPUs are working as expected. These steps will be automated later in the release cycle.
 
 ### Post-setup ###
 1.	Get your Kubeconfig for the target cluster
@@ -90,49 +91,82 @@ PS C:\> ssh -i C:\AksHci\.ssh\akshci_rsa clouduser@<ipaddress of linux worker no
 Once logged into the worker node use the below to edit the config file to enable the nvidia driver.
 
 ```bash
-$ sudo vim /etc/docker/daemon.json
+$ sudo vim /etc/containerd/config.toml
 ```
 
-2. Change the above file content to: 
+2. Replace the existing text with the below text: 
 
-```json
-{
-    "default-runtime": "nvidia",
-    "runtimes": {
-        "nvidia": {
-            "path": "/usr/bin/nvidia-container-runtime",
-            "runtimeArgs": []
-        }
-    }
-}
+```toml
+version = 2
+[plugins]
+  [plugins."io.containerd.gc.v1.scheduler"]
+  [plugins."io.containerd.grpc.v1.cri"]
+    sandbox_image = "ecpacr.azurecr.io/pause:3.2"
+    [plugins."io.containerd.grpc.v1.cri".containerd]
+      default_runtime_name = "nvidia"
+      [plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
+        [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
+          [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+            SystemdCgroup = false
+        [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.nvidia]
+           privileged_without_host_devices = false
+           runtime_engine = ""
+           runtime_root = ""
+           runtime_type = "io.containerd.runc.v1"
+           [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.nvidia.options]
+              BinaryName = "/usr/bin/nvidia-container-runtime"
+              SystemdCgroup = false
+  [plugins."io.containerd.runtime.v1.linux"]
+    runtime = "nvidia"
 ```
-3.	Reload the daemon
+If you had to change a setting in the above file you will need to restart containerD.
+
+3.	(optional) Reload containerD
 ```bash
-$ sudo systemctl daemon-reload
+$ sudo systemctl restart containerd
 ```
-4.	Restart the Docker engine
-```bash
-$ sudo systemctl restart docker
-```
-5. Go back to powershell and retrieve the kubeconfig for the target cluster
+
+You can now exit out of the worker node.
+
+Use kubectl to configure Kubernetes for node discovery. This will allow Kubernetes to automatically detect and tag workernodes with the required annotations.
+
 ```powershell
-PS C:\> Get-AksHciCredential -Name gpuwl
+kubectl create -f https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/v0.10.0/nvidia-device-plugin.yml
+kubectl apply -f https://raw.githubusercontent.com/NVIDIA/gpu-feature-discovery/v0.4.1/deployments/static/nfd.yaml
+kubectl apply -f https://raw.githubusercontent.com/NVIDIA/gpu-feature-discovery/v0.4.1/deployments/static/gpu-feature-discovery-daemonset.yaml
 ```
-Use kubectl to configure Kubernetes for node discovery
-```powershell
-PS C:\> kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/node-feature-discovery/v0.8.2/nfd-master.yaml.template
-PS C:\> kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/node-feature-discovery/v0.8.2/nfd-worker-daemonset.yaml.template
-PS C:\> kubectl create -f https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/v0.9.0/nvidia-device-plugin.yml
-```
+
 9.	Verify that there is a GPU associated with the worker node.
 ```powershell
 PS C:\> kubectl describe node | findstr "gpu" 
 ```
-The output should display the GPU(s) from the worker node
+The output should display the GPU(s) from the worker node and look something like this
+
+```yaml
+Annotations:        cluster.x-k8s.io/cluster-name: gpuwl
+                    cluster.x-k8s.io/machine: gpuwl-control-plane-l2bvg
+                    cluster.x-k8s.io/owner-name: gpuwl-control-plan
+ProviderID:         moc://gpuwl-control-plane-f697t
+                    nvidia.com/gpu.compute.major=7
+                    nvidia.com/gpu.compute.minor=5
+                    nvidia.com/gpu.count=1
+                    nvidia.com/gpu.family=turing
+                    nvidia.com/gpu.machine=Virtual-Machine
+                    nvidia.com/gpu.memory=15109
+                    nvidia.com/gpu.product=Tesla-T4
+Annotations:        cluster.x-k8s.io/cluster-name: gpuwl
+                    cluster.x-k8s.io/machine: gpuwl-linux-md-86d8f64464-79v9t
+                    cluster.x-k8s.io/owner-name: gpuwl-linux-md-86d8f64464
+  nvidia.com/gpu:     1
+  nvidia.com/gpu:     1
+ProviderID:                   moc://gpuwl-linux-md-n7n9p
+  default                     gpu-feature-discovery-9tvgw             0 (0%)        0 (0%)      0 (0%)           0 (0%)         25h
+  nvidia.com/gpu     0          0
+```
 
 ### Testing ###
 Once the above steps are completed create a new yaml file for testing e.g. gpupod.yaml:
-Copy and paste the below yaml into the new file and save it.
+Copy and paste the below yaml into the new file named 'gpupod.yaml' and save it.
 ```yaml
 apiVersion: v1
 kind: Pod
@@ -147,11 +181,32 @@ spec:
         limits:
           nvidia.com/gpu: 1
 ```
+
 ```powershell
 PS C:\> kubectl apply -f gpupod.yaml
 ```
-Verify if the pod has started and the GPU is working
-
+Verify if the pod has started, completed running and the GPU is assigned:
+```powershell
+ kubectl describe pod cuda-vector-add |findstr 'gpu'
+```
+should show one GPU assigned.
+```
+      nvidia.com/gpu:  1
+      nvidia.com/gpu:  1
+```
+Check the log file of the pod to see if the test has passed
+```powershell
+kubectl logs cuda-vector-add
+```
+should show 
+```
+[Vector addition of 50000 elements]
+Copy input data from the host memory to the CUDA device
+CUDA kernel launch with 196 blocks of 256 threads
+Copy output data from the CUDA device to the host memory
+Test PASSED
+Done
+```
 ## Dealing with errors ##
 ________________________________________
 ```powershell
