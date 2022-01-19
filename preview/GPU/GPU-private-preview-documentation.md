@@ -59,7 +59,7 @@ PS C:\> Enable-AksHciPreview
 3. Update the current deployment
 ``` powershell
 PS C:\> Get-AksHciUpdates
-PS C:\> Uppdate-AksHci
+PS C:\> Update-AksHci
 ```
 This will install the required preview bits and enable updates for the preview channel.
 
@@ -75,7 +75,7 @@ Once the AKS cluster is deployed you need to configure a few things to ensure GP
 ### Post-setup ###
 1.	Get your Kubeconfig for the target cluster
 ```powershell
-PS C:? Get-AksHciCredentials -Name gpuwl
+PS C:> Get-AksHciCredential -Name gpuwl
 ```
 2. Use kubectl to get the node IP address
 ```powershell
@@ -88,6 +88,7 @@ kubectl get nodes -o wide
 ```powershell
 PS C:\> ssh -i C:\AksHci\.ssh\akshci_rsa clouduser@<ipaddress of linux worker node>
 ```
+
 Once logged into the worker node use the below to edit the config file to enable the nvidia driver.
 
 ```bash
