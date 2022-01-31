@@ -14,7 +14,7 @@ See [Supplemental Terms of Use for Microsoft Azure Previews](https://azure.micro
 NVIDIA Software. The software may include components developed and owned by NVIDIA Corporation or its licensors. The use of these components is governed by the NVIDIA end user license agreement located at https://www.nvidia.com/content/DriverDownload-March2009/licence.php?lang=us.
 
 ## Known issues and limitations ##
-* VMs with GPU enabled are not added to HA clustering in Windows Server 2019 or AKS-HCI. This functionality will be available in a later version of Windows Server and AKS-HCI.
+* VMs with GPU enabled are not added to HA clustering in Windows Server 2019, Windows Server 2002 or Azure Stack HCI. This functionality will be available in a later version of Windows Server and Azure Stack HCI.
 * There is a 1:1 mapping of GPU to VM.
 * GPU enabled VMs are not pinned to a specific worker node and will not automatically failover to another physical node. AKS-HCI will recreate the VM on another physical node should the node hosting the current VM go down. This might incur application downtime during this preview if the application is not redundantly setup.
 * Some manual configuration steps are needed to configure the Linux workernodes once the target cluster is set up.
