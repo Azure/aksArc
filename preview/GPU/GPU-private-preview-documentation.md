@@ -102,7 +102,7 @@ version = 2
 [plugins]
   [plugins."io.containerd.gc.v1.scheduler"]
   [plugins."io.containerd.grpc.v1.cri"]
-    sandbox_image = "ecpacr.azurecr.io/pause:3.2"
+    sandbox_image = "ecpacr.azurecr.io/pause:3.4.1"
     [plugins."io.containerd.grpc.v1.cri".containerd]
       default_runtime_name = "nvidia"
       [plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
