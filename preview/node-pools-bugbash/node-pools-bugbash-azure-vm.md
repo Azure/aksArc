@@ -162,13 +162,8 @@ For more details:
     * You will need atleast two non-overlapping VIPPools for this preview. Apart from IP addresses in the DHCP server, we also need to statically assign IP addresses to some important agents, so they are long lived.
 
 ```powershell
-# set other configurations for the management cluster
-
-Connect-AzAccount -TenantId 8548a469-8c0e-4aa4-b534-ac75ca1e02f7
-Set-AzContext -Subscription 3959ec86-5353-4b0c-b5d7-3877122861a0
-$currentAzContext = Get-AzContext
-$subscriptionId = $currentAzContext.Subscription.Id
-$tenantId=$currentAzContext.Tenant.Id 
+$subscriptionId = <Azure subscription ID>
+$tenantId = <Azure tenant>
 # make sure your `–workingDir` parameter value does not contain any spaces. 
 $workingDir = "V:\AKS-HCI\WorkingDir"
 $cloudConfigLocation = "V:\AKS-HCI\Config"
