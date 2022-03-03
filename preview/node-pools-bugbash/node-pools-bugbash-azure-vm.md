@@ -42,18 +42,7 @@ Get-AzResourceProvider -ProviderNamespace Microsoft.HybridConnectivity | Select-
 ```
 
 ## 1. Create an Azure VM and deploy AzStack-HCI on the Azure VM
-```PowerShell
-# Get the Execution Policy on the system
-Get-ExecutionPolicy
-# Set the Execution Policy for this process only
-if ((Get-ExecutionPolicy) -ne "RemoteSigned") { Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process -Force }
 
-# Update all modules
-Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
-Update-Module -Force  
-```
-
-### Deployment of the AzStack host
 ```PowerShell
 # Adjust any parameters you wish to change
 $rgName = "akshcinodepoolsbugbash"
@@ -103,7 +92,6 @@ $getIp = Get-AzPublicIpAddress -Name "AKSHCILabPubIp" -resourceGroupName $rgName
 $getIp | Select-Object Name,IpAddress,@{label='FQDN';expression={$_.DnsSettings.Fqdn}}
 ```
 
-### Configure the Az-Stack HCI Host on the Azure VM
 RDP to the VM you just deployed in the previous step, then using PowerShell ISE (in Admin mode) or VScode run the following commands. You can find RDP instructions when you click on the virtual machine resource on the Azure portal.
 
 ### Install AZ CLI on Host
@@ -127,13 +115,8 @@ az extension add -n arcappliance
 
 Install PS client tools:
 ```PowerShell
-# install updated PowerShellGet, was needed for running on Server
 Install-PackageProvider Nuget –Force
 Install-Module –Name PowerShellGet –Force
-
-# Update all modules
-Update-Module -Force  
-# you need to exit the ISE so you can use the updated version of PowerShellGet
 Exit
 ```
 In a new connection run:
