@@ -103,6 +103,10 @@ Now verify the verison is 2.32 by running the below command:
 ```
 az -v
 ```
+If you get an error saying " The term 'az' is not recognized as the name of a cmdlet, function, script file, or operable program.", run the following command and then rerun az -v to check Az CLI version > 2.32
+```
+$env:PATH += ";C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin;"
+```
 
 ### Install Az CLI Extensions
 ```
