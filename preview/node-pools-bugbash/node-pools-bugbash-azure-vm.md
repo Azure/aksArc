@@ -104,14 +104,22 @@ $getIp | Select-Object Name,IpAddress,@{label='FQDN';expression={$_.DnsSettings.
 ```
 
 ### Configure the Az-Stack HCI Host on the Azure VM
-RDP to the VM you just deployed in the previous step, then using PowerShell ISE (in Admin mode) or VScode:
+RDP to the VM you just deployed in the previous step, then using PowerShell ISE (in Admin mode) or VScode run the following commands.
+RDP details:
+
+```
+$adminUsername = "azureuser"
+$adminPassword = ConvertTo-SecureString 'P@ssw0rd123!' -AsPlainText -Force
+$getIp = Get-AzPublicIpAddress -Name "AKSHCILabPubIp" -resourceGroupName $rgName
+$getIp | Select-Object Name,IpAddress,@{label='FQDN';expression={$_.DnsSettings.Fqdn}}
+```
 
 ### Install AZ CLI on Host
 ```PowerShell
 $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
 Exit
 ```
-Now verify the verison in 2.32:
+Now verify the verison is 2.32 by running the below command:
 ```
 az -v
 ```
