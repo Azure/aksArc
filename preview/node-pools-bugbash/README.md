@@ -4,7 +4,7 @@ Currently you can manage the life cycle of AKS on Azure Stack HCI clusters throu
 This preview feature will enable you to now manage AKS on Azure Stack HCI clusters through Az CLI using the Azure control plane. The preview is only intended for folks engaged in the private preview program who want to be able to PoC the core functionality, it is not a best practice guide!
 
 # Register for the preview!
-You will need to register your interest to get access to the docs and have your subscription enabled for this private preview, please register (https://aka.ms/arcAksHciPriPreview).
+You will need to register your interest to get access to the docs and have your subscription enabled for this private preview, please register at [https://aka.ms/arcAksHciPriPreview](https://aka.ms/arcAksHciPriPreview).
 
 # Bug bash goals
 - Create AKS-HCI clusters using Az CLI 
