@@ -51,19 +51,19 @@ In addition to above GPU prerequisites
 
 The Azure Kubernetes Service on Azure Stack HCI October update has all GPU required driver packages installed. 
 
-1. Deploy the AKS Host according to the [public documentation](https://docs.microsoft.com/en-us/azure-stack/aks-hci/kubernetes-walkthrough-powershell)
-2. Enable the Preview Channel
+2. Deploy the AKS Host according to the [public documentation](https://docs.microsoft.com/en-us/azure-stack/aks-hci/kubernetes-walkthrough-powershell)
+3. Enable the Preview Channel
 ```powershell
 PS C:\> Enable-AksHciPreview
 ```
-3. Update the current deployment
+4. Update the current deployment
 ``` powershell
 PS C:\> Get-AksHciUpdates
 PS C:\> Update-AksHci
 ```
 This will install the required preview bits and enable updates for the preview channel.
 
-4. Create a new AKS-HCI target cluster
+5. Create a new AKS-HCI target cluster
 > **[NOTE]** Do not change the VMSize when running the command.
 > **[NOTE]** GPU is now supported on the latest Kubernetes version available in AKS on Azure Stack HCI.
 > 
@@ -73,16 +73,16 @@ PS C:\> New-AksHciCluster -name gpuwl -linuxNodeVmSize "Standard_NK6"
 Once the AKS cluster is deployed you need to configure a few things to ensure GPUs are working as expected. These steps will be automated later in the release cycle.
 
 ### Post-setup ###
-1.	Get your Kubeconfig for the target cluster
+6.	Get your Kubeconfig for the target cluster
 ```powershell
 PS C:> Get-AksHciCredential -Name gpuwl
 ```
-2. Use kubectl to get the node IP address
+7. Use kubectl to get the node IP address
 ```powershell
 kubectl get nodes -o wide
 ```
 
-4.	Use SSH to connect to the linux worker and setup the configuration.
+8.	Use SSH to connect to the linux worker and setup the configuration.
 > **[NOTE]** Make sure to replace the IP address below!
 
 ```powershell
@@ -91,18 +91,38 @@ PS C:\> ssh -i C:\AksHci\.ssh\akshci_rsa clouduser@<ipaddress of linux worker no
 
 Once logged into the worker node use the below to edit the config file to enable the nvidia driver.
 
+9. Move the existing containerD configuration file to a backup file:
+
 ```bash
-$ sudo vim /etc/containerd/config.toml
+$ sudo cp /etc/containerd/config.toml /etc/containerd/config.toml.bak
+```
+10. list the content of the existing file: 
+
+```bash
+$ sudo cat /etc/containerd/config.toml.bak
+```
+```toml
+version = 2
+[plugins]
+  [plugins."io.containerd.gc.v1.scheduler"]
+  [plugins."io.containerd.grpc.v1.cri"]
+    sandbox_image = "ecpacr.azurecr.io/pause:3.5"
+```
+make a note of the line containing the 'sandbox_image' name and version.
+
+11. Create a new containerD configuration file
+```bash
+$ sudo nano /etc/containerd/config.toml
 ```
 
-2. Replace the existing text with the below text: 
+12. Copy the below text, replacing the 'sandbox_image' line with the line you noted from the orignal file above: 
 
 ```toml
 version = 2
 [plugins]
   [plugins."io.containerd.gc.v1.scheduler"]
   [plugins."io.containerd.grpc.v1.cri"]
-    sandbox_image = "ecpacr.azurecr.io/pause:3.4.1"
+    sandbox_image = "ecpacr.azurecr.io/pause:3.5"
     [plugins."io.containerd.grpc.v1.cri".containerd]
       default_runtime_name = "nvidia"
       [plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
@@ -120,8 +140,9 @@ version = 2
   [plugins."io.containerd.runtime.v1.linux"]
     runtime = "nvidia"
 ```
-
-3.	Reload containerD
+close the editor 'CTRL-X, Y,<ENTER>'
+   
+13. Reload containerD
 ```bash
 $ sudo systemctl restart containerd
 ```
@@ -136,7 +157,7 @@ kubectl apply -f https://raw.githubusercontent.com/NVIDIA/gpu-feature-discovery/
 kubectl apply -f https://raw.githubusercontent.com/NVIDIA/gpu-feature-discovery/v0.4.1/deployments/static/gpu-feature-discovery-daemonset.yaml
 ```
 
-9.	Verify that there is a GPU associated with the worker node.
+14.	Verify that there is a GPU associated with the worker node.
 ```powershell
 PS C:\> kubectl describe node | findstr "gpu" 
 ```
