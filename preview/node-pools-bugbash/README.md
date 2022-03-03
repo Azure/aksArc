@@ -10,16 +10,18 @@ You will need to register your interest to get access to the docs and have your 
 - Create AKS-HCI clusters using Az CLI 
 - Azure RBAC for cluster creation - an "admin" can do all the pre-requisite install operations, give Azure RBAC scope to a "user", who can then create an AKS-HCI cluster using Azure CLI 
 - Get the certificate based kubeconfig of the AKS-HCI cluster – this is an admin operation for this release and requires you to login to the Azure Stack HCI cluster to retrieve the kubeconfig
-- Add, list, show and delete nodepools on your AKS-HCI cluster using Az CLI
+- Add nodepools on your AKS-HCI cluster using Az CLI
+- List/show AKS-HCI cluster nodepools using Az CLI
+- Delete AKS-HCI nodepools using Az CLI
 - List/show AKS-HCI clusters using Az CLI
 - Delete the AKS-HCI cluster using Az CLI
 - Collect logs for troubleshooting
 
 # Do you have hardware?
-If you have hardware, follow this document to create AKS clusters on your Azure Stack HCI/Windows Server cluster via Azure.
+If you have hardware, follow [this document](https://github.com/Azure/aks-hci/blob/main/preview/node-pools-bugbash/node-pools-bug-bash-hardware.md) to create AKS clusters on your Azure Stack HCI/Windows Server cluster via Azure.
 
 # What to do if you do not have hardware?
-If you do not have hardware, follow this doc to setup an Azure VM demo environment and then create AKS clusters on your Azure VM. 
+If you do not have hardware, follow [this document](https://github.com/Azure/aks-hci/blob/main/preview/node-pools-bugbash/node-pools-bugbash-azure-vm.md) to setup an Azure VM demo environment and then create AKS clusters on your Azure VM. 
 
 # How to file bugs for this bugbash?
 TBD
