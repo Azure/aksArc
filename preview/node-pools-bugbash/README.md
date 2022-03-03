@@ -24,7 +24,7 @@ If you have hardware, follow [this document](https://github.com/Azure/aks-hci/bl
 If you do not have hardware, follow [this document](https://github.com/Azure/aks-hci/blob/main/preview/node-pools-bugbash/node-pools-bugbash-azure-vm.md) to setup an Azure VM demo environment and then create AKS clusters on your Azure VM. 
 
 # How to file bugs for this bugbash?
-TBD
+Click on [this link](https://msazure.visualstudio.com/msk8s/_workitems/create/Bug?templateId=4374d822-3296-4097-bd84-2b0791978202&ownerId=14abcc74-dc70-4881-a373-f5c12c28f688) to create a new bug that you found in this bug bash. Please capture all the details of the bug and the required steps to reproduce it, and make sure to upload the logs generated using Get-ArcHciLogs to a share and link it in the bug. (Don't forget to hit the "Save" button on the top right :P )
 
 # Glossary of terms you should know
 
