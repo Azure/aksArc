@@ -104,15 +104,7 @@ $getIp | Select-Object Name,IpAddress,@{label='FQDN';expression={$_.DnsSettings.
 ```
 
 ### Configure the Az-Stack HCI Host on the Azure VM
-RDP to the VM you just deployed in the previous step, then using PowerShell ISE (in Admin mode) or VScode run the following commands.
-RDP details:
-
-```
-$adminUsername = "azureuser"
-$adminPassword = ConvertTo-SecureString 'P@ssw0rd123!' -AsPlainText -Force
-$getIp = Get-AzPublicIpAddress -Name "AKSHCILabPubIp" -resourceGroupName $rgName
-$getIp | Select-Object Name,IpAddress,@{label='FQDN';expression={$_.DnsSettings.Fqdn}}
-```
+RDP to the VM you just deployed in the previous step, then using PowerShell ISE (in Admin mode) or VScode run the following commands. You can find RDP instructions when you click on the virtual machine resource on the Azure portal.
 
 ### Install AZ CLI on Host
 ```PowerShell
@@ -122,17 +114,6 @@ Exit
 Now verify the verison is 2.32 by running the below command:
 ```
 az -v
-```
-
-### Install Az CLI extensions on your Azure VM
-Run these commands from VS Code or the Windows PowerShell ISE
-```
-$subscription=<enter subscription ID>
-az login -t <enter tenant ID>
-
-az account show --output table
-az account set --subscription $subscription
-$subscriptionId=az account show --subscription $subscription --query "id" -o tsv
 ```
 
 ### Install Az CLI Extensions
