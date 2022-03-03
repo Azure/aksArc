@@ -18,7 +18,7 @@ You will need to register your interest to get access to the docs and have your 
 - Collect logs for troubleshooting
 
 # Do you have hardware?
-If you have hardware, follow [this document](https://github.com/Azure/aks-hci/blob/main/preview/node-pools-bugbash/node-pools-bug-bash-hardware.md) to create AKS clusters on your Azure Stack HCI/Windows Server cluster via Azure.
+If you have an Azure Stack HCI cluster, a Windows Server cluster or a single node Windows Server, follow [this document](https://github.com/Azure/aks-hci/blob/main/preview/node-pools-bugbash/node-pools-bug-bash-hardware.md) to create AKS clusters on your Azure Stack HCI/Windows Server cluster via Azure.
 
 # What to do if you do not have hardware?
 If you do not have hardware, follow [this document](https://github.com/Azure/aks-hci/blob/main/preview/node-pools-bugbash/node-pools-bugbash-azure-vm.md) to setup an Azure VM demo environment and then create AKS clusters on your Azure VM. 
