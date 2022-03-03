@@ -125,20 +125,17 @@ Exit
 ```
 In a new connection run:
 ```PowerShell
-# set repo
-Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
-# install the DownloadSDK prereq
-Install-Module -Name DownloadSdk -Force -AcceptLicense
 # install the AKSHCI modules
 Install-Module -Name AksHci -Repository PSGallery -Force -AcceptLicense
-Install-Module -Name ArcHci -RequiredVersion 0.2.7 -Force -Confirm:$false -SkipPublisherCheck -AcceptLicense
+Install-Module -Name ArcHci -RequiredVersion 0.2.8 -Force -Confirm:$false -SkipPublisherCheck -AcceptLicense
 Exit
 ```
 
-Now open a new window and run the following command on all your Azure Stack HCI nodes:
+Now open a new window and run the following command:
 
 ```powershell
 Initialize-AksHciNode 
+Exit
 ```
 
 ### Networking & IP Assignments in PoC Environment
