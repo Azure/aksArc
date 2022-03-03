@@ -1,12 +1,10 @@
-## Running the demo
-Once you create the Azure VM, run all commands from an RDP session there.
-
+# Running the demo
 >> NOTE: The instructions are a mixture of PS and AZ CLI commands, you run all of these from a PS ISE such as PS ISE in Windows or VS Code. They are split between PS and CLI because the InfraAdmin will be the individual who sets up the infra layers (server, connection to Azure and dependent componets). The end user (e.g. dev) will then use AZ CLI to create AKS clusters on HCI via Azure.
 
 # Register for the preview!
 You will need to register your interest to get access to the docs and have your subscription enabled for this private preview, please register [here (https://aka.ms/arcAksHciPriPreview).
 
-### Register for features and providers
+## Register for features and providers
 ```PowerShell
 Login-AzAccount
 Get-AzSubscription
@@ -43,7 +41,7 @@ Get-AzResourceProvider -ProviderNamespace Microsoft.HybridContainerService | Sel
 Get-AzResourceProvider -ProviderNamespace Microsoft.HybridConnectivity | Select-Object -Property ProviderNamespace, Locations, RegistrationState
 ```
 
-### Create an Azure VM and deploy AzStack-HCI Host on the Azure VM
+## 1. Create an Azure VM and deploy AzStack-HCI on the Azure VM
 ```PowerShell
 # Get the Execution Policy on the system
 Get-ExecutionPolicy
@@ -75,7 +73,7 @@ $customRdpPort = "3389" # Between 0 and 65535 #
 $autoShutdownStatus = "Enabled" # Or Disabled #
 $autoShutdownTime = "00:00"
 $autoShutdownTimeZone = "Pacific Standard Time"
-$existingWindowsServerLicense = "No" # See NOTE 2 below on Azure Hybrid Benefit
+$existingWindowsServerLicense = "No"
 
 # Create Resource Group
 New-AzresourceGroup -Name $rgName -Location  $location -Verbose
@@ -103,48 +101,40 @@ New-AzresourceGroupDeployment -resourceGroupName $rgName -Name $deploymentName `
 # Get connection details of the newly created VM
 $getIp = Get-AzPublicIpAddress -Name "AKSHCILabPubIp" -resourceGroupName $rgName
 $getIp | Select-Object Name,IpAddress,@{label='FQDN';expression={$_.DnsSettings.Fqdn}}
-
 ```
 
-# Configure the Az-Stack HCI Host on the Azure VM
+### Configure the Az-Stack HCI Host on the Azure VM
 RDP to the VM you just deployed in the previous step, then using PowerShell ISE (in Admin mode) or VScode:
 
-## Install AZ CLI on Host
+### Install AZ CLI on Host
 ```PowerShell
 $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
 Exit
 ```
 Now verify the verison in 2.32:
-```bash
+```
 az -v
 ```
 
-## Connect Az CLI to Azure
+### Install Az CLI extensions on your Azure VM
 Run these commands from VS Code or the Windows PowerShell ISE
-```bash
+```
 $subscription=<enter subscription ID>
 az login -t <enter tenant ID>
 
 az account show --output table
 az account set --subscription $subscription
 $subscriptionId=az account show --subscription $subscription --query "id" -o tsv
-
-# Install Az CLI Extensions
-az extension add --name connectedk8s --version 1.2.0 
-az extension add --name k8s-configuration --version 1.1.1 
-az extension add --name k8s-extension --version 1.0.0 
-az extension add --name customlocation --version 0.1.3 
 ```
 
-## Add Arc Appliance Az CLI Extension
-Install the arcappliance Az CLI Extension
-```bash
-az extension remove -n arcappliance
-# the above is just to make sure any arc appliance extn is removed and you have the latest
+### Install Az CLI Extensions
+```
+az extension add -n k8s-extension 
+az extension add -n customlocation
 az extension add -n arcappliance
 ```
 
-## Install AKS on Azure Stack HCI [Infra admin role]
+## 2. Install AKS on Azure Stack HCI 
 
 Install PS client tools:
 ```PowerShell
@@ -175,7 +165,7 @@ Now open a new window and run the following command on all your Azure Stack HCI 
 Initialize-AksHciNode 
 ```
 
-## Networking & IP Assignments in PoC Environment
+### Networking & IP Assignments in PoC Environment
 The following command creates a network object for the AKS on Azure Stack HCI host (or management cluster) as well as the Resource Bridge. This will take IPs from the VIP VIP Pool for:
 * 1x AKS host / Mgmt Cluster
 * 1x The Resource Bridge / Arc Appliance
@@ -242,12 +232,12 @@ Make sure your AKS on Azure Stack HCI version is at least the following versions
 Expected Output:
 
 ```powershell
-> 1.0.5.11028
+1.0.8.10215
 ```
 
-> Note! Now the AzStack-HCI node is configured, if you have had any errors please do not proceed.
+> Note! Now the AzStack-HCI node is configured. If you have had any errors please do not proceed. 
 
-## Install Arc Appliance [Infra admin role] 
+## 3. Install Arc Appliance
 ```PowerShell
 # set appliance name
 $arcAppName="pocArcApp"
@@ -289,10 +279,10 @@ az arcappliance create hci --config-file $configFilePath --kubeconfig $workingDi
 # to check on the status
 
 az arcappliance show --resource-group $resourceGroup --name $arcAppName --query "provisioningState" -o tsv
-# check the provisioningState ==  Succeeded 
+# check the provisioningState == Succeeded 
 ```
 
-## Installing the AKS on Azure Stack HCI extension on the Arc Appliance [Infra admin role]
+## 4. Installing the AKS on Azure Stack HCI extension on the Arc Appliance 
 
 ```PowerShell
 $arcExtnName = "akshcicluExtn1"
@@ -311,7 +301,7 @@ az k8s-extension show --resource-group $resourceGroup --cluster-name $arcAppName
 az k8s-extension show --resource-group $resourceGroup  --cluster-name $arcAppName --cluster-type appliances --name $arcExtnName --query "provisioningState" -o tsv
 ```
 
-## Installing a custom location on top of the AKS-HCI extension on the Arc Appliance [Infra admin role]
+## 5. Installing a custom location on top of the AKS-HCI extension on the Arc Appliance 
 ```PowerShell
 $customLocationName="AzStackEusCustLoc"
 
@@ -327,53 +317,37 @@ $CustomLocationResourceId = az customlocation show --name $customLocationName --
 
 ```
 
-## Create a network for your AKS-HCI workload clusters [Infra admin role]
+## 6. Create a network for your AKS-HCI workload clusters
 This VIP Pool must not overlap with the previous mgmt VIP Pool range you created by running New-AksHciNetworkSetting, this is for workload clusters only!
 
 ```PowerShell
-
 $wkldClusterVnet = "wkldvnet"
 $wkldCluVipPoolStart = "192.168.0.201"
 $wkldCluVipPoolEnd = "192.168.0.250"
+$vSwitch = "InternalNAT"
 
 New-KvaVirtualNetwork -name $wkldClusterVnet -vippoolstart $wkldCluVipPoolStart -vippoolend $wkldCluVipPoolEnd -vswitchname $vSwitch 
 
 ```
 
-## Download the Kubernetes VHD file [Infra admin role] 
+## 7. Download the Kubernetes VHD file [Infra admin role] 
 
 ```PowerShell
 Add-KvaGalleryImage -kubernetesVersion 1.21.2
 ```
 
-## Create AKS-HCI clusters using Az CLI [User role]
+## 8. Create and manage AKS-HCI clusters using Az CLI
 
 [Download the hybridaks Az CLI extension]() WHL file.
 
 Install the hybridaks Az CLI Extension using the downloaded WHL file.
 ```bash
-az extension remove -n hybridaks
 az extension add --yes --source <path to the downloaded hybridaks-0.1.1-py3-none-any.whl file>
 az hybridaks -h
 ```
 
 ### Create an AKS-HCI cluster using Az CLI 
 ```bash 
-# demo only
-k8sClusterName="akscluster01"
-resourceGroup="akshciPP2bugbash"
-location="eastus"
-wkldClusterVnet="wkldvnet"
-customLocationName="AzStackEusCustLoc"
-customLocationResourceId = $(az customlocation show --name $customLocationName --resource-group $resourceGroup --query id -o tsv) 
-
-az hybridaks create --name $k8sClusterName `
-      --resource-group $resourceGroup `
-      --location $location `
-      --custom-location $customLocationResourceId `
-      --vnet-id $wkldClusterVnet `
-      --kubernetes-version "v1.21.2" `
-      --generate-ssh-keys `
 ```
 You can skip adding --generate-ssh-keys if you already have an SSH key named `id_rsa` in the ~/.ssh folder.
 
@@ -381,21 +355,60 @@ You can skip adding --generate-ssh-keys if you already have an SSH key named `id
 ```azurecli
 az hybridaks show --resource-group $resourceGroup --name $k8sClusterName 
 ```
-## Access your clusters using kubectl
-In a different session while the above proxy command is running, access your target AKS-HCI cluster using kubectl.
+
+### Add a nodepool to your AKS-HCI cluster
+
+### Delete a nodepool on your AKS-HCI cluster
+
+### Get admin kubeconfig of AKS-HCI cluster created using Az CLI
+RDP into to the Azure VM before proceeding
+
+```powershell
+Get-TargetClusterAdminCredentials -clusterName "<akshci cluster name>" -outfile "<file path where you want to store your target akshci cluster admin kubeconfig>"
+```
+
+### Access your clusters using kubectl
 ```
 kubectl get pods -A --kubeconfig "<file path where you stored your target akshci cluster admin kubeconfig in the previous step 10>"
 ```
 
-## Delete an AKS-HCI cluster
-Run the following command to delete an AKS-HCI cluster:
+## Clean up
 ```azurecli
-az hybridaks delete --resource-group $resourceGroup --name $k8sClusterName -y
+az login
+az account set -s <subscriptionID>
 ```
 
-## Clean up
+Step 1: Delete all preview AKS-HCI clusters created using Az CLI
 
-In the mean time please review the deletion steps at the end of the [Private Preview 1– AKS on Azure Stack HCI cluster lifecycle management through Azure Arc](https://github.com/Azure/azure-arc-kubernetes-preview/blob/master/docs/aks-hci/cluster-lifecycle-pp1-nov-2021.md).
+```azurecli
+az hybridaks delete --resource-group <resource group name> --name <akshci cluster name>
+```
+
+Step 2: Delete the custom location
+
+```azurecli
+az customlocation delete --name <custom location name> --resource-group <resource group name>
+```
+
+Step 3: Delete the cluster extension
+
+```azurecli
+az k8s-extension delete --resource-group <resource group name> --cluster-name <arc appliance name> --cluster-type appliances --name <akshci extension name>
+```
+
+Step 4: Delete the Arc Appliance
+
+```azurecli
+az arcappliance delete hci --config-file 'C:\ClusterStorage\Volume01\WorkDir\hci-appliance.yaml'
+```
+
+Step 5: Delete the ArcHCI config files
+
+```powershell
+Remove-ArcHciConfigFiles -workDir "<path to workDir you used in all the above commands>"
+```
+
+Step 6: Delete the Azure VM if you're finished!
 
 # Common Errors
 You may see this error:
