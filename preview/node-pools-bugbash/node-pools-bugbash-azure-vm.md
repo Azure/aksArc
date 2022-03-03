@@ -5,6 +5,8 @@
 You will need to register your interest to get access to the docs and have your subscription enabled for this private preview, please register [here (https://aka.ms/arcAksHciPriPreview).
 
 ## Register for features and providers
+You can run the following commands on your laptop/devbox using Az PS. You can download Az PS [here](https://docs.microsoft.com/powershell/azure/install-az-ps?view=azps-7.3.0)
+
 ```PowerShell
 Login-AzAccount
 Get-AzSubscription
