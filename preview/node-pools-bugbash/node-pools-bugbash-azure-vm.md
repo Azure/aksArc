@@ -330,13 +330,13 @@ New-KvaVirtualNetwork -name $wkldClusterVnet -vippoolstart $wkldCluVipPoolStart 
 
 ```
 
-## Download the Kubernetes VHD file [Infra admin role] 
+## 7. Download the Kubernetes VHD file [Infra admin role] 
 
 ```PowerShell
 Add-KvaGalleryImage -kubernetesVersion 1.21.2
 ```
 
-## Create AKS-HCI clusters using Az CLI
+## 8. Create and manage AKS-HCI clusters using Az CLI
 
 [Download the hybridaks Az CLI extension]() WHL file.
 
@@ -355,21 +355,60 @@ You can skip adding --generate-ssh-keys if you already have an SSH key named `id
 ```azurecli
 az hybridaks show --resource-group $resourceGroup --name $k8sClusterName 
 ```
-## Access your clusters using kubectl
-In a different session while the above proxy command is running, access your target AKS-HCI cluster using kubectl.
+
+### Add a nodepool to your AKS-HCI cluster
+
+### Delete a nodepool on your AKS-HCI cluster
+
+### Get admin kubeconfig of AKS-HCI cluster created using Az CLI
+RDP into to the Azure VM before proceeding
+
+```powershell
+Get-TargetClusterAdminCredentials -clusterName "<akshci cluster name>" -outfile "<file path where you want to store your target akshci cluster admin kubeconfig>"
+```
+
+### Access your clusters using kubectl
 ```
 kubectl get pods -A --kubeconfig "<file path where you stored your target akshci cluster admin kubeconfig in the previous step 10>"
 ```
 
-## Delete an AKS-HCI cluster
-Run the following command to delete an AKS-HCI cluster:
+## Clean up
 ```azurecli
-az hybridaks delete --resource-group $resourceGroup --name $k8sClusterName -y
+az login
+az account set -s <subscriptionID>
 ```
 
-## Clean up
+Step 1: Delete all preview AKS-HCI clusters created using Az CLI
 
-In the mean time please review the deletion steps at the end of the [Private Preview 1– AKS on Azure Stack HCI cluster lifecycle management through Azure Arc](https://github.com/Azure/azure-arc-kubernetes-preview/blob/master/docs/aks-hci/cluster-lifecycle-pp1-nov-2021.md).
+```azurecli
+az hybridaks delete --resource-group <resource group name> --name <akshci cluster name>
+```
+
+Step 2: Delete the custom location
+
+```azurecli
+az customlocation delete --name <custom location name> --resource-group <resource group name>
+```
+
+Step 3: Delete the cluster extension
+
+```azurecli
+az k8s-extension delete --resource-group <resource group name> --cluster-name <arc appliance name> --cluster-type appliances --name <akshci extension name>
+```
+
+Step 4: Delete the Arc Appliance
+
+```azurecli
+az arcappliance delete hci --config-file 'C:\ClusterStorage\Volume01\WorkDir\hci-appliance.yaml'
+```
+
+Step 5: Delete the ArcHCI config files
+
+```powershell
+Remove-ArcHciConfigFiles -workDir "<path to workDir you used in all the above commands>"
+```
+
+Step 6: Delete the Azure VM if you're finished!
 
 # Common Errors
 You may see this error:
