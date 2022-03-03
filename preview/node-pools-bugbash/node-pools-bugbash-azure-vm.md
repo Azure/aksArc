@@ -8,12 +8,10 @@ You will need to register your interest to get access to the docs and have your 
 You can run the following commands on your laptop/devbox using Az PS. You can download Az PS [here](https://docs.microsoft.com/powershell/azure/install-az-ps?view=azps-7.3.0)
 
 ```PowerShell
-Login-AzAccount
+Connect-AzAccount -TenantId <enter your Azure tenant ID>
 Get-AzSubscription
-Connect-AzAccount -TenantId <your Azure tenant ID>
-Set-AzContext -Subscription <your Azure subscription>
-$currentAzContext = Get-AzContext
-$subscriptionID = $currentAzContext.Subscription.Id
+$subscriptionID = "<enter your Azure subscription ID which has been enabled for this preview>"
+Set-AzContext -Subscription $subscriptionID
 ```
 
 ```PowerShell
