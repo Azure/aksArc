@@ -303,12 +303,12 @@ $wkldClusterVnet = "wkldvnet"
 $wkldCluVipPoolStart = "192.168.0.201"
 $wkldCluVipPoolEnd = "192.168.0.250"
 $vSwitch = "InternalNAT"
+$workingDir = "V:\AKS-HCI\WorkingDir"
 
-New-KvaVirtualNetwork -name $wkldClusterVnet -vippoolstart $wkldCluVipPoolStart -vippoolend $wkldCluVipPoolEnd -vswitchname $vSwitch 
-
+New-KvaVirtualNetwork -name $wkldClusterVnet -vippoolstart $wkldCluVipPoolStart -vippoolend $wkldCluVipPoolEnd -vswitchname $vSwitch -kubeconfig $workingDir\config
 ```
 
-## 7. Download the Kubernetes VHD file [Infra admin role] 
+## 7. Download the Kubernetes VHD file
 
 ```PowerShell
 Add-KvaGalleryImage -kubernetesVersion 1.21.2
@@ -316,7 +316,7 @@ Add-KvaGalleryImage -kubernetesVersion 1.21.2
 
 ## 8. Create and manage AKS-HCI clusters using Az CLI
 
-[Download the hybridaks Az CLI extension]() WHL file.
+[Download the hybridaks Az CLI extension](https://github.com/Azure/aks-hci/blob/main/preview/node-pools-bugbash/hybridaks-0.1.2-py3-none-any.whl) WHL file.
 
 Install the hybridaks Az CLI Extension using the downloaded WHL file.
 ```bash
