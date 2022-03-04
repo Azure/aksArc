@@ -205,6 +205,8 @@ Get-AksHciVersion
 > Note! Do not proceed if you have any errors! If you face an issue installing AKS on Azure Stack HCI, review the AKS on Azure Stack HCI [troubleshooting section](https://docs.microsoft.com/azure-stack/aks-hci/known-issues). If the troubleshooting section does not help you, please file a [GitHub issue](https://github.com/Azure/aks-hci/issues). Make sure you attach logs (use `Get-AksHciLogs`), so that we can help you faster.
 
 ## 3. Install Arc Appliance
+
+### Generate pre-requisite YAML files needed to deploy Arc Appliance 
 ```PowerShell
 # set appliance name
 $arcAppName="pocArcApp"
@@ -224,7 +226,7 @@ Config file successfully generated in 'V:\AKS-HCI\WorkingDir'
 
 > Note! Here you will be switching to AZ CLI, please continue to run this from the PS ISE or VS Code inside the Azure VM. 
 
-Login to Azure using Az CLI
+### Login to Azure using Az CLI
 ```
 $subscription=<Enter subscription ID>
 $tenantid = <Enter tenant ID>
@@ -234,21 +236,24 @@ az login -t $tenantid --use-device-code
 az account set -s $subscription
 ```
 
-Create Arc Appliance
+### Create Arc Appliance
 ```
 $workingDir = "V:\AKS-HCI\WorkingDir"
 $configFilePath= $workingDir + "\hci-appliance.yaml"
+$arcAppName="pocArcApp"
+$resourceGroup = "akshcinodepoolsbugbash"
 ```
 ```
 az arcappliance validate hci --config-file $configFilePath
 az arcappliance prepare hci --config-file $configFilePath
 az arcappliance deploy hci --config-file $configFilePath --outfile $workingDir\config
 az arcappliance create hci --config-file $configFilePath --kubeconfig $workingDir\config
+```
+The above command may take upto 10mins to finish, so be patient. To check the status of your deployment, run the following command
 
-# the command above may ~10mins so be patient!!
-# to check on the status
-az arcappliance show --resource-group $resourceGroup --name $arcAppName --query "provisioningState" -o tsv
+```
 # check the provisioningState == Succeeded 
+az arcappliance show --resource-group $resourceGroup --name $arcAppName --query "provisioningState" -o tsv
 ```
 
 ## 4. Installing the AKS on Azure Stack HCI extension on the Arc Appliance 
