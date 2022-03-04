@@ -388,38 +388,13 @@ az k8s-extension delete --resource-group <resource group name> --cluster-name <a
 Step 4: Delete the Arc Appliance
 
 ```azurecli
-az arcappliance delete hci --config-file 'C:\ClusterStorage\Volume01\WorkDir\hci-appliance.yaml'
+az arcappliance delete hci --config-file $workingDir\config
 ```
 
 Step 5: Delete the ArcHCI config files
 
 ```powershell
-Remove-ArcHciConfigFiles -workDir "<path to workDir you used in all the above commands>"
+Remove-ArcHciConfigFiles -workDir $workingDir
 ```
 
 Step 6: Delete the Azure VM if you're finished!
-
-# Common Errors
-You may see this error:
-```Text
-az hybridaks show --resource-group  $resourceGroup --name $k8sClusterName
-az : WARNING: Command group 'hybridaks' is in preview and under development. Reference and support levels: https://aka.ms/CLI_refstatus
-At line:1 char:1
-+ az hybridaks show --resource-group  $resourceGroup --name $k8sCluster ...
-+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    + CategoryInfo          : NotSpecified: (WARNING: Comman...s/CLI_refstatus:String) [], RemoteException
-    + FullyQualifiedErrorId : NativeCommandError
- 
-ERROR: AADSTS70043: The refresh token has expired or is invalid due to sign-in frequency checks by conditional access. The token was issued on 
-2021-11-18T04:19:03.3260000Z and the maximum allowed lifetime for this request is 43200.
-Trace ID: fcd27086-9a1d-42e7-97dd-991cd2391800
-Correlation ID: b9e78969-459f-4066-ac6c-6fd6942fad2e
-Timestamp: 2021-11-19 17:18:43Z
-To re-authenticate, please run:
-az login --scope https://management.core.windows.net//.default 
-```
-If so, please run:
-```PowerShell
-az login --scope https://management.core.windows.net//.default 
-az account set --subscription <subscriptionName> 
-```
