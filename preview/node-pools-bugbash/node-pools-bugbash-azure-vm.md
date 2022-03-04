@@ -326,7 +326,9 @@ az hybridaks -h
 
 ### Create an AKS-HCI cluster using Az CLI 
 ```bash 
+az hybridaks create -n cluster-1 -g $resourceGroup --custom-location $CustomLocationResourceId --vnet-id $wkldClusterVnet --generate-ssh-keys
 ```
+
 You can skip adding --generate-ssh-keys if you already have an SSH key named `id_rsa` in the ~/.ssh folder.
 
 ### Show the AKS-HCI cluster
@@ -335,6 +337,7 @@ az hybridaks show --resource-group $resourceGroup --name $k8sClusterName
 ```
 
 ### Add a nodepool to your AKS-HCI cluster
+
 
 ### Delete a nodepool on your AKS-HCI cluster
 
