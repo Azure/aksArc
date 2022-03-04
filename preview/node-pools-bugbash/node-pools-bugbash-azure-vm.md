@@ -252,8 +252,8 @@ az arcappliance create hci --config-file $configFilePath --kubeconfig $workingDi
 The above command may take upto 10mins to finish, so be patient. To check the status of your deployment, run the following command
 
 ```
-# check the provisioningState == Succeeded 
-az arcappliance show --resource-group $resourceGroup --name $arcAppName --query "provisioningState" -o tsv
+# check the status == Connected 
+az arcappliance show --resource-group $resourceGroup --name $arcAppName --query "status" -o tsv
 ```
 
 ## 4. Installing the AKS on Azure Stack HCI extension on the Arc Appliance 
