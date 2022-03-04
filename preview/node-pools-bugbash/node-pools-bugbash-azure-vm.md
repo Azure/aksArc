@@ -220,16 +220,22 @@ Config file successfully generated in 'V:\AKS-HCI\WorkingDir'
 
 > Note! Here you will be switching to AZ CLI, please continue to run this from the PS ISE or VS Code inside the Azure VM. 
 
+Login to Azure using Az CLI
 ```
-# define all the variables again just in case you switched windows
-
 $subscription=<Enter subscription ID>
 $tenantid = <Enter tenant ID>
-$workingDir = "V:\AKS-HCI\WorkingDir"
-$location = "eastus"
-$resourceGroup = "akshcinodepoolsbugbash"
-$configFilePath= $workingDir + "\hci-appliance.yaml"
+```
+```
+az login -t $tenantid --use-device-code
+az account set -s $subscription
+```
 
+Create Arc Appliance
+```
+$workingDir = "V:\AKS-HCI\WorkingDir"
+$configFilePath= $workingDir + "\hci-appliance.yaml"
+```
+```
 az arcappliance validate hci --config-file $configFilePath
 az arcappliance prepare hci --config-file $configFilePath
 az arcappliance deploy hci --config-file $configFilePath --outfile $workingDir\config
