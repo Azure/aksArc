@@ -207,16 +207,15 @@ $arcAppName="pocArcApp"
 # import module
 Import-Module ArcHci
 
-New-ArcHciConfigFiles -subscriptionID $subscriptionId -location $location -resourceGroup $resourceGroup -resourceName $arcAppName -workDirectory $workingDir
+New-ArcHciAksConfigFiles -subscriptionID $subscriptionId -location $location -resourceGroup $resourceGroup -resourceName $arcAppName -workDirectory $workingDir
 ```
 
 Sample output:
 
 ```output
-HCI login file successfully generated in 'C:\ClusterStorage\Volume01\WorkDir\kvatoken.tok'
-MOC config file successfully generated in 'C:\ClusterStorage\Volume01\WorkDir\hci-config.json'
-Cloud agent service FQDN/IP: 'ca-b9772182-2492-4ab3-aa8f-05547413aac7.sa18.nttest.microsoft.com'
-Config file successfully generated in 'C:\ClusterStorage\Volume01\WorkDir'
+HCI login file successfully generated in 'V:\AKS-HCI\WorkingDir\kvatoken.tok'
+Generating ARC HCI configuration files...
+Config file successfully generated in 'V:\AKS-HCI\WorkingDir'
 ```
 
 > Note! Here you will be switching to AZ CLI, please continue to run this from the PS ISE or VS Code, they will continue to use the vars declared in PS in the AZ CLI commands as you are using PS Shell.
