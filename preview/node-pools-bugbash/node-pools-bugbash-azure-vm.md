@@ -218,18 +218,16 @@ Generating ARC HCI configuration files...
 Config file successfully generated in 'V:\AKS-HCI\WorkingDir'
 ```
 
-> Note! Here you will be switching to AZ CLI, please continue to run this from the PS ISE or VS Code, they will continue to use the vars declared in PS in the AZ CLI commands as you are using PS Shell.
+> Note! Here you will be switching to AZ CLI, please continue to run this from the PS ISE or VS Code inside the Azure VM. 
 
-```bash
-# connect the AZ CLI on the server to the Az Sub
+```
+# define all the variables again just in case you switched windows
+
 $subscription=<Enter subscription ID>
-az login -t <Enter tenant ID>
-
-az account show --output table
-az account set --subscription $subscription
-$subscriptionId=az account show --subscription $subscription --query "id" -o tsv
-
-# Deploy the appliance
+$tenantid = <Enter tenant ID>
+$workingDir = "V:\AKS-HCI\WorkingDir"
+$location = "eastus"
+$resourceGroup = "akshcinodepoolsbugbash"
 $configFilePath= $workingDir + "\hci-appliance.yaml"
 
 az arcappliance validate hci --config-file $configFilePath
@@ -239,7 +237,6 @@ az arcappliance create hci --config-file $configFilePath --kubeconfig $workingDi
 
 # the command above may ~10mins so be patient!!
 # to check on the status
-
 az arcappliance show --resource-group $resourceGroup --name $arcAppName --query "provisioningState" -o tsv
 # check the provisioningState == Succeeded 
 ```
