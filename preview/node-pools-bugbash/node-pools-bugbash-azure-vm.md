@@ -305,7 +305,7 @@ $wkldCluVipPoolEnd = "192.168.0.250"
 $vSwitch = "InternalNAT"
 $workingDir = "V:\AKS-HCI\WorkingDir"
 
-New-KvaVirtualNetwork -name $wkldClusterVnet -vippoolstart $wkldCluVipPoolStart -vippoolend $wkldCluVipPoolEnd -vswitchname $vSwitch -kubeconfig $workingDir\applianceconfig
+New-KvaVirtualNetwork -name $wkldClusterVnet -vippoolstart $wkldCluVipPoolStart -vippoolend $wkldCluVipPoolEnd -vswitchname $vSwitch -kubeconfig $workingDir\config
 ```
 
 ## 7. Download the Kubernetes VHD file
@@ -369,7 +369,7 @@ Get-ArcHciLogs
 ```
 
 ```azurecli
-az arcappliance logs hci --kubeconfig $workingDir\applianceconfig
+az arcappliance logs hci --kubeconfig $workingDir\config
 ``` 
 
 ## Clean up
