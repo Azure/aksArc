@@ -185,9 +185,8 @@ Install-AksHci
 ```
 
 This command will take ~10-15mins and you maybe asked to authenticate and see the below, this is ok.
-```text
-WARNING: If you are running Windows PowerShell remotely, note that some failover clustering cmdlets do not work remotely. When possible, run the commands locally and specify a remote computer as the target. To run the cmdlet remotely, try using the Credential Security Service Provider (CredSSP). All additional errors or warnings from this cmdlet might be caused by running it remotely. 
-```
+
+>> NOTE: If you are running Windows PowerShell remotely, note that some failover clustering cmdlets do not work remotely. When possible, run the commands locally and specify a remote computer as the target. To run the cmdlet remotely, try using the Credential Security Service Provider (CredSSP). All additional errors or warnings from this cmdlet might be caused by running it remotely. 
 
 To check if you have successfully installed AKS on Azure Stack HCI, run the following command:
 
