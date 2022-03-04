@@ -266,7 +266,7 @@ az k8s-extension create `
   --cluster-type appliances `
   --name $arcExtnName `
   --extension-type Microsoft.HybridAKSOperator `
-  --version 0.0.9 `
+  --version 0.0.21 `
   --config Microsoft.CustomLocation.ServiceAccount="default"
 
 az k8s-extension show --resource-group $resourceGroup --cluster-name $arcAppName --cluster-type appliances --name $arcExtnName 
