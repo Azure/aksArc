@@ -305,7 +305,7 @@ $wkldCluVipPoolEnd = "192.168.0.250"
 $vSwitch = "InternalNAT"
 $workingDir = "V:\AKS-HCI\WorkingDir"
 
-New-KvaVirtualNetwork -name $wkldClusterVnet -vippoolstart $wkldCluVipPoolStart -vippoolend $wkldCluVipPoolEnd -vswitchname $vSwitch -kubeconfig $workingDir\config
+New-KvaVirtualNetwork -name $wkldClusterVnet -vippoolstart $wkldCluVipPoolStart -vippoolend $wkldCluVipPoolEnd -vswitchname $vSwitch -kubeconfig $workingDir\applianceconfig
 ```
 
 ## 7. Download the Kubernetes VHD file
@@ -360,6 +360,17 @@ kubectl get pods -A --kubeconfig $workingDir\targetclusterconfig
 ```
 az hybridaks nodepool delete --name "samplenodepool" --cluster-name cluster-1 --resource-group $resourceGroup
 ```
+
+## [Admin role] Collecting logs
+If things go wrong, you can collect logs using the following commands:
+
+```powershell
+Get-ArcHciLogs
+```
+
+```azurecli
+az arcappliance logs hci --kubeconfig $workingDir\applianceconfig
+``` 
 
 ## Clean up
 ```azurecli
