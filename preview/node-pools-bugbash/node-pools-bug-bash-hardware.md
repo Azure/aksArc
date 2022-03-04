@@ -82,23 +82,27 @@ To check if you have successfully installed AKS on Azure Stack HCI, run the foll
 Get-AksHciVersion
 ```
 
-Make sure your AKS on Azure Stack HCI version is at least the following version. We currently work with both January and February releases.
+Make sure your AKS on Azure Stack HCI version is the following version. 
 
 Expected Output:
 
 ```powershell
-1.0.7.10118 or 1.0.8.10215
+1.0.8.10223
 ```
-
-Once you have installed AKS on Azure Stack HCI and verified that you have the right version installed, proceed to the next step. Do not go to Step 2 without a successful AKS on Azure Stack HCI installation.
+> Note! Do not proceed if you have any errors! If you face an issue installing AKS on Azure Stack HCI, review the AKS on Azure Stack HCI [troubleshooting section](https://docs.microsoft.com/azure-stack/aks-hci/known-issues). If the troubleshooting section does not help you, please file a [GitHub issue](https://github.com/Azure/aks-hci/issues). Make sure you attach logs (use `Get-AksHciLogs`), so that we can help you faster.
 
 
 ## Step 2: Install Arc Appliance [Infra admin role] 
 
 Installing Arc Appliance requires you to create a YAML file. Fortunately, we have automated the process of creating this YAML file for you. Run the following command to create the YAML file.
 
+```
+$workingDir = "<csv path to store config files, yamls, etc>"
+```
+The workingDir is the path to a shared cluster volume that stores the config files we create for you. I recommend you use the same workDir you used while installing AKS-HCI. Make sure your workDir full path does not contain any spaces. 
+
 ```powershell
-New-ArcHciConfigFiles -subscriptionID "<subscriptionID from #1>" -location "<eastus/westeurope>" -resourceGroup "<azure resource group>" -resourceName "<name of appliance/resource bridge>" -workDirectory "<csv path to store config files, yamls, etc>"
+New-ArcHciAksConfigFiles -subscriptionID "<subscriptionID from #1>" -location "<eastus/westeurope>" -resourceGroup "<azure resource group>" -resourceName "<name of appliance/resource bridge>" -workDirectory "<csv path to store config files, yamls, etc>"
 ```
 
 |  Parameter  |  Parameter details |
@@ -113,8 +117,7 @@ Sample output:
 
 ```output
 HCI login file successfully generated in 'C:\ClusterStorage\Volume01\WorkDir\kvatoken.tok'
-MOC config file successfully generated in 'C:\ClusterStorage\Volume01\WorkDir\hci-config.json'
-Cloud agent service FQDN/IP: 'ca-b9772182-2492-4ab3-aa8f-05547413aac7.sa18.nttest.microsoft.com'
+Generating ARC HCI configuration files...
 Config file successfully generated in 'C:\ClusterStorage\Volume01\WorkDir'
 ```
 
@@ -138,9 +141,9 @@ az arcappliance prepare hci --config-file 'C:\ClusterStorage\Volume01\WorkDir\hc
 In the below command, the outfile is the location where you want to store Arc Appliance's kubeconfig. I recommend storing it in the WorkDir shared cluster volume location. For example, `C:\ClusterStorage\Volume01\WorkDir\appliancekubeconfig` 
 
 ```azurecli
-az arcappliance deploy hci --config-file '<full path of the config file>' --outfile '<location where you want to store the kubeconfig file, for ex C:\ClusterStorage\Volume01\WorkDir\appliancekubeconfig>'
+az arcappliance deploy hci --config-file '<full path of the config file>' --outfile $workingDir\applianceconfig
 
-az arcappliance create hci --config-file '<full path of the config file>' --kubeconfig '<location of the kubeconfig file that you passed in --outfile of the az arcappliance deploy hci command>'
+az arcappliance create hci --config-file '<full path of the config file>' --kubeconfig $workingDir\applianceconfig
 ```
 
 Sample input:
@@ -151,7 +154,7 @@ az arcappliance create hci --config-file 'C:\ClusterStorage\Volume01\WorkDir\hci
 
 And with the `az arcappliance create` command, you're done with deploying the Appliance! 
 
-Before proceeding to the next step, run the following command to check if the Arc Appliance status says *Running*. It might not say *Running* at first. This takes time. Try again after 10 minutes.
+Before proceeding to the next step, run the following command to check if the Arc Appliance status says *Connected*. It might not say *Connected* at first. This takes time. Try again after a few minutes.
 
 ```azurecli
 az arcappliance show --resource-group <azure resource group> --name <name of appliance/resource bridge> --query "status" -o tsv
@@ -164,7 +167,7 @@ To install the extension, run the following command:
 ```azurecli
 az account set -s <subscription from #1>
 
-az k8s-extension create --resource-group <azure resource group> --cluster-name <arc appliance name> --cluster-type appliances --name <akshci cluster extension name> --extension-type Microsoft.HybridAKSOperator --version 0.0.18 --config Microsoft.CustomLocation.ServiceAccount="default" 
+az k8s-extension create --resource-group <azure resource group> --cluster-name <arc appliance name> --cluster-type appliances --name <akshci cluster extension name> --extension-type Microsoft.HybridAKSOperator --version 0.0.21 --config Microsoft.CustomLocation.ServiceAccount="default" 
 ```
 
 |  Parameter  |  Parameter details  |
@@ -173,11 +176,11 @@ az k8s-extension create --resource-group <azure resource group> --cluster-name <
 | cluster-name  |  The name of your Arc Appliance. |
 | name  |  Name of your AKS-HCI cluster extension on top of Arc Appliance  |
 | cluster-type  | Must be *appliances*. Do not change this value.  |
-|  extension-type  |  Must be *Microsoft.HybridAKSOperator*. Do not change this value. |
-| version | Must be *0.0.18*. Do not change this value. |
+| extension-type  |  Must be *Microsoft.HybridAKSOperator*. Do not change this value. |
+| version | Must be *0.0.21*. Do not change this value. |
 | config  | Must be *config Microsoft.CustomLocation.ServiceAccount="default"*. Do not change this value. |
 
-Once you have created the AKS on Azure Stack HCI extension on top of the Arc Appliance, run the following command to check if the extension provisioning status says *Succeeded*. It might say *pending* at first. Be patient! This takes time. Try again after 10 minutes.
+Once you have created the AKS on Azure Stack HCI extension on top of the Arc Appliance, run the following command to check if the extension provisioning status says *Succeeded*. It might say *pending* at first. Be patient! This takes time. Try again after a few minutes.
 
 ```azurecli
 az k8s-extension show --resource-group <resource group name> --cluster-name <arc appliance name> --cluster-type appliances --name <akshci extension name> --query "provisioningState" -o tsv
@@ -218,7 +221,7 @@ az customlocation show --name <custom location name> --resource-group <resource 
 We're so close! Create a network for your developers to use to create AKS on Azure Stack HCI clusters using the following command.
 
 ```powershell
-New-KvaVirtualNetwork -name "<vnet name>" -vippoolstart "<vippoolstart IP address>" -vippoolend "<vippoolstart IP address>" -vswitchname "<vmswitchname>"
+New-KvaVirtualNetwork -name "<vnet name>" -vippoolstart "<vippoolstart IP address>" -vippoolend "<vippoolstart IP address>" -vswitchname "<vmswitchname>" -kubeconfig $workingDir\applianceconfig
 ```
 
 Make sure the IP addresses you give in the VIP pool (vippoolstart and vippoolend) do not overlap with the VIP pool you created by running `New-AksHciNetworkSetting`.
@@ -258,48 +261,62 @@ Provide the following details to the end user:
 
 Before creating AKS on Azure Stack HCI clusters, make sure you have Az CLI and the hybrid AKS extension installed in your environment. 
 
-Download the hybridaks-0.1.1-py3-none-any.whl file from the [GitHub repo](https://github.com/Azure/azure-arc-kubernetes-preview/raw/master/cli-extensions/hybridaks-0.1.1-py3-none-any.whl) and run the following commands: 
+[Download the hybridaks Az CLI extension](https://github.com/Azure/aks-hci/blob/main/preview/node-pools-bugbash/hybridaks-0.1.2-py3-none-any.whl) WHL file.
 
 ```azurecli
 az extension remove -n hybridaks
-az extension add --yes --source <path to the downloaded hybridaks-0.1.1-py3-none-any.whl file>
+az extension add --yes --source <path to the downloaded hybridaks-0.1.2-py3-none-any.whl file>
 az hybridaks -h
 ```
-
-| Command |  Description |
-| --------- | ------------------|
-| create | Creates the Hybrid AKS provisioned cluster
-| delete | Deletes the Hybrid AKS provisioned cluster 
-| list | Lists the Hybrid AKS provisioned cluster in a  resource group or in a subscription
-| show | Gets the Hybrid AKS provisioned cluster 
-| update | Updates the Hybrid AKS provisioned cluster 
-
 ### Create an AKS-HCI cluster using Az CLI 
-```azurecli
-az hybridaks create --name <akshci cluster name> --resource-group <resource group name> --location <eastus/westeurope> --custom-location <custom location ARM id from admin> --vnet-id <vnet id from admin> --kubernetes-version "v1.21.2" --generate-ssh-keys
+```bash 
+az hybridaks create -n cluster-1 -g $resourceGroup --custom-location $CustomLocationResourceId --vnet-id $wkldClusterVnet --generate-ssh-keys
 ```
 You can skip adding --generate-ssh-keys if you already have an SSH key named `id_rsa` in the ~/.ssh folder.
 
 ### Show the AKS-HCI cluster
 ```azurecli
-az hybridaks show --resource-group <resource group name> --name <akshci cluster name>
+az hybridaks show -g $resourceGroup -n cluster-1 
 ```
 
-### Delete an AKS-HCI cluster
-Run the following command to delete an AKS-HCI cluster:
+### Add a nodepool to your AKS-HCI cluster
+```
+az hybridaks nodepool add --name "samplenodepool" --cluster-name cluster-1 --resource-group $resourceGroup
+```
+
+### List nodepools in your AKS-HCI cluster
+```
+az hybridaks nodepool list -g $resourceGroup --cluster-name cluster-1 --query value -o table
+```
+
+### Get admin kubeconfig of AKS-HCI cluster created using Az CLI
+RDP into to the Azure VM before proceeding.
+```powershell
+Get-TargetClusterAdminCredentials -clusterName "cluster-1" -outfile $workingDir\targetclusterconfig -kubeconfig $workingDir\applianceconfig
+```
+
+### Access your clusters using kubectl
+```
+kubectl get pods -A --kubeconfig $workingDir\targetclusterconfig
+```
+
+### Delete a nodepool on your AKS-HCI cluster
+```
+az hybridaks nodepool delete --name "samplenodepool" --cluster-name cluster-1 --resource-group $resourceGroup
+```
+
+## [Admin role] Collecting logs
+If things go wrong, you can collect logs using the following commands:
+
+```powershell
+Get-ArcHciLogs
+```
+
 ```azurecli
-az hybridaks delete --resource-group <resource group name> --name <akshci cluster name>
-```
+az arcappliance logs hci --kubeconfig 'C:\ClusterStorage\Volume01\WorkDir\config'
+``` 
 
-## Access your clusters using kubectl
-Access your target AKS-HCI cluster using kubectl.
-
-```
-kubectl get pods -A --kubeconfig "<file path where you stored your target akshci cluster admin kubeconfig in the previous step 10>"
-```
-
-## [Admin role] Uninstalling the private preview
-
+## Clean up
 ```azurecli
 az login
 az account set -s <subscriptionID>
@@ -326,23 +343,14 @@ az k8s-extension delete --resource-group <resource group name> --cluster-name <a
 Step 4: Delete the Arc Appliance
 
 ```azurecli
-az arcappliance delete hci --config-file 'C:\ClusterStorage\Volume01\WorkDir\hci-appliance.yaml'
+az arcappliance delete hci --config-file $workingDir\config
 ```
 
 Step 5: Delete the ArcHCI config files
 
 ```powershell
-Remove-ArcHciConfigFiles -workDir "<path to workDir you used in all the above commands>"
+Remove-ArcHciConfigFiles -workDir $workingDir
 ```
 
-## [Admin role] Collecting logs
-If things go wrong, you can collect logs using the following commands:
-
-```powershell
-Get-ArcHciLogs
-```
-
-```azurecli
-az arcappliance logs hci --kubeconfig 'C:\ClusterStorage\Volume01\WorkDir\config'
-``` 
+Step 6: Delete the Azure VM if you're finished!
 
