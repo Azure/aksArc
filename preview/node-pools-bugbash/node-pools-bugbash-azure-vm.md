@@ -342,7 +342,7 @@ az hybridaks nodepool add --name "samplenodepool" --cluster-name cluster-1 --res
 
 ### List nodepools in your AKS-HCI cluster
 ```
-az hybridaks nodepool list -g $resourceGroup --cluster-name cluster-1
+az hybridaks nodepool list -g $resourceGroup --cluster-name cluster-1 --query value -o table
 ```
 
 ### Get admin kubeconfig of AKS-HCI cluster created using Az CLI
