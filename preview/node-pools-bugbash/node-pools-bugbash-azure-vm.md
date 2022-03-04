@@ -92,9 +92,10 @@ $getIp = Get-AzPublicIpAddress -Name "AKSHCILabPubIp" -resourceGroupName $rgName
 $getIp | Select-Object Name,IpAddress,@{label='FQDN';expression={$_.DnsSettings.Fqdn}}
 ```
 
-RDP to the VM you just deployed in the previous step, then using PowerShell ISE (in Admin mode) or VScode run the following commands. You can find RDP instructions when you click on the virtual machine resource on the Azure portal.
+### RDP into the Azure VM
+RDP into the VM you just deployed in the previous step, then using PowerShell ISE (in Admin mode) or VScode run the following commands. You can find RDP instructions when you click on the virtual machine resource on the Azure portal.
 
-### Install AZ CLI on Host
+### Install AZ CLI on the Azure VM
 ```PowerShell
 $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
 Exit
@@ -108,21 +109,23 @@ If you get an error saying " The term 'az' is not recognized as the name of a cm
 $env:PATH += ";C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin;"
 ```
 
-### Install Az CLI Extensions
+### Install Az CLI Extensions on the Azure VM
 ```
 az extension add -n k8s-extension 
 az extension add -n customlocation
 az extension add -n arcappliance
 ```
 
-## 2. Install AKS on Azure Stack HCI 
+## 2. Install AKS on Azure Stack HCI on the Azure VM
 
+### Install pre-requisites
 Install PS client tools:
 ```PowerShell
 Install-PackageProvider Nuget –Force
 Install-Module –Name PowerShellGet –Force
 Exit
 ```
+
 In a new connection run:
 ```PowerShell
 # install the AKSHCI modules
@@ -132,13 +135,12 @@ Exit
 ```
 
 Now open a new window and run the following command:
-
 ```powershell
 Initialize-AksHciNode 
 Exit
 ```
 
-### Networking & IP Assignments in PoC Environment
+### Networking & IP assignments in the Azure VM PoC environment
 The following command creates a network object for the AKS on Azure Stack HCI host (or management cluster) as well as the Resource Bridge. This will take IPs from the VIP VIP Pool for:
 * 1x AKS host / Mgmt Cluster
 * 1x The Resource Bridge / Arc Appliance
@@ -155,11 +157,15 @@ $vSwitch = "InternalNAT"
 # cloud service IP
 $cloudServiceIP = "192.168.0.150"
 ```
+
 For more details:
 * [cloudserviceIP](https://docs.microsoft.com/azure-stack/aks-hci/concepts-node-networking#microsoft-on-premises-cloud-service) so that the Kubernetes bits can talk to your Azure Stack HCI physical nodes.
 * *What are the IP's for?* You need a set of IP addresses in the same subnet as the DHCP server but excluded from the DHCP scope.
     * You will build “VIPPools” from this IP address list later during deployment.
     * You will need atleast two non-overlapping VIPPools for this preview. Apart from IP addresses in the DHCP server, we also need to statically assign IP addresses to some important agents, so they are long lived.
+
+
+### Install AKS-HCI
 
 ```powershell
 $subscriptionId = <Azure subscription ID>
@@ -180,10 +186,9 @@ Set-AksHciConfig -vnet $vnet -workingDir $workingDir -cloudConfigLocation $cloud
 # NOTE!!! when running this command you will be asked to authenticate
 Set-AksHciRegistration -SubscriptionId $subscriptionId -resourceGroupName $resourceGroup -TenantId $tenantId -UseDeviceAuthentication
 
-# install AKS-HCI mgmt cluster and arc connected
+# install AKS-HCI mgmt cluster 
 Install-AksHci
 ```
-
 This command will take ~10-15mins and you maybe asked to authenticate and see the below, this is ok.
 
 >> NOTE: If you are running Windows PowerShell remotely, note that some failover clustering cmdlets do not work remotely. When possible, run the commands locally and specify a remote computer as the target. To run the cmdlet remotely, try using the Credential Security Service Provider (CredSSP). All additional errors or warnings from this cmdlet might be caused by running it remotely. 
