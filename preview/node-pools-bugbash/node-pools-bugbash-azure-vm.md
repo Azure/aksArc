@@ -268,10 +268,10 @@ az k8s-extension create `
   --extension-type Microsoft.HybridAKSOperator `
   --version 0.0.21 `
   --config Microsoft.CustomLocation.ServiceAccount="default"
+ ```
 
-az k8s-extension show --resource-group $resourceGroup --cluster-name $arcAppName --cluster-type appliances --name $arcExtnName 
-
-# check install, the extension provisioningState is "Succeeded", can take up to 10mins!!!
+Check if the extension provisioningState is "Succeeded", this can take up to 10mins!!!
+```
 az k8s-extension show --resource-group $resourceGroup  --cluster-name $arcAppName --cluster-type appliances --name $arcExtnName --query "provisioningState" -o tsv
 ```
 
@@ -284,11 +284,15 @@ $ArcApplianceResourceId=az arcappliance show --resource-group $resourceGroup  --
 $ClusterExtensionResourceId=az k8s-extension show --resource-group $resourceGroup --cluster-name  $arcAppName --cluster-type appliances --name $arcExtnName --query id -o tsv
 
 az customlocation create --name $customLocationName --namespace "default" --host-resource-id $ArcApplianceResourceId --cluster-extension-ids $ClusterExtensionResourceId --resource-group $resourceGroup 
+```
 
+Check if the custom location provisioningState is "Succeeded":
+```
 az customlocation show --name $customLocationName --resource-group $resourceGroup --query "provisioningState" -o tsv
+```
 
+```
 $CustomLocationResourceId = az customlocation show --name $customLocationName --resource-group $resourceGroup --query id -o tsv 
-
 ```
 
 ## 6. Create a network for your AKS-HCI workload clusters
