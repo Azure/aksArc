@@ -328,29 +328,37 @@ az hybridaks -h
 ```bash 
 az hybridaks create -n cluster-1 -g $resourceGroup --custom-location $CustomLocationResourceId --vnet-id $wkldClusterVnet --generate-ssh-keys
 ```
-
 You can skip adding --generate-ssh-keys if you already have an SSH key named `id_rsa` in the ~/.ssh folder.
 
 ### Show the AKS-HCI cluster
 ```azurecli
-az hybridaks show --resource-group $resourceGroup --name $k8sClusterName 
+az hybridaks show -g $resourceGroup -n cluster-1 
 ```
 
 ### Add a nodepool to your AKS-HCI cluster
+```
+az hybridaks nodepool add --name "samplenodepool" --cluster-name cluster-1 --resource-group $resourceGroup
+```
 
-
-### Delete a nodepool on your AKS-HCI cluster
+### List nodepools in your AKS-HCI cluster
+```
+az hybridaks nodepool list -g $resourceGroup --cluster-name cluster-1
+```
 
 ### Get admin kubeconfig of AKS-HCI cluster created using Az CLI
-RDP into to the Azure VM before proceeding
-
+RDP into to the Azure VM before proceeding.
 ```powershell
-Get-TargetClusterAdminCredentials -clusterName "<akshci cluster name>" -outfile "<file path where you want to store your target akshci cluster admin kubeconfig>"
+Get-TargetClusterAdminCredentials -clusterName "cluster-1" -outfile $workingDir\targetclusterconfig -kubeconfig $workingDir\config
 ```
 
 ### Access your clusters using kubectl
 ```
-kubectl get pods -A --kubeconfig "<file path where you stored your target akshci cluster admin kubeconfig in the previous step 10>"
+kubectl get pods -A --kubeconfig $workingDir\targetclusterconfig
+```
+
+### Delete a nodepool on your AKS-HCI cluster
+```
+az hybridaks nodepool delete --name "samplenodepool" --cluster-name cluster-1 --resource-group $resourceGroup
 ```
 
 ## Clean up
