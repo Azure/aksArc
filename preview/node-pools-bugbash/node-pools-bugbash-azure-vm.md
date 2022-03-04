@@ -164,11 +164,13 @@ For more details:
 ```powershell
 $subscriptionId = <Azure subscription ID>
 $tenantId = <Azure tenant>
+```
+```powershell
 # make sure your `–workingDir` parameter value does not contain any spaces. 
 $workingDir = "V:\AKS-HCI\WorkingDir"
 $cloudConfigLocation = "V:\AKS-HCI\Config"
 $location = "eastus"
-$resourceGroup = "akshciPP2bugbash04"
+$resourceGroup = "akshcinodepoolsbugbash"
 
 # create network object
 $vnet = New-AksHciNetworkSetting -Name "vnet-mgmt-setting01" -vippoolstart $mgmtVipPoolStart -vippoolend $mgmtVipPoolEnd -vSwitchName $vSwitch
@@ -184,26 +186,19 @@ Install-AksHci
 
 This command will take ~10-15mins and you maybe asked to authenticate and see the below, this is ok.
 ```text
-WARNING: If you are running Windows PowerShell remotely, note that some failover clustering cmdlets do not work remotely. When possible, run the cmd locally and specify a remote computer as the target. To run the cmdlet remotely, try using the Credential Security Service Provider (CredSSP). A
-ll additional errors or warnings from this cmdlet might be caused by running it remotely. 
+WARNING: If you are running Windows PowerShell remotely, note that some failover clustering cmdlets do not work remotely. When possible, run the commands locally and specify a remote computer as the target. To run the cmdlet remotely, try using the Credential Security Service Provider (CredSSP). All additional errors or warnings from this cmdlet might be caused by running it remotely. 
 ```
-
-If you face an issue installing AKS on Azure Stack HCI, review the AKS on Azure Stack HCI [troubleshooting section](https://docs.microsoft.com/azure-stack/aks-hci/known-issues). If the troubleshooting section does not help you, please file a [GitHub issue](https://github.com/Azure/aks-hci/issues). Make sure you attach logs (use `Get-AksHciLogs`), so that we can help you faster.
 
 To check if you have successfully installed AKS on Azure Stack HCI, run the following command:
 
 ```powershell
 Get-AksHciVersion
 ```
-Make sure your AKS on Azure Stack HCI version is at least the following versions. We currently work with both January and February releases.
-
-Expected Output:
-
-```powershell
-1.0.8.10215
+```output
+1.0.8.10223
 ```
 
-> Note! Now the AzStack-HCI node is configured. If you have had any errors please do not proceed. 
+> Note! Do not proceed if you have any errors! If you face an issue installing AKS on Azure Stack HCI, review the AKS on Azure Stack HCI [troubleshooting section](https://docs.microsoft.com/azure-stack/aks-hci/known-issues). If the troubleshooting section does not help you, please file a [GitHub issue](https://github.com/Azure/aks-hci/issues). Make sure you attach logs (use `Get-AksHciLogs`), so that we can help you faster.
 
 ## 3. Install Arc Appliance
 ```PowerShell
