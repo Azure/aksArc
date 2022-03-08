@@ -1,4 +1,4 @@
-## Step 0: Prerequisites [Infra admin]
+## Step 0: Prerequisites
 
 First, you need to make sure that you have your environment set up. Follow the table below to ensure you've covered everything you need for a successful installation:
 
@@ -9,18 +9,18 @@ Azure Stack HCI/AKS on Azure Stack HCI admin:
 | 1   | Do you have an Azure subscription?  | [Guide to get an Azure subscription](https://docs.microsoft.com/azure-stack/aks-hci/system-requirements#azure-account-and-subscription), if you don’t already have one. Need Azure subscription to create AKS-HCI clusters + AKS-HCI billing.  |  Make sure you have your subscription ID. |
 | 2 | Do you have the right permissions on your Azure subscription? | Required to register AKS-HCI for billing. You have two options: <br> *Option 1*: [You are an Azure subscription "owner"](https://docs.microsoft.com/azure-stack/aks-hci/system-requirements#azure-subscription-role-and-access-level) AND [Ability to register applications](https://docs.microsoft.com/azure-stack/aks-hci/system-requirements#azure-ad-permissions-role-and-access-level). <br> *Option 2*: Have a service principal. Ask your Azure subscription "owner" to create this service principal for you, using this [guide](https://docs.microsoft.com/azure-stack/aks-hci/system-requirements#optional-create-a-new-service-principal). | If you used option 2: Make sure you have a service principal "AppID" and service principal "Password/Secret" |
 | 3 | Is your subscription in the "allow list" for this private preview?  | You will need to register your interest and have your subscription enabled for this private preview. Register at [aka.ms/lifecycle-management-preview](https://aka.ms/arcAksHciPriPreview).  | We will email you back when your subscription has been added. |
-| 4 | Do you have a recent version of Az CLI installed? | Required to run the Az commands. [Install Az CLI](https://docs.microsoft.com/cli/azure/install-azure-cli-windows?tabs=azure-cli). Verify that the Az CLI version is greater than 2.32.0 by running `az -v`. You can upgrade to the latest version by running `az upgrade`. | Make sure you have the latest Az CLI version by running `az -v`. |
+| 4 | Do you have a recent version of Az CLI installed? | Required to run the Az commands. [Install Az CLI](https://docs.microsoft.com/cli/azure/install-azure-cli-windows?tabs=azure-cli). You can upgrade to the latest version by running `az upgrade`. | Verify that you have Az CLI by running `az -v`. |
 | 5 | Have you registered your subscription for this preview feature? | `az account set -s <subscriptionID from step 1>` <br> `az feature register --namespace Microsoft.HybridContainerService --name hiddenPreviewAccess` <br> `az feature register --namespace Microsoft.ResourceConnector --name Appliances-ppauto` <br>`az feature register --namespace Microsoft.HybridConnectivity --name hiddenPreviewAccess`| Verify if you have registered the features by running the command: <br> `az account set -s <subscriptionID from #1>` <br> `az feature show --namespace Microsoft.HybridContainerService --name hiddenPreviewAccess -o table` <br> `az feature show --namespace Microsoft.HybridContainerService --name hiddenPreviewAccess -o table` |
 | 6 | Have you registered all the right providers on your subscription? | You need to register the providers to use this preview: <br> `az account set -s <subscriptionID from step #1>` <br> `az provider register --namespace Microsoft.Kubernetes` <br> `az provider register --namespace Microsoft.KubernetesConfiguration` <br> `az provider register --namespace Microsoft.ExtendedLocation` <br> `az provider register --namespace Microsoft.ResourceConnector` <br> `az provider register --namespace Microsoft.HybridContainerService`  <br> `az provider register --namespace Microsoft.HybridConnectivity` | If the status shows *registering*, try again after some time. <br> `az account set -s <subscriptionID from step #1>` <br> `az provider show --namespace Microsoft.Kubernetes -o table` <br> `az provider show --namespace Microsoft.KubernetesConfiguration -o table` <br> `az provider show --namespace Microsoft.ExtendedLocation -o table` <br> `az provider show --namespace Microsoft.ResourceConnector -o table` <br> `az provider show --namespace Microsoft.HybridContainerService -o table` | 
 | 7 | Do you have a DHCP server with enough IP addresses in your environment? | For this month’s preview release, you need a DHCP server. [Follow this guide for recommended number of IP addresses in your DHCP server](https://docs.microsoft.com/en-us/azure-stack/aks-hci/concepts-node-networking#minimum-ip-address-reservation) <br> This DHCP server will be used to assign IP addresses to VMs that are the underlying compute for your Kubernetes cluster nodes. | Check with your admin if your Azure Stack HCI network environment has a DHCP server. |
 | 8 | Do you have a continuous set of IP addresses in the same subnet as the DHCP server but excluded from the DHCP scope? | You need a set of IP addresses in the same subnet as the DHCP server but excluded from the DHCP scope. <br> You will build "VIPPools" from this IP address list later during deployment. <br> You will need atleast two non-overlapping VIPPools for this preview. Apart from IP addresses in the DHCP server, we also need to statically assign IP addresses to some important agents, so they are long lived. | List of IP addresses in the same subnet as the DHCP server but excluded from the DHCP scope. |
 | 9 | Do you have an external virtual switch? | You need an external virtual switch for the VMs that are the underlying compute for your Kubernetes cluster nodes | Name of your virtual switch |
 | 10 | Do you have a cloudserviceIP? | You need a [cloudserviceIP](https://docs.microsoft.com/azure-stack/aks-hci/concepts-node-networking#microsoft-on-premises-cloud-service) so that the Kubernetes bits can talk to your Azure Stack HCI physical nodes. | Enter your cloudserviceIP address |
-| 11 | Did you install the AKS-HCI PowerShell module? | `Install-Module -Name AksHci -Repository PSGallery` | Confirm that the AksHci module version is `1.1.25` by running the following command: `Get-Module -Name akshci` |
+| 11 | Did you install the AKS-HCI PowerShell module? | `Install-Module -Name AksHci -Repository PSGallery` | Confirm that the AksHci module version is `1.1.27` by running the following command: `Get-Module -Name akshci` |
 | 12 | Did you install the ArcHCI PowerShell module? | `Install-Module -Name ArcHci -RequiredVersion 0.2.8 -Force -Confirm:$false -SkipPublisherCheck -AcceptLicense` | |
-| 13 | Did you install the Az extensions? | `az extension add --name k8s-extension` <br> `az extension add --name customlocation` <br> `az extension add --name arcappliance` | You can check if you have the extensions installed and their versions by running the following command: `az -v` <br> Expected output: <br> `azure-cli                         2.33.1` <br> `core                              2.33.1` <br> `telemetry                          1.0.6` <br> Extensions: <br>` arcappliance                      0.2.15` <br> `customlocation                     0.1.3` <br> `k8s-extension                      1.0.4` |
+| 13 | Did you install the Az extensions? | `az extension add --name k8s-extension` <br> `az extension add --name customlocation` <br> `az extension add --name arcappliance` | You can check if you have the extensions installed and their versions by running the following command: `az -v` <br> Expected output: <br> `azure-cli                         2.33.1` <br> `core                              2.33.1` <br> `telemetry                          1.0.6` <br> Extensions: <br>` arcappliance                      0.2.16` <br> `customlocation                     0.1.3` <br> `k8s-extension                      1.0.4` |
 
-## Step 1: Install AKS on Azure Stack HCI [Infra admin role] 
+## Step 1: Install AKS on Azure Stack HCI 
 
 Install AKS on Azure Stack HCI's management cluster using either PowerShell or Windows Admin Center. You can only install the management cluster using DHCP networking, without VLAN, in an environment that does not have a proxy. Since you will be running preview software beside your AKS on Azure Stack HCI setup, we do not recommend running AKS on Azure Stack HCI and this private preview in your production environment.
 
@@ -92,7 +92,7 @@ Expected Output:
 > Note! Do not proceed if you have any errors! If you face an issue installing AKS on Azure Stack HCI, review the AKS on Azure Stack HCI [troubleshooting section](https://docs.microsoft.com/azure-stack/aks-hci/known-issues). If the troubleshooting section does not help you, please file a [GitHub issue](https://github.com/Azure/aks-hci/issues). Make sure you attach logs (use `Get-AksHciLogs`), so that we can help you faster.
 
 
-## Step 2: Install Arc Appliance [Infra admin role] 
+## Step 2: Install Arc Appliance 
 
 Installing Arc Appliance requires you to create a YAML file. Fortunately, we have automated the process of creating this YAML file for you. Run the following command to create the YAML file.
 
@@ -160,7 +160,7 @@ Before proceeding to the next step, run the following command to check if the Ar
 az arcappliance show --resource-group <azure resource group> --name <name of appliance/resource bridge> --query "status" -o tsv
 ```
 
-## Step 3: Installing the AKS on Azure Stack HCI extension on the Arc Appliance [Infra admin role]
+## Step 3: Installing the AKS on Azure Stack HCI extension on the Arc Appliance 
 
 To install the extension, run the following command:
 
@@ -180,13 +180,13 @@ az k8s-extension create --resource-group <azure resource group> --cluster-name <
 | version | Must be *0.0.21*. Do not change this value. |
 | config  | Must be *config Microsoft.CustomLocation.ServiceAccount="default"*. Do not change this value. |
 
-Once you have created the AKS on Azure Stack HCI extension on top of the Arc Appliance, run the following command to check if the extension provisioning status says *Succeeded*. It might say *pending* at first. Be patient! This takes time. Try again after a few minutes.
+Once you have created the AKS on Azure Stack HCI extension on top of the Arc Appliance, run the following command to check if the extension status says *Running*. It might say *pending* at first. Be patient! This takes time. Try again after a few minutes.
 
 ```azurecli
-az k8s-extension show --resource-group <resource group name> --cluster-name <arc appliance name> --cluster-type appliances --name <akshci extension name> --query "provisioningState" -o tsv
+az k8s-extension show --resource-group <resource group name> --cluster-name <arc appliance name> --cluster-type appliances --name <akshci extension name> --query "status" -o tsv
 ```
 
-## Step 4: Installing a custom location on top of the AKS-HCI extension on the Arc Appliance [Infra admin role]
+## Step 4: Installing a custom location on top of the AKS-HCI extension on the Arc Appliance 
 
 You need to first collect the ARM IDs of the Arc Appliance and the AKS on Azure Stack HCI extension in PowerShell variables.
 
@@ -216,7 +216,7 @@ Once you create the custom location on top of the Arc Appliance, run the followi
 az customlocation show --name <custom location name> --resource-group <resource group name> --query "provisioningState" -o tsv
 ```
 
-## Step 5: Create a network for your AKS-HCI workload clusters [Infra admin role]
+## Step 5: Create a network for your AKS-HCI workload clusters
 
 We're so close! Create a network for your developers to use to create AKS on Azure Stack HCI clusters using the following command.
 
@@ -229,7 +229,7 @@ Make sure the IP addresses you give in the VIP pool (vippoolstart and vippoolend
 IP address exhaustion can lead to AKS on Azure Stack HCI cluster deployment failures. Plan your IP addresses very carefully. For more information, you can [learn more about DHCP IP address planning](https://docs.microsoft.com/azure-stack/aks-hci/concepts-node-networking#minimum-ip-address-reservations-for-an-aks-on-azure-stack-hci-deployment).
 
 
-## Step 6: Assign user role RBAC access to create AKS on Azure Stack HCI clusters [Infra admin role] 
+## Step 6: Assign user role RBAC access to create AKS on Azure Stack HCI clusters
 
 Use the following steps to create AKS on Azure Stack HCI clusters and assign RBAC access:
 
@@ -239,7 +239,7 @@ Use the following steps to create AKS on Azure Stack HCI clusters and assign RBA
 4. Type in the name of the end user and assign them *contributor* access.
 
 
-## Step 7: Download the Kubernetes VHD file [Infra admin role] 
+## Step 7: Download the Kubernetes VHD file 
 
 Run the following command to download the Linux VHD file specific to the Kubernetes version. For this preview release, you can only download the VHD file for Kubernetes version 1.21.2
 
@@ -247,7 +247,7 @@ Run the following command to download the Linux VHD file specific to the Kuberne
 Add-KvaGalleryImage -kubernetesVersion 1.21.2
 ```
 
-## Step 8: Give the dev user the details [Infra admin role] 
+## Step 8: Give the dev user the details 
 
 Provide the following details to the end user:
 
@@ -255,7 +255,6 @@ Provide the following details to the end user:
 | --------- | ------------------|
 | Custom-location  | ARM ID of the custom location you created in step 4. You can get the ARM ID using `az customlocation show --name <custom location name> --resource-group <azure resource group> --query "id" -o tsv`
 | vnet-id | The name of the virtual network you created using New-KvaVirtualNetwork in step 5. |
-| kubernetes-version | v1.21.2. Do not change this value. |
 
 ## Step 9: Create AKS-HCI clusters using Az CLI [User role] 
 
