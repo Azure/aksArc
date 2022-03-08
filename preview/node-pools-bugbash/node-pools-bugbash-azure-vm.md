@@ -274,7 +274,7 @@ az k8s-extension show --resource-group $resourceGroup  --cluster-name $arcAppNam
 
 ## 5. Installing a custom location on top of the AKS-HCI extension on the Arc Appliance 
 ```PowerShell
-$customLocationName="AzStackEusCustLoc"
+$customLocationName="azstackhci-cl"
 
 $ArcApplianceResourceId=az arcappliance show --resource-group $resourceGroup  --name $arcAppName --query id -o tsv
 
