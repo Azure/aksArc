@@ -92,6 +92,8 @@ $getIp | Select-Object Name,IpAddress,@{label='FQDN';expression={$_.DnsSettings.
 ### RDP into the Azure VM
 RDP into the VM you just deployed in the previous step, then using PowerShell ISE (in Admin mode) or VScode run the following commands. You can find RDP instructions when you click on the virtual machine resource on the Azure portal.
 
+You passed the username and password to access the Azure VM when you created the VM using the above script. Refer to the script and the `adminUsername` and `adminPassword` values.
+
 ### Install AZ CLI on the Azure VM
 ```PowerShell
 $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
