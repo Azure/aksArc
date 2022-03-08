@@ -249,7 +249,7 @@ az arcappliance create hci --config-file $configFilePath --kubeconfig $workingDi
 The above command may take upto 10mins to finish, so be patient. To check the status of your deployment, run the following command
 
 ```
-# check the status == Connected 
+# check the status == Running 
 az arcappliance show --resource-group $resourceGroup --name $arcAppName --query "status" -o tsv
 ```
 
