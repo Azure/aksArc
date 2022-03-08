@@ -237,10 +237,8 @@ az account set -s $subscription
 
 ### Create Arc Appliance
 ```
-$workingDir = "V:\AKS-HCI\WorkingDir"
 $configFilePath= $workingDir + "\hci-appliance.yaml"
 $arcAppName="pocArcApp"
-$resourceGroup = "akshcinodepoolsbugbash"
 ```
 ```
 az arcappliance validate hci --config-file $configFilePath
