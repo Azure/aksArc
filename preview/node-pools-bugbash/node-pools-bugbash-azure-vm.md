@@ -1,8 +1,5 @@
-# Running the demo
->> NOTE: The instructions are a mixture of PS and AZ CLI commands, you run all of these from a PS ISE such as PS ISE in Windows or VS Code. They are split between PS and CLI because the InfraAdmin will be the individual who sets up the infra layers (server, connection to Azure and dependent componets). The end user (e.g. dev) will then use AZ CLI to create AKS clusters on HCI via Azure.
-
 # Register for the preview!
-You will need to register your interest to get access to the docs and have your subscription enabled for this private preview, please register [here (https://aka.ms/arcAksHciPriPreview).
+You will need to register your interest to have your subscription enabled for this private preview, please register here at (https://aka.ms/arcAksHciPriPreview).
 
 ## Register for features and providers
 You can run the following commands on your laptop/devbox using Az PS. You can download Az PS [here](https://docs.microsoft.com/powershell/azure/install-az-ps?view=azps-7.3.0)
