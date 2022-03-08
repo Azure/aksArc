@@ -42,8 +42,8 @@ Get-AzResourceProvider -ProviderNamespace Microsoft.HybridConnectivity | Select-
 
 ```PowerShell
 # Adjust any parameters you wish to change
-$rgName = "akshcinodepoolsbugbash"
-$location = "eastus" # To check available locations, run Get-AzureLocation 
+$rgName = "akshci-lifecyclemgmt-preview-azurevm"
+$location = "eastus" # To check available locations, run Get-AzLocation 
 $timeStamp = (Get-Date).ToString("MM-dd-HHmmss")
 $deploymentName = ("AksHciDeploy_" + "$timeStamp")
 $vmName = "AKSHCIHost004"
