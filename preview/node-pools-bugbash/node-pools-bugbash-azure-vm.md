@@ -175,7 +175,7 @@ $tenantId = <Azure tenant>
 $workingDir = "V:\AKS-HCI\WorkingDir"
 $cloudConfigLocation = "V:\AKS-HCI\Config"
 $location = "eastus"
-$resourceGroup = "akshcinodepoolsbugbash"
+$resourceGroup = "akshci-lifecyclemgmt-preview-azurevm"
 
 # create network object
 $vnet = New-AksHciNetworkSetting -Name "vnet-mgmt-setting01" -vippoolstart $mgmtVipPoolStart -vippoolend $mgmtVipPoolEnd -vSwitchName $vSwitch
