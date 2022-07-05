@@ -212,11 +212,9 @@ New-AzRoleAssignment -ObjectId $sp.Id `
 
 # Retrieve the password for the Service Principal
 
-$secret = [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR(
-    [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($sp.Secret)
-)
+$secret = $sp.PasswordCredentials[0].SecretText
 
-Write-Host "Application ID: $($sp.ApplicationId)"
+Write-Host "Application ID: $($sp.AppId)"
 Write-Host "App Secret: $secret"
 ```
 
