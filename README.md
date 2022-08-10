@@ -12,6 +12,7 @@ Do not file issues for AKS, AKS-Engine, Virtual-Kubelet, Azure Container Instanc
 * AKS-HCI Release Notes: https://aka.ms/aks-hci-relnotes
 * AKS-HCI Known Issues: https://aka.ms/aks-hci/issues
 * AKS-HCI Documentaton: https://aka.ms/aks-hci-docs
+* AKS-HCI Customer Voice Community: https://aka.ms/aks-hci-community
 * Meet the product team in Microsoft Teams (click the link to join): https://aka.ms/akshciteams fill in the form and we will add you to the channel ASAP.
 
 # Contributing
