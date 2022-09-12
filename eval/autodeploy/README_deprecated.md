@@ -1,6 +1,12 @@
 AKS on Azure Stack HCI in Azure - Full Auto Edition
 ==============
+# This guide has been deprecated and is not updated anymore. Please uss the official [deployment guide](https://aka.ms/aks-hci/evaluate) instead!! #
 
+
+
+
+
+## -- DO NOT USE -- ##
 Have you already walked through the deployment of AKS on Azure Stack HCI both with PowerShell and Windows Admin Center? If so, and you don't want to walk through those steps again for future deployments...fear not, we have a solution!
 
 The **AKS on Azure Stack HCI in Azure - Full Auto Edition** saves you time, and effort in deploying AKS on Azure Stack HCI in an Azure VM, for evaluation purposes. Simply provide some parameters via the Azure Portal or PowerShell, wait around 45 minutes, and you'll have a complete AKS-HCI infrastructure, including a target cluster, integrated with Azure Arc! BOOM!
