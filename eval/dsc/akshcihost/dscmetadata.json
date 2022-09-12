@@ -1,0 +1,16 @@
+{
+    "Modules": [
+        "StorageDSC",
+        "NetworkingDSC",
+        "ComputerManagementDsc",
+        "xPSDesiredStateConfiguration",
+        "xHyper-v",
+        "xDhcpServer",
+        "xDNSServer",
+        "DnsServerDsc",
+        "cChoco",
+        "DSCR_Shortcut",
+        "xCredSSP",
+        "xActiveDirectory"
+    ]
+}
