@@ -14,6 +14,9 @@ See [Supplemental Terms of Use for Microsoft Azure Previews](https://azure.micro
 
 NVIDIA Software. The software may include components developed and owned by NVIDIA Corporation or its licensors. The use of these components is governed by the NVIDIA end user license agreement located at https://www.nvidia.com/content/DriverDownload-March2009/licence.php?lang=us.
 
+
+Graphical Processing Units (GPU) are used for compute-intensive workloads such as graphics and video rendering in High Performance Computing (HPC), deep learning and more.
+
 ## Known issues and limitations
 
 - VMs with GPU enabled are not added to HA clustering in Windows Server 2019, Windows Server 2002 or Azure Stack HCI. This functionality will be available in a later version of Windows Server and Azure Stack HCI.
@@ -23,13 +26,11 @@ NVIDIA Software. The software may include components developed and owned by NVID
 - If you allocate more worker nodes than available GPUs, this causes a VM leak (the VM appearing in off state). This VM has no impact on the cluster and should be cleaned up by either running remove-akshcicluster or uninstall-akshci. This issue will be resolved in an upcoming release. 
 - On a cluster with 4 GPUs, if you start off with 1 worker node enabled with GPU, then scale up to 4 nodes, the set-akshcinodepool command incorrectly reports that cluster does not have enough resources however, all the worker nodes are properly created.
 
-Graphical Processing Units (GPU) are used for compute-intensive workloads such as graphics and video rendering in High Performance Computing (HPC), deep learning and more.
+Important: The GPU-enabled node pools feature is still in preview and some scenarios are still being actively validated and tested; you might notice some behavior that is different from what is described in this preview document.
 
 ## Before you begin
 
-If you are upgrading from an older preview version that is running GPU-enabled node pools on AKS on Azure Stack HCI or Windows Server, make sure you remove any workload clusters running GPU. In addition, 
-
-Important: The GPU-enabled node pools feature is still in preview and some scenarios are still being actively validated and tested; you might notice some behavior that is different from what is described by the preview documents.
+If you are updating AKS from an older preview version that is running GPU-enabled node pools, make sure you remove all workload clusters running GPU before you begin. 
 
 ### Step 1: Uninstall the Nvidia host driver
 
@@ -91,7 +92,6 @@ OK       Nvidia T4_base - Dismounted               PCI\VEN_10DE&DEV_1EB8&SUBSYS_
 
 ### Step 4: Repeat steps 1 to 3 for each node in your failover cluster.
 
-##  
 
 ## Install or Update AKS on Azure Stack HCI or Windows Server
 
@@ -159,8 +159,6 @@ ProviderID:         moc://gpunodepool-97d9f5667-49lt4
 kube-system         gpu-feature-discovery-gd62h       0 (0%)    0 (0%)   0 (0%)      0 (0%)     7m1s
          nvidia.com/gpu   0     0
 ```
-
-
 
 ## Run a GPU-enabled workload
 
