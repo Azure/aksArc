@@ -19,17 +19,15 @@ NVIDIA Software. The software may include components developed and owned by NVID
 - VMs with GPU enabled are not added to HA clustering in Windows Server 2019, Windows Server 2002 or Azure Stack HCI. This functionality will be available in a later version of Windows Server and Azure Stack HCI.
 - There is a 1:1 mapping of GPU to VM.
 - GPU enabled VMs are not pinned to a specific worker node and will not automatically failover to another physical node. AKS-HCI will recreate the VM on another physical node should the node hosting the current VM go down. This might incur application downtime during this preview if the application is not redundantly setup.
-- Some manual configuration steps are needed to configure the Linux workernodes once the target cluster is set up.
 - GPU-enabled node pools running with `Standard_NK12` have not been thoroughly tested. We recommend using `Standard_NK6` only.
 - If you allocate more worker nodes than available GPUs, this causes a VM leak (the VM appearing in off state). This VM has no impact on the cluster and should be cleaned up by either running remove-akshcicluster or uninstall-akshci. This issue will be resolved in an upcoming release. 
 - On a cluster with 4 GPUs, if you start off with 1 worker node enabled with GPU, then scale up to 4 nodes, the set-akshcinodepool command incorrectly reports that cluster does not have enough resources however, all the worker nodes are properly created.
-- **This preview requires a clean install, upgrading GPU-enabled node pools has not yet been thoroughly tested**
 
 Graphical Processing Units (GPU) are used for compute-intensive workloads such as graphics and video rendering in High Performance Computing (HPC), deep learning and more.
 
 ## Before you begin
 
-This article assumes you do not have an AKS on Azure Stack HCI or Windows Server cluster installed on any physical host machines. If you have an existing AKS cluster, you will need to uninstall to get started.
+If you are upgrading from an older preview version that is running GPU-enabled node pools on AKS on Azure Stack HCI or Windows Server, make sure you remove any workload clusters running GPU. In addition, 
 
 Important: The GPU-enabled node pools feature is still in preview and some scenarios are still being actively validated and tested; you might notice some behavior that is different from what is described by the preview documents.
 
@@ -95,9 +93,9 @@ OK       Nvidia T4_base - Dismounted               PCI\VEN_10DE&DEV_1EB8&SUBSYS_
 
 ##  
 
-## Install AKS on Azure Stack HCI or Windows Server
+## Install or Update AKS on Azure Stack HCI or Windows Server
 
-Visit the AKS quickstart using [PowerShell](https://docs.microsoft.com/en-us/azure-stack/aks-hci/kubernetes-walkthrough-powershell) or using [Windows Admin Center](https://docs.microsoft.com/en-us/azure-stack/aks-hci/setup) to install AKS on Azure Stack HCI or Windows Server.
+Visit the AKS quickstart using [PowerShell](https://docs.microsoft.com/en-us/azure-stack/aks-hci/kubernetes-walkthrough-powershell) or using [Windows Admin Center](https://docs.microsoft.com/en-us/azure-stack/aks-hci/setup) to install or update AKS on Azure Stack HCI or Windows Server.
 
 ## Enable the Preview Channel
 
@@ -105,7 +103,7 @@ Visit the AKS quickstart using [PowerShell](https://docs.microsoft.com/en-us/azu
 PS C:\> Enable-AksHciPreview 
 ```
 
-## Add a GPU-enabled node pool
+## Create a new workload cluster with a GPU-enabled node pool
 
 Create a workload cluster with a GPU node pool. Currently, using GPU-enabled node pools is only available for Linux node pools.
 
@@ -247,53 +245,4 @@ It should just work
 ### What happens if I attempt to create a GPU-enabled node pool or scale a node pool but all physical GPUs are already assigned?
 
 When you create a GPU enabled or scale a GPU enabled node pool but all physical GPUs are already assigned and there are no resources available, you will see an error such as: `Error: The Host does not have enough hardware (GPU) resources to complete the <add|Set>-AksHciNodePool request. Make sure there are enough resources available and try again.` 
-
-Recommendation: <TO DO>
-
-### What happens if I have physical GPUs installed but AKS cluster can't detect the device?
-
-When you create a GPU enabled node pool but there is no physical node in the cluster with an installed GPU, you will see an error such as: `"Error: The Host does not have the required hardware (GPU) available."` 
-
-Follow these steps to troubleshoot this:-
-
-```
-PS C:\> Get-PnpDevice -class Display 
-```
-
-If NVIDIA Tesla T4 does not appear, you need to install the drivers. If the Status of it is "Unknown", run the following commands:
-
-```
-PS C:\> $InstanceId = (Get-PnpDevice -Class Display -FriendlyName "$deviceName")[0].InstanceID
-PS C:\> $InstanceId = $InstanceId.replace("PCI", "PCIP")
-PS C:\> Remove-VMAssignableDevice -InstancePath "$InstanceId" -VM $vm 
-```
-
-Optionally if it's attached to another vm
-
-```
-PS C:\> Mount-VMHostAssignableDevice -InstancePath "$InstanceId"
-PS C:\> $InstanceId = $InstanceId.replace("PCIP", "PCI")
-PS C:\> Enable-PnpDevice -InstanceId "$InstanceId" -Confirm:$false
-```
-
-If the Status of it is "Error", try:
-
-```
-PS C:\> $InstanceId = (Get-PnpDevice -Class Display -FriendlyName "$deviceName")[0].InstanceID
-PS C:\> Enable-PnpDevice -InstanceId "$InstanceId" -Confirm:$false 
-```
-
-If it doesn't solve the issue, try:
-
-```
-PS C:\> $InstanceId= (Get-PnpDevice -Class Display -FriendlyName "$deviceName")[0].InstanceID
-PS C:\> Disable-PnpDevice -InstanceId "$InstanceId" -Confirm:$false
-PS C:\> Dismount-VMHostAssignableDevice -force -InstancePath "$InstanceId" -Confirm:$false
-PS C:\> $InstanceId = $InstanceId.replace("PCI", "PCIP")
-PS C:\> Mount-VMHostAssignableDevice -InstancePath "$InstanceId"
-PS C:\> $InstanceId = $InstanceId.replace("PCIP", "PCI")
-PS C:\> Enable-PnpDevice -InstanceId "$InstanceId" -Confirm:$false 
-```
-
-If it doesn't solve the issue, go into Device Manager, look into Display adapters node and try to repair the device. If it doesn't solve the issue, reinstall the driver and/or restart the machine. If none of the above solves the issue contact Microsoft support.
 
