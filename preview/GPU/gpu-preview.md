@@ -1,6 +1,6 @@
 # Use GPUs for compute-intensive workloads on Azure Kubernetes Service (AKS) on Azure Stack HCI and Windows Server
 
-© 2021 Microsoft Corporation. All rights reserved. Any use or distribution of these materials without express authorization of Microsoft Corp. is strictly prohibited.
+© 2022 Microsoft Corporation. All rights reserved. Any use or distribution of these materials without express authorization of Microsoft Corp. is strictly prohibited.
 
 ## Disclaimer
 
@@ -34,7 +34,15 @@ If you are updating AKS from an older preview version that is running GPU-enable
 
 ### Step 1: Uninstall the Nvidia host driver
 
-On each host machine, navigate to the Control Panel > Add or Remove programs and uninstall the NVIDIA host driver, then reboot the machine. After the machine reboots, confirm that the driver has been successfully uninstalled. Open an elevated PowerShell terminal and run the following command. 
+On each host machine, run the following command to uninstall the NVIDIA host driver, then reboot the machine:
+
+```
+PS C:\> "C:\Windows\SysWOW64\RunDll32.EXE" "C:\Program Files\NVIDIA Corporation\Installer2\InstallerCore\NVI2.DLL",UninstallPackage Display.Driver
+```
+
+On Windows Server host machines, you can navigate to the Control Panel > Add or Remove programs and uninstall the NVIDIA host driver, then reboot the machine. 
+
+After the host machine reboots, confirm that the driver has been successfully uninstalled. Open an elevated PowerShell terminal and run the following command. 
 
 ```
 PS C:\> Get-PnpDevice  | select status, class, friendlyname, instanceid | findstr /i /c:"3d video" 
@@ -137,7 +145,7 @@ moc-li87udi8l9s  Ready   <none>                3m5s  v1.22.6
  Now use the [kubectl describe node](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#describe) command to confirm that the GPUs are schedulable. Under the *Capacity* section, the GPU should list as `nvidia.com/gpu: 1`.
 
 ```powershell
-kubectl describe <node> | findstr "gpu" 
+kubectl describe node <nodename> | findstr "gpu"
 ```
 
 The output should display the GPU(s) from the worker node and look something like this
@@ -238,9 +246,11 @@ If an upgrade is triggered on a cluster without extra GPU resources to facilitat
 
 ### What should I do if a physical host machine running a GPU-enabled node pool reboots?
 
-It should just work
+Once the host machine has rebooted, your AKS cluster should recover seamlessly.
 
 ### What happens if I attempt to create a GPU-enabled node pool or scale a node pool but all physical GPUs are already assigned?
 
 When you create a GPU enabled or scale a GPU enabled node pool but all physical GPUs are already assigned and there are no resources available, you will see an error such as: `Error: The Host does not have enough hardware (GPU) resources to complete the <add|Set>-AksHciNodePool request. Make sure there are enough resources available and try again.` 
+
+To resolve this, make sure you have available GPUs before scaling the node pool.
 
