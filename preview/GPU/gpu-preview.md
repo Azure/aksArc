@@ -78,7 +78,7 @@ Unknown       3D Video Controller               PCI\VEN_10DE&DEV_1EB8&SUBSYS_12A
 
 ### Step 3: Install the NVIDIA mitigation driver 
 
-Visit the [NVIDIA data center documentation](https://docs.nvidia.com/datacenter/tesla/gpu-passthrough/nvidia_azure_stack_inf_v2022.02.01_public.zip) to download the NVIDIA mitigation driver. After downloading the driver, expand the archive and follow these steps to install the mitigation driver on each host machine. 
+Visit the [NVIDIA data center documentation](https://docs.nvidia.com/datacenter/tesla/gpu-passthrough/) to download the NVIDIA mitigation driver. After downloading the driver, expand the archive and follow these steps to install the mitigation driver on each host machine. 
 
 To install the mitigation driver, navigate to the folder containing the extracted files, right click on `nvidia_azure_stack_T4_base.inf` and select Install. Check that you have the correct driver; AKS currently supports only the NVIDIA Tesla T4 GPU. 
 
