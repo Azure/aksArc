@@ -1,4 +1,4 @@
-# Welcome to the Azure Kubernetes Service on AKS hybrid repo
+# Welcome to the AKS hybrid deployment options repo
 
 As you can tell we have changed our name from AKS-HCI to AKS hybrid this allows us to encompass all of the AKS hybrid deployment options we support. Check out the [Ignite 2022 blog\(https://aka.ms/aks-hybrid-blog22) for details.
 This is where the AKS hybrid team will track features and issues with AKS hybrid. We will monitor this repo in order to engage with our community and discuss questions, customer scenarios, or feature requests.
