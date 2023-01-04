@@ -16,11 +16,11 @@ We want to hear from you! Fill in this [anonymous survey](https://aka.ms/AKSHCIP
 |-----|-----|
 |Evaluation Guide|https://aka.ms/aks-hybrid-evaluate|
 |Roadmap|https://aka.ms/aks-hybrid-roadmap|
-|Release Notes|https://aka.ms/aks-hybrid-relnotes|
-|Known Issues|https://aka.ms/aks-hci/issues|
+|Release Notes|https://aka.ms/AKS-hybrid-Releasenotes|
+|Known Issues|https://aka.ms/AKS-hybrid-issues|
 |Documentaton|https://aka.ms/aks-hybrid-docs|
 |Customer Voice Community|https://aka.ms/aks-hybrid-community|
-|Meet the product team in Microsoft Teams<br>Fill in the form and we will add you to the channel ASAP.|https://aka.ms/akshciteams 
+|Meet the product team in Microsoft Teams<br>Fill in the form and we will add you to the channel ASAP.|https://aka.ms/aks-hybrid-teams|
 
 # Contributing
 
