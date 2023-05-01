@@ -1,1 +1,1 @@
-Please note: the article "Use GPUs for compute-intensive workloads on AKS hybrid" has been moved to the Microsoft Learn platform. The new location is: https://learn.microsoft.com/en-us/azure/aks/hybrid/deploy-gpu-node-pool.
+The article "Use GPUs for compute-intensive workloads on AKS hybrid" has been moved to the Microsoft Learn platform. The new location is: https://learn.microsoft.com/en-us/azure/aks/hybrid/deploy-gpu-node-pool.
