@@ -7,10 +7,6 @@ install:
   - ps: . .\AppVeyor\AppVeyorInstall.ps1
 
 environment:
-  nugetKey:
-    secure: hwpi8ydkuOj0J22HAalIy+mRq4kxDKH7EjtCqwQ5V96svUwfostPY00EIp2HtNhZ
-  github_access_token:
-    secure: Xk7jTkdE82qskQy9WPZK0zSafSjT6gK1SYxH8m4Aa8muCMQ4ACkkztJ3toh9DFlS
   ModuleName: cChoco
 #---------------------------------#
 #      build configuration        #
