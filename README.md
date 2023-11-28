@@ -1,8 +1,14 @@
-# Welcome to the AKS hybrid deployment options repo
+# Welcome to the AKS repo
 
 ## What's new
-We have changed our name from AKS-HCI to AKS hybrid this allows us to encompass all of the AKS hybrid deployment options we support. Check out the [Ignite 2022 blog\(https://aka.ms/aks-hybrid-blog22) for details.
-This is where the AKS hybrid team will track features and issues with AKS hybrid. We will monitor this repo in order to engage with our community and discuss questions, customer scenarios, or feature requests.
+We are now part of the Azure adaptive cloud and are now part of the AKS family. To reflect this huge move we have sim;lified the product name from "AKS hybrid deployment options" to AKS. 
+When needed we will suffix AKS with a platform name i.e. AKS for Azure Stack HCI or AKS for Windows Server, in general though we are simply AKS which you can deploy on your own infrastructure and manage through the cloud using Azure Arc. 
+**Why is the repo then named aksArc?**
+There is already an AKS repo and merging into that will be one of our next steps we want to make.
+
+To learn more about the Azure adaptive cloud check out this [blog post](https://azure.microsoft.com/blog/advancing-hybrid-cloud-to-adaptive-cloud-with-azure/).
+
+This repo is where the AKS team tracks features and issues with you encounter with AKS on your infrastructure. We are monitoring this repo and triage new issues regularly.
 
 ## Overview
 
