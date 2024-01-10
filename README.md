@@ -19,7 +19,7 @@ All AKS versions Microsoft ships for edge or datacenter deployment are part of t
 * [AKS on Azure Stack Hub](https://learn.microsoft.com/azure-stack/user/azure-stack-kubernetes-aks-engine-overview)
 * [AKS on IoT (AKS Edge Essentials)](https://learn.microsoft.com/en-us/azure/aks/hybrid/aks-edge-overview)
 * [AKS hybrid cluster provisioning from Azure (Public Preview)](https://learn.microsoft.com/en-us/azure/aks/hybrid/aks-hybrid-preview-overview)
-  * This is the Arc Resource Bridge based implementation which allows you to provision AKS hybrid clusters on premise. Thes clustes are always Arc enabled and managed entirely from the cloud like a cloud based AKS cluster would be. 
+  * This is the Arc Resource Bridge based implementation which allows you to provision AKS hybrid clusters on premise. The clusters are always Arc enabled and managed entirely from the cloud like a cloud based AKS cluster would be. 
 
 ## What you will find here
 This repository is a central place for tracking features and issues with AKS. This repository is monitored by the product team in order to engage with our community and discuss questions, customer scenarios, or feature requests.
