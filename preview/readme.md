@@ -17,14 +17,8 @@ With [AKS enabled by Azure Arc, on Azure Stack HCI 23H2](https://learn.microsoft
 
 ### Steps to delete existing clusters and recreate
 
-1. Delete the nodepools
-    ```
-    az hybridaks nodepool delete --name $aksNodepoolName --resource-group $resource_group --cluster-name $aksClusterName
-    ```
-2. Delete the cluster
-    ```
-    az hybridaks delete --resource-group $resource_group --name $aksClusterName
-    ```
-3. Follow the instructions to recreate the cluster
+1. Follow the instructions to delete existing preview cluster
+    * [Uninstall the AKS cluster provisioning preview](https://learn.microsoft.com/azure/aks/hybrid/aks-hybrid-preview-uninstall)
+2. Follow the instructions to create new cluster
     * [Using CLI](https://learn.microsoft.com/azure/aks/hybrid/aks-create-clusters-cli)
     * [Using Azure Portal](https://learn.microsoft.com/en-us/azure/aks/hybrid/aks-create-clusters-portal)
