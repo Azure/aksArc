@@ -17,7 +17,7 @@ All AKS versions Microsoft ships for edge or datacenter deployment are part of t
 
 ## Related AKS products
 
-* [AKS on Azure Stack Hub](https://learn.microsoft.com/azure-stack/user/azure-stack-kubernetes-aks-engine-overview)
+* [AKS on Azure Stack Hub](https://learn.microsoft.com/azure-stack/user/azure-stack-kubernetes-aks-engine-overview). Please use [github.com/Azure/aks-engine-azurestack](https://github.com/Azure/aks-engine-azurestack) for this product.
 
 ## What you will find here
 
@@ -29,8 +29,6 @@ Support through issues on this repository is provided on a best-effort basis for
 [Azure Support options][1] and [AKS Support Policies][2].
 
 Do not file issues for AKS-Engine, Virtual-Kubelet, Azure Container Instances, or services on this repository unless it is related to that feature/service and functionality with AKS. For other tools, products and services see the Upstream Azure Compute projects page.
-
-We want to hear from you! Respond to this short and [anonymous survey](https://aka.ms/AKSHCIPreviewSurvey) to share your thoughts with us.
 
 ## Important AKS Arc links
 
