@@ -328,6 +328,7 @@
         "publicIpAddressSku": "Basic",
         "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
         "subnetRef": "[concat(variables('vnetId'), '/subnets/', variables('subnetName'))]",
+        "networkSecurityGroupRef": "[resourceId(Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]",
         "vmSkuGen1": "[if(equals(parameters('virtualMachineOS'), 'Windows Server 2022'), '2022-datacenter', '2019-datacenter')]",
         "vmSkuGen2": "[if(equals(parameters('virtualMachineOS'), 'Windows Server 2022'), '2022-datacenter-g2', '2019-datacenter-gensecond')]"
     },
@@ -372,6 +373,9 @@
                     },
                     "location": {
                         "value": "[resourceGroup().location]"
+                    },
+                    "networkSecurityGroup": {
+                        "value": "[variables('networkSecurityGroupRef')]"
                     }
                 }
             }
@@ -609,6 +613,9 @@
                     },
                     "location": {
                         "value": "[resourceGroup().location]"
+                    },
+                    "networkSecurityGroup": {
+                        "value": "[variables('networkSecurityGroupRef')]"
                     }
                 }
             }
