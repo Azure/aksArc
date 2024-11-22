@@ -32,9 +32,14 @@ Do not file issues for AKS-Engine, Virtual-Kubelet, Azure Container Instances, o
 
 ## Important AKS Arc links
 
+* Roadmaps
+  * [AKS Arc Product Roadmap](https://github.com/orgs/Azure/projects/751/views/4)
+  * [AKS Arc Feature Roadmap](https://github.com/orgs/Azure/projects/397/views/1)
+* Release Notes
+  * [AKS on Azure Local, version 23H2](https://learn.microsoft.com/en-us/azure/aks/hybrid/aks-whats-new-23h2#features-and-improvements)
+  * [AKS on Windows Server/Azure Local, version 22H2](https://github.com/Azure/aksArc/releases)
+  * [AKS Edge Essentials](https://github.com/Azure/AKS-Edge/releases)
 * [Evaluate using Jumpstart](https://arcjumpstart.com/azure_jumpstart_hcibox)
-* [AKS Arc Roadmap](https://github.com/orgs/Azure/projects/397/views/1)
-* [Release Notes](https://github.com/Azure/aksArc/releases)
 * [Known Issues](https://github.com/Azure/aksArc/issues)
 
 ## Bug Reports <a name="bugs"></a>
