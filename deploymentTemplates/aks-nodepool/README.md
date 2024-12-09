@@ -1,6 +1,6 @@
 # Provisioned cluster ARM template
 
-Deploys a provisioned cluster with workload identity federation enabled and OIDC issuer URL enabled on ASZ environment.
+This template is to deploy node pool on an existing kubernetes cluster. The template requires an existing AKS Arc cluster.
 
 ```CLI
 az deployment group create -g $resourceGroup -n sstest02 --template-file template.json --parameters `@parameters.json
