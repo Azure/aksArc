@@ -1,6 +1,6 @@
-# ARM template to deploy an AKS Arc node pool
+# ARM template to deploy/update an AKS Arc node pool
 
-This template is to deploy node pool on an existing AKS Arc cluster. 
+This template is to deploy a new node pool on an existing AKS Arc cluster or can be used to update an existing nodepool. 
 
 ## Prerequisites
 
