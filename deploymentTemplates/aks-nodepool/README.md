@@ -14,4 +14,4 @@ You can use the following command to deploy the template
 az deployment group create -g $resourceGroup -n cluster01 --template-file azuredeploy.json --parameters azuredeploy.parameters.json
 ```
 > [NOTE]
-> _cluster01_ is an existing ASK Arc cluster in the resource group.
+> _cluster01_ is an existing AKS Arc cluster in the resource group.
