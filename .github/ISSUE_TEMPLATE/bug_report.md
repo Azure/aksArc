@@ -4,8 +4,10 @@ about: Create a report to help us improve
 title: "[BUG] Please type a title"
 labels: bug
 assignees: ''
-project: Azure/aks-hci/1
+project: Azure/aksArc/1
 ---
+
+Before creating a new issue, check the [existing trouble shooting guides](https://learn.microsoft.com/en-us/azure/aks/aksarc/aks-troubleshoot) to see if there is an existing guide for the issue you are encountering.
 
 **Describe the bug**
 A clear and concise description of what the bug is.
@@ -27,7 +29,7 @@ If applicable, add screenshots to help explain your problem.
 - OS: [e.g. iOS]
 - Browser [e.g. chrome, safari]
 - Version [e.g. 22]
-- AKS-HCI Version (i.e. Public Preview October-2020)
+- AKS on Azure Local Version (i.e. 2402)
 - Kubernetes Version (i.e. 1.18.8)
 
 **Additional context**
@@ -35,6 +37,5 @@ Add any other context about the problem here.
 
 
 **Collect log files**
-- From a PowerShell Admin window run **Get-AksHciLogs**
-- If you are running into issues with the deployment wizard in Windows Admin Center, run 
-**Get-SMEUILogs.ps1** from the machine hosting Windows Admin Center.”
+- Run **Get-ArcHciLogs**. If you are running into issues collecting logs, refer to the [troubleshooting documentation](https://learn.microsoft.com/en-us/azure/aks/aksarc/get-on-demand-logs).
+
