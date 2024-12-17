@@ -1,0 +1,81 @@
+kind: ConfigMap
+apiVersion: v1
+data:
+  prometheus-config: |-
+    global:
+      scrape_interval: 30s
+      scrape_timeout: 10s
+      evaluation_interval: 30s
+    scrape_configs:
+      # ==== ETCD ==== 
+      - job_name: 'etcd'
+        metrics_path: /metrics
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        dns_sd_configs:
+          - names:
+            - '_http-metrics._tcp.etcd-metrics-proxy.kube-system.svc.cluster.local'
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        metric_relabel_configs:
+        # keep the minimal ingestion metrics.
+          - source_labels: [ __name__ ]
+            action: keep
+            regex: "etcd_server_has_leader|rest_client_requests_total|etcd_mvcc_db_total_size_in_bytes|etcd_mvcc_db_total_size_in_use_in_bytes|etcd_server_slow_read_indexes_total|etcd_server_slow_apply_total|etcd_network_client_grpc_sent_bytes_total|etcd_server_heartbeat_send_failures_total"
+      # ==== CONTROLLER MANAGER ==== 
+      - job_name: 'controller-manager'
+        metrics_path: /metrics
+        scheme: https
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              names:
+                - kube-system
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_label_component,__meta_kubernetes_pod_label_tier]
+            action: keep
+            regex: kube-controller-manager;control-plane
+          - source_labels: [__address__]
+            action: replace
+            regex: (.+?)
+            replacement: "$1:10257"
+            target_label: __address__
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+          insecure_skip_verify: true
+        metric_relabel_configs:
+        # keep the minimal ingestion metrics.
+          - source_labels: [ __name__ ]
+            action: keep
+            regex: "rest_client_request_duration_seconds|rest_client_requests_total|workqueue_depth"
+      # ==== KUBE SCHEDULER ==== 
+      - job_name: kube-scheduler
+        metrics_path: /metrics
+        scheme: https
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              names:
+                - kube-system
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+          insecure_skip_verify: true
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_label_component,__meta_kubernetes_pod_label_tier]
+            action: keep
+            regex: kube-scheduler;control-plane
+          - source_labels: [__address__]
+            action: replace
+            regex: (.+?)
+            replacement: "$1:10259"
+            target_label: __address__
+        metric_relabel_configs:
+        # keep the minimal ingestion metrics.
+          - source_labels: [ __name__ ]
+            action: keep
+            regex: "scheduler_pending_pods|scheduler_unschedulable_pods|scheduler_pod_scheduling_attempts|scheduler_queue_incoming_pods_total|scheduler_preemption_attempts_total|scheduler_preemption_victims|scheduler_scheduling_attempt_duration_seconds|scheduler_schedule_attempts_total|scheduler_pod_scheduling_duration_seconds"
+metadata:
+  name: ama-metrics-prometheus-config
+  namespace: kube-system

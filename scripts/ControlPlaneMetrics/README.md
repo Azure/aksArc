@@ -1,0 +1,2 @@
+## Overview
+This folder contains two sample scripts to enable control plane metrics for AKS on Azure Local 23H2. The sample files are created based on [instructions](https://learn.microsoft.com/en-us/azure/azure-monitor/containers/prometheus-metrics-scrape-configuration?tabs=CRDConfig%2CCRDScrapeConfig%2CConfigFileScrapeConfigBasicAuth%2CConfigFileScrapeConfigTLSAuth) for customized scraping Prometheus Metrics in Azure Managed Prometheus.
