@@ -1,6 +1,6 @@
 # Welcome to the AKS enabled by Arc repo
 
-Azure Kubernetes Service (AKS) enabled by Azure Arc is a managed Kubernetes service that you can use to deploy and manage containerized applications on-premises, in datacenters, or at edge locations such as retail stores or manufacturing plants. See [What is AKS enabled by Arc?](https://learn.microsoft.com/azure/aks/hybrid/aks-overview) for more information.
+Azure Kubernetes Service (AKS) enabled by Azure Arc is a managed Kubernetes service that you can use to deploy and manage containerized applications on-premises, in datacenters, or at edge locations such as retail stores or manufacturing plants. See [What is AKS enabled by Arc?](https://learn.microsoft.com/azure/aks/aksarc/aks-overview) for more information.
 
 To learn more about the Azure adaptive cloud check out this [blog post](https://azure.microsoft.com/blog/advancing-hybrid-cloud-to-adaptive-cloud-with-azure/).
 
@@ -10,10 +10,10 @@ This repo is where the AKS team tracks features and issues with you encounter wi
 
 All AKS versions Microsoft ships for edge or datacenter deployment are part of the "AKS" family, this includes:
 
-* **[AKS on Azure Local, version 23H2](https://learn.microsoft.com/azure/aks/hybrid/aks-whats-new-23h2)**: AKS on Azure Local, version 23H2 uses Azure Arc to create new Kubernetes clusters on Azure Local directly from Azure. It enables you to use familiar tools like the Azure portal and Azure Resource Manager templates to create and manage your Kubernetes clusters running on Azure Local.
-* **[AKS Edge Essentials](https://learn.microsoft.com/azure/aks/hybrid/aks-edge-overview)**: AKS Edge Essentials includes a lightweight Kubernetes distribution with a small footprint and simple installation experience, making it easy for you to deploy Kubernetes on PC-class or "light" edge hardware. Please use [github.com/Azure/aksedge](https://github.com/Azure/AKS-Edge) for AKS EE requests.
-* **[AKS on Windows Server/Azure Local, version 22H2](https://learn.microsoft.com/azure/aks/hybrid/overview)**: Azure Kubernetes Service on Windows Server (and on Azure Local, version 22H2) is an on-premises Kubernetes implementation of AKS that automates running containerized applications at scale, using Windows PowerShell and Windows Admin Center. It simplifies deployment and management of AKS on Windows Server 2019/2022 Datacenter and Azure Local, version 22H2.
-* **[AKS on VMWare (preview)](https://learn.microsoft.com/azure/aks/hybrid/aks-vmware-overview)**: AKS on VMware (preview) enables you to use Azure Arc to create new Kubernetes clusters on VMware vSphere. With AKS on VMware, you can manage your AKS clusters running on VMware vSphere using familiar tools like Azure CLI.
+* **[AKS on Azure Local, version 23H2](https://learn.microsoft.com/azure/aks/aksarc/aks-whats-new-23h2)**: AKS on Azure Local, version 23H2 uses Azure Arc to create new Kubernetes clusters on Azure Local directly from Azure. It enables you to use familiar tools like the Azure portal and Azure Resource Manager templates to create and manage your Kubernetes clusters running on Azure Local.
+* **[AKS Edge Essentials](https://learn.microsoft.com/azure/aks/aksarc/aks-edge-overview)**: AKS Edge Essentials includes a lightweight Kubernetes distribution with a small footprint and simple installation experience, making it easy for you to deploy Kubernetes on PC-class or "light" edge hardware. Please use [github.com/Azure/aksedge](https://github.com/Azure/AKS-Edge) for AKS EE requests.
+* **[AKS on Windows Server/Azure Local, version 22H2](https://learn.microsoft.com/azure/aks/aksarc/overview)**: Azure Kubernetes Service on Windows Server (and on Azure Local, version 22H2) is an on-premises Kubernetes implementation of AKS that automates running containerized applications at scale, using Windows PowerShell and Windows Admin Center. It simplifies deployment and management of AKS on Windows Server 2019/2022 Datacenter and Azure Local, version 22H2.
+* **[AKS on VMWare (preview)](https://learn.microsoft.com/azure/aks/aksarc/aks-vmware-overview)**: AKS on VMware (preview) enables you to use Azure Arc to create new Kubernetes clusters on VMware vSphere. With AKS on VMware, you can manage your AKS clusters running on VMware vSphere using familiar tools like Azure CLI.
 
 ## Related AKS products
 
@@ -36,7 +36,7 @@ Do not file issues for AKS-Engine, Virtual-Kubelet, Azure Container Instances, o
   * [AKS Arc Product Roadmap](https://github.com/orgs/Azure/projects/751/views/4)
   * [AKS Arc Feature Roadmap](https://github.com/orgs/Azure/projects/397/views/1)
 * Release Notes
-  * [AKS on Azure Local, version 23H2](https://learn.microsoft.com/en-us/azure/aks/hybrid/aks-whats-new-23h2#features-and-improvements)
+  * [AKS on Azure Local, version 23H2](https://learn.microsoft.com/en-us/azure/aks/aksarc/aks-whats-new-23h2#features-and-improvements)
   * [AKS on Windows Server/Azure Local, version 22H2](https://github.com/Azure/aksArc/releases)
   * [AKS Edge Essentials](https://github.com/Azure/AKS-Edge/releases)
 * [Evaluate using Jumpstart](https://arcjumpstart.com/azure_jumpstart_hcibox)
@@ -69,7 +69,7 @@ this repository must:
      * This includes YAML files/deployments, scripts to reproduce, exact commands used, screenshots, etc.
 
 [1]: https://azure.microsoft.com/support/options/
-[2]: https://learn.microsoft.com/azure/aks/hybrid/support-policies
+[2]: https://learn.microsoft.com/azure/aks/aksarc/support-policies
 
 ## Contributing
 
