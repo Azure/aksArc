@@ -2,13 +2,13 @@
 param ClusterName string
 param location string = 'eastus'
 
-// Default to 1 node CP
-@description('The name of AKS Arc cluster control plane IP, provide this parameter during deployment')
-param aksControlPlaneIP string
+// Default to 1 node control plane, aksControlPlaneIP is optional
+@description('The settings for cluster control plane, provide the parameters during deployment')
 param aksControlPlaneNodeSize string = 'Standard_A4_v2'
 param aksControlPlaneNodeCount int = 1
+param aksControlPlaneIP string = ''
 
-// Default to 1 node NP
+// Default to 1 node node pool
 param aksNodePoolName string = 'nodepool1'
 param aksNodePoolNodeSize string = 'Standard_A4_v2'
 param aksNodePoolNodeCount int = 1
