@@ -1,8 +1,8 @@
 param azureLocation string
-param azureResourceGroupName string
-param customLocationName string
+param customLocationResourceID string
 
 // Logical network
+param logicalNetworkName string
 param dnsServers array
 param addressPrefix string
 param vmSwitchName string
@@ -10,7 +10,7 @@ param ipAllocationMethod string
 param vlan int
 param vipPoolStart string
 param vipPoolEnd string
-param gateway string
+param nextHopIpAddress string
 
 // Provisioned cluster
 param connectedClusterName string
@@ -30,26 +30,19 @@ param nodePoolTaint string
 param netWorkProfilNetworkPolicy string
 param networkProfileLoadBalancerCount int
 
-// The custom location needs to exist already.
-// You can look up a bicep template for custom location if you wish to create one.
-resource customLocation 'Microsoft.ExtendedLocation/customLocations@2021-08-31-preview' existing = {
-  name: customLocationName
-  scope: resourceGroup(azureResourceGroupName)
-}
-
 // You can replace the creation code with the below commented-out code to reference an existing logical network.
-// resource logicalNetwork 'Microsoft.AzureStackHCI/logicalNetworks@2023-09-01-preview' existing = {
+// resource logicalNetwork 'Microsoft.AzureStackHCI/logicalNetworks@2024-01-01' existing = {
 //   name: 'bicepLogicalNetwork'
 //   scope: resourceGroup(azureResourceGroupName)
 // }
 
-resource logicalNetwork 'Microsoft.AzureStackHCI/logicalNetworks@2024-08-01-preview' = {
+resource logicalNetwork 'Microsoft.AzureStackHCI/logicalNetworks@2024-01-01' = {
   extendedLocation: {
     type: 'CustomLocation'
-    name: customLocation.id
+    name: customLocationResourceID
   }
   location: azureLocation
-  name: 'bicepLogicalNetwork'
+  name: logicalNetworkName
   properties: {
     dhcpOptions: {
       dnsServers: dnsServers
@@ -76,7 +69,7 @@ resource logicalNetwork 'Microsoft.AzureStackHCI/logicalNetworks@2024-08-01-prev
                   name: 'defaultRoute'
                   properties: {
                     addressPrefix: '0.0.0.0/0'
-                    nextHopIpAddress: gateway
+                    nextHopIpAddress: nextHopIpAddress
                   }
                 }
               ]
@@ -114,7 +107,7 @@ resource provisionedClusterInstance 'Microsoft.HybridContainerService/provisione
   scope: connectedCluster
   extendedLocation: {
     type: 'CustomLocation'
-    name: customLocation.id
+    name: customLocationResourceID
   }
   properties: {
     kubernetesVersion: kubernetesVersion

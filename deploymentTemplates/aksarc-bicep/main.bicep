@@ -3,10 +3,10 @@ targetScope='subscription'
 
 param azureLocation string
 param deploymentResourceGroupName string
-param azureResourceGroupName string
-param customLocationName string
+param customLocationResourceID string
 
 // Logical network
+param logicalNetworkName string
 param addressPrefix string
 param dnsServers array
 param vmSwitchName string
@@ -14,7 +14,7 @@ param ipAllocationMethod string
 param vlan int
 param vipPoolStart string
 param vipPoolEnd string
-param gateway string
+param nextHopIpAddress string
 
 // Provisioned cluster
 param connectedClusterName string
@@ -39,7 +39,7 @@ resource deploymentResourceGroup'Microsoft.Resources/resourceGroups@2024-03-01' 
 }
 
 module aksarcModule 'aksarc.bicep' = {
-  name: 'bicepDeploymentRG'
+  name: '${deployment().name}-aksarc'
   scope: resourceGroup(deploymentResourceGroupName)
   params:{
     kubernetesVersion: kubernetesVersion
@@ -57,8 +57,7 @@ module aksarcModule 'aksarc.bicep' = {
     sshPublicKey: sshPublicKey
     nodePoolOSType: nodePoolOSType
     nodePoolCount: nodePoolCount
-    customLocationName: customLocationName
-    azureResourceGroupName: azureResourceGroupName
+    customLocationResourceID: customLocationResourceID
     azureLocation: azureLocation
     addressPrefix: addressPrefix
     dnsServers: dnsServers
@@ -67,7 +66,8 @@ module aksarcModule 'aksarc.bicep' = {
     vmSwitchName: vmSwitchName
     vipPoolStart: vipPoolStart
     vipPoolEnd: vipPoolEnd
-    gateway: gateway
+    nextHopIpAddress: nextHopIpAddress
+    logicalNetworkName: logicalNetworkName
   }
   dependsOn: [
     deploymentResourceGroup
