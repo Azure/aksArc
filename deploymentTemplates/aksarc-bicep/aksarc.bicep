@@ -10,7 +10,7 @@ param ipAllocationMethod string
 param vlan int
 param vipPoolStart string
 param vipPoolEnd string
-param gateway string
+param nextHopIpAddress string
 
 // Provisioned cluster
 param connectedClusterName string
@@ -76,7 +76,7 @@ resource logicalNetwork 'Microsoft.AzureStackHCI/logicalNetworks@2024-01-01' = {
                   name: 'defaultRoute'
                   properties: {
                     addressPrefix: '0.0.0.0/0'
-                    nextHopIpAddress: gateway
+                    nextHopIpAddress: nextHopIpAddress
                   }
                 }
               ]
