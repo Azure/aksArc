@@ -14,7 +14,7 @@ param ipAllocationMethod string
 param vlan int
 param vipPoolStart string
 param vipPoolEnd string
-param gateway string
+param nextHopIpAddress string
 
 // Provisioned cluster
 param connectedClusterName string
@@ -67,7 +67,7 @@ module aksarcModule 'aksarc.bicep' = {
     vmSwitchName: vmSwitchName
     vipPoolStart: vipPoolStart
     vipPoolEnd: vipPoolEnd
-    gateway: gateway
+    nextHopIpAddress: nextHopIpAddress
   }
   dependsOn: [
     deploymentResourceGroup

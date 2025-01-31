@@ -2,9 +2,9 @@ using 'main.bicep'
 
 param azureLocation = 'eastus' // TODO: add your Azure location.
 param deploymentResourceGroupName = '<TODO>' // The resource group where bicep template deploys to.
-// The resource group where azure local custom location already exists.
-// You can also have your logical network in that resource group, but the template will have to be updated to refer to
-// that existing logical network since currently it creates a new one.
+// This is the resource group where azure local custom location already exists.
+// You can also have your logical network in this resource group, but the template will have to be updated to refer to
+// that existing logical network since currently it creates a new one in the deployment resource group.
 param azureResourceGroupName = '<TODO>'
 param customLocationName = '<TODO>'
 
@@ -17,7 +17,7 @@ param vmSwitchName = '<TODO>'
 param ipAllocationMethod = '<TODO>'
 param vipPoolStart = '<TODO>'
 param vipPoolEnd = '<TODO>'
-param gateway = '<TODO>'
+param nextHopIpAddress = '<TODO>'
 param vlan = 0 // TODO: add your vlan.
 
 // Provisioned cluster
