@@ -1,8 +1,8 @@
 param azureLocation string
-param azureResourceGroupName string
-param customLocationName string
+param customLocationResourceID string
 
 // Logical network
+param logicalNetworkName string
 param dnsServers array
 param addressPrefix string
 param vmSwitchName string
@@ -30,13 +30,6 @@ param nodePoolTaint string
 param netWorkProfilNetworkPolicy string
 param networkProfileLoadBalancerCount int
 
-// The custom location needs to exist already.
-// You can look up a bicep template for custom location if you wish to create one.
-resource customLocation 'Microsoft.ExtendedLocation/customLocations@2021-08-15' existing = {
-  name: customLocationName
-  scope: resourceGroup(azureResourceGroupName)
-}
-
 // You can replace the creation code with the below commented-out code to reference an existing logical network.
 // resource logicalNetwork 'Microsoft.AzureStackHCI/logicalNetworks@2024-01-01' existing = {
 //   name: 'bicepLogicalNetwork'
@@ -46,10 +39,10 @@ resource customLocation 'Microsoft.ExtendedLocation/customLocations@2021-08-15' 
 resource logicalNetwork 'Microsoft.AzureStackHCI/logicalNetworks@2024-01-01' = {
   extendedLocation: {
     type: 'CustomLocation'
-    name: customLocation.id
+    name: customLocationResourceID
   }
   location: azureLocation
-  name: 'bicepLogicalNetwork'
+  name: logicalNetworkName
   properties: {
     dhcpOptions: {
       dnsServers: dnsServers
@@ -114,7 +107,7 @@ resource provisionedClusterInstance 'Microsoft.HybridContainerService/provisione
   scope: connectedCluster
   extendedLocation: {
     type: 'CustomLocation'
-    name: customLocation.id
+    name: customLocationResourceID
   }
   properties: {
     kubernetesVersion: kubernetesVersion
