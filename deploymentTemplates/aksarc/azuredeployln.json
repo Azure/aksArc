@@ -1,0 +1,58 @@
+{
+    "type": "Microsoft.AzureStackHCI/logicalNetworks",
+    "apiVersion": "2025-02-01-preview",
+    "name": "string",
+    "extendedLocation": {
+      "name": "string",
+      "type": "string"
+    },
+    "location": "string",
+    "properties": {
+      "dhcpOptions": {
+        "dnsServers": [ "string" ]
+      },
+      "subnets": [
+        {
+          "name": "string",
+          "properties": {
+            "addressPrefix": "string",
+            "addressPrefixes": [ "string" ],
+            "ipAllocationMethod": "string",
+            "ipConfigurationReferences": [
+              {
+                "ID": "string"
+              }
+            ],
+            "ipPools": [
+              {
+                "end": "string",
+                "info": {
+                },
+                "ipPoolType": "string",
+                "name": "string",
+                "start": "string"
+              }
+            ],
+            "networkSecurityGroup": {
+              "id": "string"
+            },
+            "routeTable": {
+              "properties": {
+                "routes": [
+                  {
+                    "name": "string",
+                    "properties": {
+                      "addressPrefix": "string",
+                      "nextHopIpAddress": "string"
+                    }
+                  }
+                ]
+              }
+            },
+            "vlan": "int"
+          }
+        }
+      ],
+      "vmSwitchName": "string"
+    }
+  }
