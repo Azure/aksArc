@@ -108,12 +108,6 @@
                   "description": "The VM size for control plane."
               }
           },
-          "vnetSubnetIds": {
-              "type": "array",
-              "metadata": {
-                  "description": "List of subnet Ids for the AKS cluster."
-              }
-          },
           "podCidr": {
             "type": "string",
             "defaultValue": "10.244.0.0/16",
@@ -133,9 +127,81 @@
             "metadata": {
                   "description": "Fully qualified custom location ARM resource Id."
               }
+          },
+          "lnetNAme": {
+            "type": "string",
+            "metadata": {
+                  "description": "Name of the Logical Network."
+              }
+          },
+          "subnetName": {
+            "type": "string"
+          },
+          "addressPrefix": {
+            "type": "string"
+          },
+          "ipAllocationMethod": {
+            "type": "string"
+          },
+          "vippoolstart": {
+            "type": "string"
+          },
+          "vippoolend": {
+            "type": "string"
+          },
+          "nextHopIpAddress": {
+            "type": "string"
           }
       },
       "resources": [
+        {
+        "type": "Microsoft.AzureStackHCI/logicalNetworks",
+        "apiVersion": "2025-02-01-preview",
+        "name": "[parameters('lnetName')]",
+        "extendedLocation": {
+          "name": "[parameters('customLocation')]",
+          "type": "string"
+        },
+        "location": "[parameters('location')]",
+        "properties": {
+          "dhcpOptions": {
+            "dnsServers": [ "string" ]
+          },
+          "subnets": [
+            {
+              "name": "[parameters('subnetName')]",
+              "properties": {
+                "addressPrefix": "[parameters('addressPrefix')]",
+                "ipAllocationMethod": "[parameters('ipAllocationMethod')]",
+                "ipPools": [
+                  {
+                    "end": "[parameters('vippoolend')]",
+                    "info": {
+                    },
+                    "ipPoolType": "vippool",
+                    "name": "armIPPool",
+                    "start": "[parameters('vippoolstart')]"
+                  }
+                ],
+                "routeTable": {
+                  "properties": {
+                    "routes": [
+                      {
+                        "name": "defaultRoute",
+                        "properties": {
+                          "addressPrefix": "0.0.0.0/0",
+                          "nextHopIpAddress": "[parameters('nextHopIpAddress')]"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ],
+          "vmSwitchName": "string"
+        }
+      },
       {
           "apiVersion": "[parameters('connectedClustersApiVersion')]",
           "type": "Microsoft.Kubernetes/ConnectedClusters",
@@ -168,6 +234,7 @@
           "scope": "[concat('Microsoft.Kubernetes/ConnectedClusters', '/', parameters('provisionedClusterName'))]",
           "dependsOn": [
               "[resourceId('Microsoft.Kubernetes/ConnectedClusters', parameters('provisionedClusterName'))]"
+              "[resourceId('Microsoft.AzureStackHCI/logicalNetworks', parameters('provisionedClusterName'))]"
           ],
           "properties": {
           "agentPoolProfiles": [
@@ -180,7 +247,7 @@
           ],
           "cloudProviderProfile": {
             "infraNetworkProfile": {
-                  "vnetSubnetIds": "[parameters('vnetSubnetIds')]"
+                  "vnetSubnetIds": "[resourceId('Microsoft.AzureStackHCI/logicalNetworks', parameters('provisionedClusterName'))]"
             }
           },
           "controlPlane": {

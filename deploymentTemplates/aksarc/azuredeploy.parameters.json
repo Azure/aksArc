@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "provisionedClusterName": {
-            "value": "TODO: Enter the name of the provisioned cluster"
+            "value": ""
         },
         "location": {
             "value": "eastus"
@@ -11,8 +11,14 @@
         "resourceTags": {
             "value": {}
         },
+        "connectedClustersApiVersion": {
+            "value": ""
+        },
+        "provisionedClustersApiVersion": {
+            "value": ""
+        },
         "sshRSAPublicKey": {
-            "value": "TODO: Enter the SSH RSA public key"
+            "value": "" // TODO: Fill in parameter value
         },
         "enableAHUB": {
             "value": "NotApplicable"
@@ -33,27 +39,16 @@
             "value": 0
         },
         "kubernetesVersion": {
-            "value": ""
+            "value": "" // TODO: Fill in parameter value
         },
-        "provisionedClustersApiVersion":{
-            "value": "2024-01-01"
-        },
-		"connectedClustersApiVersion" : {
-			"value": "2024-07-15-preview"
-		},
         "controlPlaneNodeCount": {
             "value": 1
         },
         "controlPlaneIp": {
-            "value": "100.72.19.162"
+            "value": "<default_value>"
         },
         "controlPlaneVMSize": {
             "value": "Standard_A4_v2"
-        },
-        "vnetSubnetIds": {
-            "value": [
-                "TODO: Enter the ARM ID of the vnet subnet"
-            ]
         },
         "podCidr": {
             "value": "10.244.0.0/16"
@@ -62,7 +57,28 @@
             "value": "calico"
         },
         "customLocation": {
-            "value": "TODO: Enter the custom location ARM ID" 
+            "value": "" // TODO: Fill in parameter value
+        },
+        "lnetNAme": {
+            "value": "" // TODO: Fill in parameter value
+        },
+        "subnetName": {
+            "value": "" // TODO: Fill in parameter value
+        },
+        "addressPrefix": {
+            "value": "" // TODO: Fill in parameter value
+        },
+        "ipAllocationMethod": {
+            "value": "" // TODO: Fill in parameter value
+        },
+        "vippoolstart": {
+            "value": "" // TODO: Fill in parameter value
+        },
+        "vippoolend": {
+            "value": "" // TODO: Fill in parameter value
+        },
+        "nextHopIpAddress": {
+            "value": "" // TODO: Fill in parameter value
         }
     }
 }
