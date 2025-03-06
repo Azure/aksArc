@@ -45,7 +45,7 @@
             "value": 1
         },
         "controlPlaneIp": {
-            "value": "<default_value>"
+            "value": "" // TODO: Fill in parameter value
         },
         "controlPlaneVMSize": {
             "value": "Standard_A4_v2"
@@ -59,10 +59,10 @@
         "customLocation": {
             "value": "" // TODO: Fill in parameter value
         },
-        "lnetNAme": {
+        "lnetName": {
             "value": "" // TODO: Fill in parameter value
         },
-        "subnetName": {
+        "dnsServers": {
             "value": "" // TODO: Fill in parameter value
         },
         "addressPrefix": {

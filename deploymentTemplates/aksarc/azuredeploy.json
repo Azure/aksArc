@@ -96,7 +96,6 @@
           },
           "controlPlaneIp": {
             "type": "string",
-            "defaultValue": "<default_value>",
               "metadata": {
                   "description": "Control plane IP address."
               }
@@ -128,13 +127,13 @@
                   "description": "Fully qualified custom location ARM resource Id."
               }
           },
-          "lnetNAme": {
+          "lnetName": {
             "type": "string",
             "metadata": {
                   "description": "Name of the Logical Network."
               }
           },
-          "subnetName": {
+          "dnsServers": {
             "type": "string"
           },
           "addressPrefix": {
@@ -165,11 +164,11 @@
         "location": "[parameters('location')]",
         "properties": {
           "dhcpOptions": {
-            "dnsServers": [ "string" ]
+            "dnsServers": "[parameters('dnsServers')]"
           },
           "subnets": [
             {
-              "name": "[parameters('subnetName')]",
+              "name": "armSubnet",
               "properties": {
                 "addressPrefix": "[parameters('addressPrefix')]",
                 "ipAllocationMethod": "[parameters('ipAllocationMethod')]",
@@ -233,8 +232,8 @@
           "name": "default",
           "scope": "[concat('Microsoft.Kubernetes/ConnectedClusters', '/', parameters('provisionedClusterName'))]",
           "dependsOn": [
-              "[resourceId('Microsoft.Kubernetes/ConnectedClusters', parameters('provisionedClusterName'))]"
-              "[resourceId('Microsoft.AzureStackHCI/logicalNetworks', parameters('provisionedClusterName'))]"
+              "[resourceId('Microsoft.Kubernetes/ConnectedClusters', parameters('provisionedClusterName'))]",
+              "[resourceId('Microsoft.AzureStackHCI/logicalNetworks', parameters('lnetName'))]"
           ],
           "properties": {
           "agentPoolProfiles": [
@@ -247,7 +246,7 @@
           ],
           "cloudProviderProfile": {
             "infraNetworkProfile": {
-                  "vnetSubnetIds": "[resourceId('Microsoft.AzureStackHCI/logicalNetworks', parameters('provisionedClusterName'))]"
+                  "vnetSubnetIds": "[resourceId('Microsoft.AzureStackHCI/logicalNetworks', parameters('lnetName'))]"
             }
           },
           "controlPlane": {
