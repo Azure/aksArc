@@ -134,7 +134,7 @@
               }
           },
           "dnsServers": {
-            "type": "string"
+            "type": "array"
           },
           "addressPrefix": {
             "type": "string"
@@ -159,7 +159,7 @@
         "name": "[parameters('lnetName')]",
         "extendedLocation": {
           "name": "[parameters('customLocation')]",
-          "type": "string"
+          "type": "CustomLocation"
         },
         "location": "[parameters('location')]",
         "properties": {
@@ -246,7 +246,7 @@
           ],
           "cloudProviderProfile": {
             "infraNetworkProfile": {
-                  "vnetSubnetIds": "[resourceId('Microsoft.AzureStackHCI/logicalNetworks', parameters('lnetName'))]"
+                  "vnetSubnetIds": ["[resourceId('Microsoft.AzureStackHCI/logicalNetworks', parameters('lnetName'))]"]
             }
           },
           "controlPlane": {
