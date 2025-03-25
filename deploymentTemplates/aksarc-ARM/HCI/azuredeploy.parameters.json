@@ -20,9 +20,6 @@
         "sshRSAPublicKey": {
             "value": "" // TODO: Fill in parameter value
         },
-        "enableAHUB": {
-            "value": "NotApplicable"
-        },
         "agentName": {
             "value": "nodepool"
         },
@@ -49,9 +46,6 @@
         },
         "controlPlaneVMSize": {
             "value": "Standard_A4_v2"
-        },
-        "podCidr": {
-            "value": "10.244.0.0/16"
         },
         "networkPolicy": {
             "value": "calico"
