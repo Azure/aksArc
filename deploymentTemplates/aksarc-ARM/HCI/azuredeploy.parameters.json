@@ -18,7 +18,7 @@
             "value": ""
         },
         "sshRSAPublicKey": {
-            "value": "" // TODO: Fill in parameter value
+            "value": "TODO: Fill in parameter value"
         },
         "agentName": {
             "value": "nodepool"
@@ -36,13 +36,13 @@
             "value": 0
         },
         "kubernetesVersion": {
-            "value": "" // TODO: Fill in parameter value
+            "value": "TODO: Fill in parameter value"
         },
         "controlPlaneNodeCount": {
             "value": 1
         },
         "controlPlaneIp": {
-            "value": "" // TODO: Fill in parameter value
+            "value": "TODO: Fill in parameter value"
         },
         "controlPlaneVMSize": {
             "value": "Standard_A4_v2"
@@ -51,28 +51,28 @@
             "value": "calico"
         },
         "customLocation": {
-            "value": "" // TODO: Fill in parameter value
+            "value": "TODO: Fill in parameter value"
         },
         "lnetName": {
-            "value": "" // TODO: Fill in parameter value
+            "value": "TODO: Fill in parameter value"
         },
         "dnsServers": {
-            "value": "" // TODO: Fill in parameter value
+            "value": "TODO: Fill in parameter value"
         },
         "addressPrefix": {
-            "value": "" // TODO: Fill in parameter value
+            "value": "TODO: Fill in parameter value"
         },
         "ipAllocationMethod": {
-            "value": "" // TODO: Fill in parameter value
+            "value": "TODO: Fill in parameter value"
         },
         "vippoolstart": {
-            "value": "" // TODO: Fill in parameter value
+            "value": "TODO: Fill in parameter value"
         },
         "vippoolend": {
-            "value": "" // TODO: Fill in parameter value
+            "value": "TODO: Fill in parameter value"
         },
         "nextHopIpAddress": {
-            "value": "" // TODO: Fill in parameter value
+            "value": "TODO: Fill in parameter value"
         }
     }
 }
