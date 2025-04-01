@@ -74,6 +74,12 @@
         },
         "provisionedClustersApiVersion": {
             "type": "String"
+        },
+        "nodepoolLabel":{
+            "type": "string"
+        },
+        "nodepoolTaint":{
+            "type": "string"
         }
     },
     "resources": [
@@ -180,7 +186,11 @@
                         "name": "[parameters('agentName')]",
                         "count": "[parameters('agentCount')]",
                         "vmSize": "[parameters('agentVMSize')]",
-                        "osType": "[parameters('agentOsType')]"
+                        "osType": "[parameters('agentOsType')]",
+                        "nodeLabels": {
+                        "nodePoolLabelValue": "[parameters('nodepoolLabel')]"
+                        },
+                        "nodeTaints": ["[parameters('nodepoolTaint')]"]
                     }
                 ],
                 "cloudProviderProfile": {
