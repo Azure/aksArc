@@ -73,6 +73,12 @@
         },
         "nextHopIpAddress": {
             "value": "TODO: Fill in parameter value"
+        },
+        "nodepoolLabel":{
+            "value": "TODO: Fill in parameter value"
+        },
+        "nodepoolTaint":{
+            "value": "TODO: Fill in parameter value"
         }
     }
 }
