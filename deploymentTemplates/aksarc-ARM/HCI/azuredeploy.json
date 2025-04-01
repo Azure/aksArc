@@ -78,6 +78,9 @@
         "nodepoolLabel":{
             "type": "string"
         },
+         "nodepoolLabelVal":{
+            "type": "string"
+        },
         "nodepoolTaint":{
             "type": "string"
         }
@@ -188,7 +191,7 @@
                         "vmSize": "[parameters('agentVMSize')]",
                         "osType": "[parameters('agentOsType')]",
                         "nodeLabels": {
-                        "nodePoolLabelValue": "[parameters('nodepoolLabel')]"
+                            "[parameters('nodepoolLabel')]": "[parameters('nodepoolLabelVal')]"
                         },
                         "nodeTaints": ["[parameters('nodepoolTaint')]"]
                     }
