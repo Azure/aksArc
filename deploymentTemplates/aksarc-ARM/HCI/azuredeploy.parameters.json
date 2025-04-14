@@ -30,58 +30,13 @@
             "value": "TODO: Fill in parameter value" 
         },
         "nextHopIpAddress": {
-            "value": "TODO: Fill in parameter value" 
+            "value": "TODO: Fill in parameter value"
         },
-        "provisionedClusterName": {
-            "value": "TODO: Fill in parameter value" 
+        "nodepoolLabel":{
+            "value": "TODO: Fill in parameter value"
         },
-        "sshRSAPublicKey": {
-            "value": "TODO: Fill in parameter value" 
-        },
-        "controlPlaneIp": {
-            "value": "TODO: Fill in parameter value" 
-        },
-        "kubernetesVersion": {
-            "value": "TODO: Fill in parameter value" 
-        },
-        "controlPlaneVMSize": {
-            "value": "TODO: Fill in parameter value" 
-        },
-        "controlPlaneNodeCount": {
-            "value": 0 
-        },
-        "agentName": {
-            "value": "TODO: Fill in parameter value" 
-        },
-        "agentVMSize": {
-            "value": "TODO: Fill in parameter value" 
-        },
-        "agentOsType": {
-            "value": "TODO: Fill in parameter value" 
-        },
-        "agentCount": {
-            "value": 0 
-        },
-        "networkPolicy": {
-            "value": "TODO: Fill in parameter value" 
-        },
-        "loadBalancerCount": {
-            "value": 0 
-        },
-        "connectedClustersApiVersion": {
-            "value": "TODO: Fill in parameter value" 
-        },
-        "provisionedClustersApiVersion": {
-            "value": "TODO: Fill in parameter value" 
-        },
-        "nodepoolLabel": {
-            "value": "TODO: Fill in parameter value" 
-        },
-        "nodepoolLabelValue": {
-            "value": "TODO: Fill in parameter value" 
-        },
-        "nodepoolTaint": {
-            "value": "TODO: Fill in parameter value" 
+        "nodepoolTaint":{
+            "value": "TODO: Fill in parameter value"
         }
     }
 }
