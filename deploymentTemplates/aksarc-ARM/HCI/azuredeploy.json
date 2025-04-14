@@ -3,82 +3,85 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "location": {
-            "type": "String"
+            "type": "string"
         },
         "customLocation": {
-            "type": "String"
+            "type": "string"
         },
         "lnetName": {
-            "type": "String"
+            "type": "string"
         },
         "dnsServers": {
-            "type": "Array"
+            "type": "array"
         },
         "addressPrefix": {
-            "type": "String"
+            "type": "string"
         },
         "ipAllocationMethod": {
-            "type": "String"
+            "type": "string"
         },
+         "vmSwitchName": {
+             "type": "string"
+         },
         "vippoolstart": {
-            "type": "String"
+            "type": "string"
         },
         "vippoolend": {
-            "type": "String"
+            "type": "string"
         },
         "nextHopIpAddress": {
-            "type": "String"
+            "type": "string"
         },
         "provisionedClusterName": {
-            "type": "String"
+            "type": "string"
         },
         "sshRSAPublicKey": {
-            "type": "String"
+            "type": "string"
         },
         "controlPlaneIp": {
-            "type": "String"
+            "type": "string"
         },
         "kubernetesVersion": {
-            "type": "String"
+            "type": "string"
         },
         "controlPlaneVMSize": {
-            "type": "String"
+            "type": "string"
         },
         "controlPlaneNodeCount": {
-            "type": "Int"
+            "type": "int"
         },
         "agentName": {
-            "type": "String"
+            "type": "string"
         },
         "agentVMSize": {
-            "type": "String"
+            "type": "string"
         },
         "agentOsType": {
             "allowedValues": [
                 "Linux",
                 "Windows"
             ],
-            "type": "String"
+            "type": "string"
         },
         "agentCount": {
-            "type": "Int"
+            "type": "int"
         },
         "networkPolicy": {
-            "type": "String"
+            "type": "string"
         },
         "loadBalancerCount": {
-            "type": "Int"
+            "type": "int"
         },
         "connectedClustersApiVersion":{
             "type": "string"
         },
         "provisionedClustersApiVersion": {
-            "type": "String"
+            "type": "string"
         },
         "nodepoolLabel":{
             "type": "string"
         },
-         "nodepoolLabelVal":{
+         "nodepoolLabelValue":{
             "type": "string"
         },
         "nodepoolTaint":{
@@ -129,7 +132,7 @@
                         }
                     }
                 ],
-                "vmSwitchName": "Default Switch"
+                "vmSwitchName": "[parameters('vmSwitchName')]"
             }
         },
         {
@@ -191,7 +194,7 @@
                         "vmSize": "[parameters('agentVMSize')]",
                         "osType": "[parameters('agentOsType')]",
                         "nodeLabels": {
-                            "[parameters('nodepoolLabel')]": "[parameters('nodepoolLabelVal')]"
+                            "[parameters('nodepoolLabel')]": "[parameters('nodepoolLabelValue')]"
                         },
                         "nodeTaints": ["[parameters('nodepoolTaint')]"]
                     }
