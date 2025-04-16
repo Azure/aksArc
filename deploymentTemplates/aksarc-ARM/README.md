@@ -13,3 +13,6 @@ You can use the following command to deploy the template
 ```CLI
 az deployment group create -g $resourceGroup --template-file azuredeploy.json -p azuredeploy.parameters.json
 ```
+for more details please look through [Arm template deployment with Powershell](https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/deploy-powershell) 
+and 
+[ARM template documentation](https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/)
