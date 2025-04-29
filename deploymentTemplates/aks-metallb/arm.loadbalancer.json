@@ -1,0 +1,63 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "parentResourceId": {
+            "type": "string",
+            "metadata": {
+                "description": "The resource ID of the connected cluster"
+            }
+        },
+        "loadBalancerName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the load balancer resource"
+            }
+        },
+        "addresses": {
+            "type": "array",
+            "metadata": {
+                "description": "IP address ranges for the load balancer"
+            }
+        },
+        "advertiseMode": {
+            "type": "string",
+            "allowedValues": [
+                "ARP",
+                "BGP", 
+                "Both"
+            ],
+            "metadata": {
+                "description": "Advertisement mode for the load balancer"
+            }
+        },
+        "serviceSelector": {
+            "type": "object",
+            "defaultValue": {},
+            "metadata": {
+                "description": "Label selector to identify services this load balancer should handle"
+            }
+        },
+        "bgpPeers": {
+            "type": "array",
+            "defaultValue": [],
+            "metadata": {
+                "description": "List of BGP peers to advertise to"
+            }
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.KubernetesRuntime/loadBalancers",
+            "apiVersion": "2024-03-01",
+            "scope": "[parameters('parentResourceId')]",
+            "name": "[parameters('loadBalancerName')]",
+            "properties": {
+                "addresses": "[parameters('addresses')]",
+                "advertiseMode": "[parameters('advertiseMode')]",
+                "serviceSelector": "[parameters('serviceSelector')]",
+                "bgpPeers": "[parameters('bgpPeers')]"
+            }
+        }
+    ]
+}

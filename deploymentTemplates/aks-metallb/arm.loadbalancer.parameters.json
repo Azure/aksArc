@@ -1,0 +1,28 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "parentResourceId": {
+            "value": "/subscriptions/{subscription-id}/resourceGroups/{resource-group}/providers/Microsoft.Kubernetes/connectedClusters/{cluster-name}"
+        },
+        "loadBalancerName": {
+            "value": "example-lb"
+        },
+        "addresses": {
+            "value": [
+                "192.168.0.100-192.168.0.150"
+            ]
+        },
+        "advertiseMode": {
+            "value": "ARP"
+        },
+        "serviceSelector": {
+            "value": {
+                "app": "web"
+            }
+        },
+        "bgpPeers": {
+            "value": []
+        }
+    }
+}
