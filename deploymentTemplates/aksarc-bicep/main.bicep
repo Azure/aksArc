@@ -38,6 +38,27 @@ resource deploymentResourceGroup'Microsoft.Resources/resourceGroups@2024-03-01' 
   location: azureLocation
 }
 
+module logicalNetwork 'logicalnetwork.bicep' = {
+  scope: resourceGroup(deploymentResourceGroupName)
+  name: logicalNetworkName
+  params: {
+    addressPrefix: addressPrefix
+    dnsServers: dnsServers
+    ipAllocationMethod: ipAllocationMethod
+    vlan: vlan
+    vmSwitchName: vmSwitchName
+    vipPoolStart: vipPoolStart
+    vipPoolEnd: vipPoolEnd
+    nextHopIpAddress: nextHopIpAddress
+    azureLocation: azureLocation
+    customLocationResourceID: customLocationResourceID
+    logicalNetworkName: logicalNetworkName
+  }
+  dependsOn: [
+    deploymentResourceGroup
+  ]
+}
+
 module aksarcModule 'aksarc.bicep' = {
   name: '${deployment().name}-aksarc'
   scope: resourceGroup(deploymentResourceGroupName)
@@ -59,17 +80,10 @@ module aksarcModule 'aksarc.bicep' = {
     nodePoolCount: nodePoolCount
     customLocationResourceID: customLocationResourceID
     azureLocation: azureLocation
-    addressPrefix: addressPrefix
-    dnsServers: dnsServers
-    ipAllocationMethod: ipAllocationMethod
-    vlan: vlan
-    vmSwitchName: vmSwitchName
-    vipPoolStart: vipPoolStart
-    vipPoolEnd: vipPoolEnd
-    nextHopIpAddress: nextHopIpAddress
     logicalNetworkName: logicalNetworkName
   }
   dependsOn: [
     deploymentResourceGroup
+    logicalNetwork
   ]
 }

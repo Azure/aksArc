@@ -1,16 +1,8 @@
 param azureLocation string
 param customLocationResourceID string
 
-// Logical network
+// logical network
 param logicalNetworkName string
-param dnsServers array
-param addressPrefix string
-param vmSwitchName string
-param ipAllocationMethod string
-param vlan int
-param vipPoolStart string
-param vipPoolEnd string
-param nextHopIpAddress string
 
 // Provisioned cluster
 param connectedClusterName string
@@ -31,59 +23,14 @@ param netWorkProfilNetworkPolicy string
 param networkProfileLoadBalancerCount int
 
 // You can replace the creation code with the below commented-out code to reference an existing logical network.
-// resource logicalNetwork 'Microsoft.AzureStackHCI/logicalNetworks@2024-01-01' existing = {
-//   name: 'bicepLogicalNetwork'
-//   scope: resourceGroup(azureResourceGroupName)
-// }
-
-resource logicalNetwork 'Microsoft.AzureStackHCI/logicalNetworks@2024-01-01' = {
-  extendedLocation: {
-    type: 'CustomLocation'
-    name: customLocationResourceID
-  }
-  location: azureLocation
+resource logicalNetwork 'Microsoft.AzureStackHCI/logicalNetworks@2024-01-01' existing = {
   name: logicalNetworkName
-  properties: {
-    dhcpOptions: {
-      dnsServers: dnsServers
-    }
-    subnets: [
-      {
-        name: 'bicepSubnet'
-        properties: {
-          addressPrefix: addressPrefix
-          ipAllocationMethod: ipAllocationMethod
-          vlan: vlan
-          ipPools: [
-            {
-              name: 'bicepIPPool'
-              start: vipPoolStart
-              end: vipPoolEnd
-              ipPoolType: 'vippool'
-            }
-          ]
-          routeTable: {
-            properties: {
-              routes: [
-                {
-                  name: 'defaultRoute'
-                  properties: {
-                    addressPrefix: '0.0.0.0/0'
-                    nextHopIpAddress: nextHopIpAddress
-                  }
-                }
-              ]
-            }
-          }
-        }
-      }
-    ]
-    vmSwitchName: vmSwitchName
-  }
 }
 
 // Create the connected cluster.
 // This is the Arc representation of the AKS cluster, used to create a Managed Identity for the provisioned cluster.
+
+
 resource connectedCluster 'Microsoft.Kubernetes/ConnectedClusters@2024-01-01' = {
   location: azureLocation
   name: connectedClusterName
@@ -164,3 +111,4 @@ resource provisionedClusterInstance 'Microsoft.HybridContainerService/provisione
     }
   }
 }
+
