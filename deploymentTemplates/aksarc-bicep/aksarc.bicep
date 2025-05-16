@@ -27,52 +27,6 @@ resource logicalNetwork 'Microsoft.AzureStackHCI/logicalNetworks@2024-01-01' exi
   name: logicalNetworkName
 }
 
-/* resource logicalNetwork 'Microsoft.AzureStackHCI/logicalNetworks@2024-01-01' = {
-  extendedLocation: {
-    type: 'CustomLocation'
-    name: customLocationResourceID
-  }
-  location: azureLocation
-  name: logicalNetworkName
-  properties: {
-    dhcpOptions: {
-      dnsServers: dnsServers
-    }
-    subnets: [
-      {
-        name: 'bicepSubnet'
-        properties: {
-          addressPrefix: addressPrefix
-          ipAllocationMethod: ipAllocationMethod
-          vlan: vlan
-          ipPools: [
-            {
-              name: 'bicepIPPool'
-              start: vipPoolStart
-              end: vipPoolEnd
-              ipPoolType: 'vippool'
-            }
-          ]
-          routeTable: {
-            properties: {
-              routes: [
-                {
-                  name: 'defaultRoute'
-                  properties: {
-                    addressPrefix: '0.0.0.0/0'
-                    nextHopIpAddress: nextHopIpAddress
-                  }
-                }
-              ]
-            }
-          }
-        }
-      }
-    ]
-    vmSwitchName: vmSwitchName
-  }
-} */
-
 // Create the connected cluster.
 // This is the Arc representation of the AKS cluster, used to create a Managed Identity for the provisioned cluster.
 resource connectedCluster 'Microsoft.Kubernetes/ConnectedClusters@2024-01-01' = {
