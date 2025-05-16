@@ -93,8 +93,7 @@
                 "name": "[parameters('customLocation')]"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Kubernetes/connectedClusters', parameters('provisionedClusterName'))]",
-                "[resourceId('Microsoft.AzureStackHCI/logicalNetworks', parameters('lnetName'))]"
+                "[resourceId('Microsoft.Kubernetes/connectedClusters', parameters('provisionedClusterName'))]"
             ],
             "properties": {
                 "kubernetesVersion": "[parameters('kubernetesVersion')]",
