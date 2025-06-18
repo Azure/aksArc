@@ -23,6 +23,9 @@
         },
         "bgpPeers": {
             "value": []
+        },
+        "k8sRuntimeFpaObjectId": {
+            "value": "{your-k8s-runtime-fpa-object-id}"
         }
     }
 }
