@@ -44,9 +44,27 @@
             "metadata": {
                 "description": "List of BGP peers to advertise to"
             }
+        },
+        "k8sRuntimeFpaObjectId": {
+            "type": "string",
+            "metadata": {
+                "description": "Object ID for the k8s runtime FPA"
+            }
         }
     },
     "resources": [
+        {
+            "type": "Microsoft.KubernetesConfiguration/extensions",
+            "apiVersion": "2022-11-01",
+            "scope": "[parameters('parentResourceId')]",
+            "name": "arcnetworking",
+            "properties": {
+                "extensionType": "microsoft.arcnetworking",
+                "configurationSettings": {
+                    "k8sRuntimeFpaObjectId": "[parameters('k8sRuntimeFpaObjectId')]"
+                }
+            }
+        },
         {
             "type": "Microsoft.KubernetesRuntime/loadBalancers",
             "apiVersion": "2024-03-01",
@@ -57,7 +75,10 @@
                 "advertiseMode": "[parameters('advertiseMode')]",
                 "serviceSelector": "[parameters('serviceSelector')]",
                 "bgpPeers": "[parameters('bgpPeers')]"
-            }
+            },
+            "dependsOn": [
+                "[extensionResourceId(parameters('parentResourceId'), 'Microsoft.KubernetesConfiguration/extensions', 'arcnetworking')]"
+            ]
         }
     ]
 }
