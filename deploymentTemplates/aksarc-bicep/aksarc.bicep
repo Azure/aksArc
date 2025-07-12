@@ -1,7 +1,7 @@
 param azureLocation string
 param customLocationResourceID string
 
-// Logical network
+// logical network
 param logicalNetworkName string
 
 // Provisioned cluster
@@ -29,6 +29,8 @@ resource logicalNetwork 'Microsoft.AzureStackHCI/logicalNetworks@2024-01-01' exi
 
 // Create the connected cluster.
 // This is the Arc representation of the AKS cluster, used to create a Managed Identity for the provisioned cluster.
+
+
 resource connectedCluster 'Microsoft.Kubernetes/ConnectedClusters@2024-01-01' = {
   location: azureLocation
   name: connectedClusterName
@@ -109,3 +111,4 @@ resource provisionedClusterInstance 'Microsoft.HybridContainerService/provisione
     }
   }
 }
+
