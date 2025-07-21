@@ -1,7 +1,7 @@
 using 'main.bicep'
 
-param azureLocation = 'westeurope' // TODO: add your Azure location.
-param deploymentResourceGroupName = 'rg-aksArc' // The resource group where bicep template deploys to.
+param azureLocation = 'eastus' // TODO: add your Azure location.
+param deploymentResourceGroupName = '<TODO>' // The resource group where bicep template deploys to.
 // This ID should refer to an existing custom location resource.
 param customLocationResourceID = '<TODO>'
 
