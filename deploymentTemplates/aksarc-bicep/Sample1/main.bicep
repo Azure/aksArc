@@ -7,14 +7,6 @@ param customLocationResourceID string
 
 // Logical network
 param logicalNetworkName string
-param addressPrefix string
-param dnsServers array
-param vmSwitchName string
-param ipAllocationMethod string
-param vlan int
-param vipPoolStart string
-param vipPoolEnd string
-param nextHopIpAddress string
 
 // Provisioned cluster
 param connectedClusterName string
@@ -59,14 +51,6 @@ module aksarcModule 'aksarc.bicep' = {
     nodePoolCount: nodePoolCount
     customLocationResourceID: customLocationResourceID
     azureLocation: azureLocation
-    addressPrefix: addressPrefix
-    dnsServers: dnsServers
-    ipAllocationMethod: ipAllocationMethod
-    vlan: vlan
-    vmSwitchName: vmSwitchName
-    vipPoolStart: vipPoolStart
-    vipPoolEnd: vipPoolEnd
-    nextHopIpAddress: nextHopIpAddress
     logicalNetworkName: logicalNetworkName
   }
   dependsOn: [
