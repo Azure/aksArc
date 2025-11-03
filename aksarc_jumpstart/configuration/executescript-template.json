@@ -8,8 +8,15 @@
     "location": {
       "type": "string"
     },
-    "scriptToExecute": {
+    "scriptFileUri": {
       "type": "string"
+    },
+    "commandToExecute": {
+      "type": "string"
+    },
+    "forceUpdateTag": {
+      "type": "string",
+      "defaultValue": "[newGuid()]"
     }
   },
   "resources": [
@@ -24,9 +31,12 @@
         "typeHandlerVersion": "1.10",
         "autoUpgradeMinorVersion": true,
         "settings": {
-          "fileUris": ["parameters('scriptToExecute')"],
-          "commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -File [parameters('scriptToExecute')]" 
-        }
+          "fileUris": [
+            "[parameters('scriptFileUri')]"
+          ],
+          "commandToExecute": "[parameters('commandToExecute')]" 
+        },
+        "forceUpdateTag": "[parameters('forceUpdateTag')]"
       }
     }
   ]
