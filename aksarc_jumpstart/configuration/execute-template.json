@@ -28,5 +28,11 @@
         }
       }
     }
-  ]
+  ],
+  "outputs": {
+    "scriptExecutionStatus": {
+      "type": "string",
+      "value": "[concat('Status0: ', reference(resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('vmName'), 'CustomScriptExtension'), '2022-08-01').instanceView.statuses[0].message, if(greater(length(reference(resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('vmName'), 'CustomScriptExtension'), '2022-08-01').instanceView.statuses), 1), concat(' | Status1: ', reference(resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('vmName'), 'CustomScriptExtension'), '2022-08-01').instanceView.statuses[1].message), ' | Status1: N/A'))]"
+    }
+  }
 }
