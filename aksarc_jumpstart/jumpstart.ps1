@@ -47,7 +47,7 @@ az role assignment create --assignee $principalId --role Contributor --scope /su
 az vm update   --resource-group $GroupName   --name $vmName --set additionalCapabilities.enableNestedVirtualization=true
 
 $gitSource = (git config --get remote.origin.url).Replace("github.com","raw.githubusercontent.com").Replace("aksArc.git","aksArc")
-$branch = (git branch)
+$branch = (git branch --show-current)
 $scriptLocation = "$gitSource/refs/heads/$branch/aksarc_jumpstart"
 
 $scriptToExecute = [ordered] @{

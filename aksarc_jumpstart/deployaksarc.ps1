@@ -32,7 +32,9 @@ param (
 # At this point, MOC is expected to be installed.
 
 $gitSource = (git config --get remote.origin.url).Replace("github.com","raw.githubusercontent.com").Replace("aksArc.git","aksArc")
-$scriptLocation = "$gitSource/refs/heads/jumpStart/aksarc_jumpstart"
+$branch = (git branch --show-current)
+$scriptLocation = "$gitSource/refs/heads/$branch/aksarc_jumpstart"
+
 $applianceName = "$vmName-appliance"
 $scriptToExecute = [ordered] @{
   "$scriptLocation/installazmodules.ps1" = "installazmodules.ps1 -arcHciVersion ""1.3.15""  ";
