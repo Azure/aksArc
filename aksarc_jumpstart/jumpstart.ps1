@@ -48,7 +48,7 @@ az vm update   --resource-group $GroupName   --name $vmName --set additionalCapa
 
 $gitSource = (git config --get remote.origin.url).Replace("github.com","raw.githubusercontent.com").Replace("aksArc.git","aksArc")
 $branch = (git branch --show-current)
-$scriptLocation = "$gitSource/refs/heads/$branch/aksarc_jumpstart"
+$scriptLocation = "$gitSource/refs/heads/$branch/aksarc_jumpstart/scripts"
 
 $scriptToExecute = [ordered] @{
   "$scriptLocation/initializedisk.ps1" = "initializedisk.ps1";
