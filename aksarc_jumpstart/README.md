@@ -4,6 +4,7 @@ Steps:
 ```
 git clone https://github.com/Azure/aksArc.git
 cd aksArc\aksarc_jumpstart
+az login --use-device-code
 powershell .\jumpstart.ps1 -userName <username> -password <password>  -subscription  <subscriptionid>
 # Login to the VM using RDP or Bastion.
 # MOC install would start in a powershell [This was done because Install-Moc has to be done directly or via CredSSP]. 
@@ -11,3 +12,4 @@ powershell .\jumpstart.ps1 -userName <username> -password <password>  -subscript
 powershell .\deployaksarc.ps1 -subscription  <subscriptionid>
 
 ```
+
