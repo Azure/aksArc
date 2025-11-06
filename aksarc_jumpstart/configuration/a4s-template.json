@@ -1,0 +1,52 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "canadacentral"
+    },
+    "vmName": {
+      "type": "string",
+      "defaultValue": "myCanadaVM"
+    },
+    "tenantId": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure Active Directory tenant ID"
+      }
+    },
+    "subscriptionId": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure subscription ID"
+      }
+    },
+    "arcResourceGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "Resource group for Azure Arc registration"
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "apiVersion": "2022-08-01",
+      "name": "[concat(parameters('vmName'), '/AzureConnectedMachineAgent')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "publisher": "Microsoft.Azure.ConnectedMachine",
+        "type": "AzureConnectedMachineAgent",
+        "typeHandlerVersion": "1.10",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "tenantId": "[parameters('tenantId')]",
+          "subscriptionId": "[parameters('subscriptionId')]",
+          "resourceGroup": "[parameters('arcResourceGroup')]",
+          "location": "[parameters('location')]"
+        }
+      }
+    }
+  ]
+}
