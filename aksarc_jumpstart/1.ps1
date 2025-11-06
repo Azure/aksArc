@@ -7,6 +7,18 @@
 
 Start-Transcript -Path "E:\log\1.ps1.log" -Append
 
+# Wait for Hyper-V to be ready. If we attempt too quickly, we would end up getting
+# Hyper-V encountered an error trying to access an object on computer '<some comupter name>' because the object was not found.
+while ($true) {
+    try {
+        Get-VMSwitch -ErrorAction Stop | Out-Null
+        break
+    } catch {
+        Write-Host "Waiting for Hyper-V to be ready..."
+        Start-Sleep -Seconds 10
+    }
+}
+
 New-VMSwitch -Name "InternalNAT" -SwitchType Internal;  
 New-NetIPAddress -IPAddress 172.16.0.1 -PrefixLength 16 -InterfaceAlias "vEthernet (InternalNAT)"; 
 New-NetNat -Name "AKSARCNAT" -InternalIPInterfaceAddressPrefix 172.16.0.0/16; 
