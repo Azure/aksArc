@@ -1,0 +1,38 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmName": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "commandToExecute": {
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "apiVersion": "2022-08-01",
+      "name": "[concat(parameters('vmName'), '/CustomScriptExtension')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "publisher": "Microsoft.Compute",
+        "type": "CustomScriptExtension",
+        "typeHandlerVersion": "1.10",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "commandToExecute": "[parameters('commandToExecute')]"
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "scriptExecutionStatus": {
+      "type": "string",
+      "value": "[concat('Status0: ', reference(resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('vmName'), 'CustomScriptExtension'), '2022-08-01').instanceView.statuses[0].message, if(greater(length(reference(resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('vmName'), 'CustomScriptExtension'), '2022-08-01').instanceView.statuses), 1), concat(' | Status1: ', reference(resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('vmName'), 'CustomScriptExtension'), '2022-08-01').instanceView.statuses[1].message), ' | Status1: N/A'))]"
+    }
+  }
+}
