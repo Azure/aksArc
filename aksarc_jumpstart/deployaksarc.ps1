@@ -1,33 +1,36 @@
 [CmdletBinding()]
 param (
     [Parameter()]
-    [string]
-    $userName,
+    [string] $GroupName = "test-rg1",
     [Parameter()]
-    [string]
-    $password,
+    [string] $Location = "eastus2",
     [Parameter()]
-    [string]
-    $GroupName = "test-rg1",
+    [string] $vnetName = "test-vnet1",
     [Parameter()]
-    [string]
-    $Location = "eastus2",
+    [string] $vmName = "test-vm1",
     [Parameter()]
-    [string]
-    $vnetName = "test-vnet1",
+    [string] $subnetName = "test-subnet1",
+    [Parameter(Mandatory=$true)]
+    [string] $subscription,
     [Parameter()]
-    [string]
-    $vmName = "test-vm1",
+    [string] $applianceName,
     [Parameter()]
-    [string]
-    $subnetName = "test-subnet1",
+    [string] $ArcLnetName,
     [Parameter()]
-    [string]
-    $subscription,
+    [string] $customLocationName,
     [Parameter()]
-    [string]
-    $workingDir = "E:\AKSArc"
+    [string] $workingDir = "E:\AKSArc"
 )
+
+if ([string]::IsNullOrEmpty($applianceName)) {
+    $applianceName = "$vmName-appliance"
+} 
+if ([string]::IsNullOrEmpty($customLocationName)) {
+    $customLocationName = "$applianceName-cl"
+}
+if ([string]::IsNullOrEmpty($ArcLnetName)) {
+    $ArcLnetName = "$applianceName-lnet"
+}
 # This is a continuation of jumpstart.ps1 to deploy ARB specific components
 # At this point, MOC is expected to be installed.
 
@@ -40,9 +43,10 @@ $scriptToExecute = [ordered] @{
   "$scriptLocation/installazmodules.ps1" = "installazmodules.ps1 -arcHciVersion ""1.3.15""  ";
   "$scriptLocation/deployappliance.ps1" = "deployappliance.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -workDirectory ""$workingDir"" -location ""$Location"" -subscription ""$subscription"" ";
   "$scriptLocation/deployaksarcextension.ps1" = "deployaksarcextension.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -workDirectory ""$workingDir"" -location ""$Location"" -subscription ""$subscription""";
-  # "$scriptLocation/deployvmssextension.ps1" = "deployvmssextension.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -workDirectory ""$workingDir"" -location ""$Location"" -subscription ""$subscription""";
-  "$scriptLocation/deploycustomlocation.ps1" = "deploycustomlocation.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -workDirectory ""$workingDir"" -location ""$Location"" -subscription ""$subscription""";
-  #"$scriptLocation/deploylnet.ps1" = "deploylnet.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -workDirectory ""$workingDir"" -location ""$Location"" -subscription ""$subscription""";
+  "$scriptLocation/deployvmssextension.ps1" = "deployvmssextension.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -workDirectory ""$workingDir"" -location ""$Location"" -subscription ""$subscription""";
+  "$scriptLocation/deploycustomlocation.ps1" = "deploycustomlocation.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -customLocationName ""$customLocationName"" -subscription ""$subscription""";
+  "$scriptLocation/deploylnet.ps1" = "deploylnet.ps1 -resource_group ""$GroupName""  -lnetName ""$ArcLnetName"" -customLocationName ""$customLocationName"" -location ""$Location"" -subscription ""$subscription""";
+  "$scriptLocation/deployaksarccluster.ps1" = "deployaksarccluster.ps1 -resource_group ""$GroupName"" -lnetName ""$ArcLnetName"" -customLocationName ""$customLocationName"" -subscription ""$subscription""";
 }
 
 foreach ($script in $scriptToExecute.GetEnumerator()) {
