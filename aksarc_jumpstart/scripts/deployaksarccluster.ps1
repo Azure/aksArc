@@ -1,8 +1,10 @@
 param(
     [string]$resource_group = "test-rg",
-    [string]$appliance_name = "aks_arc_appliance",
-    [string] $lnetName = "azlnet-jumpstart",
+    [param(Mandatory=$true)]
+    [string] $lnetName,
+    [param(Mandatory=$true)]
     [string] $customLocationName,
+    [param(Mandatory=$true)]
     [string] $subscription
 )
 
@@ -12,7 +14,6 @@ $suffix = "jumpstart"
 
 az login --identity
 az account set -s $subscription
-# $customLocationName = ($appliance_name + "-hybridaks-cl")
 
 $clId = az customlocation show --name $customLocationName --resource-group $resource_group --query "id" -o tsv
 

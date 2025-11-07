@@ -1,9 +1,12 @@
 param(
     [string]$resource_group = "test-rg",
-    [string]$appliance_name = "aks_arc_appliance",
-    [string] $location = "eastus2",
-    [string] $lnetName = "azlnet-jumpstart",
+    [param(Mandatory=$true)]
+    [string] $location,
+    [param(Mandatory=$true)]
+    [string] $lnetName,
+    [param(Mandatory=$true)]
     [string] $customLocationName,
+    [param(Mandatory=$true)]
     [string] $subscription
 )
 
