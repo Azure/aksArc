@@ -1,11 +1,7 @@
 param(
     [string]$resource_group = "test-rg",
     [string]$appliance_name = "aks_arc_appliance",
-    [string] $workDirectory = "E:\AKSArc",
-    [string] $location = "eastus2",
-    [param(Mandatory=$true)]
     [string] $subscription,
-    [param(Mandatory=$true)]
     [string] $customLocationName
 )
 

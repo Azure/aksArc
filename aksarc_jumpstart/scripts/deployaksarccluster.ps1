@@ -1,10 +1,7 @@
 param(
     [string]$resource_group = "test-rg",
-    [param(Mandatory=$true)]
     [string] $lnetName,
-    [param(Mandatory=$true)]
     [string] $customLocationName,
-    [param(Mandatory=$true)]
     [string] $subscription
 )
 
