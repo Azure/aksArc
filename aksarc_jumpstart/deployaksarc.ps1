@@ -40,9 +40,9 @@ $scriptToExecute = [ordered] @{
   "$scriptLocation/installazmodules.ps1" = "installazmodules.ps1 -arcHciVersion ""1.3.15""  ";
   "$scriptLocation/deployappliance.ps1" = "deployappliance.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -workDirectory ""$workingDir"" -location ""$Location"" -subscription ""$subscription"" ";
   "$scriptLocation/deployaksarcextension.ps1" = "deployaksarcextension.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -workDirectory ""$workingDir"" -location ""$Location"" -subscription ""$subscription""";
-  # "$scriptLocation/deployvmssextension.ps1" = "deployvmssextension.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -workDirectory ""$workingDir"" -location ""$Location"" -subscription ""$subscription""";
+  "$scriptLocation/deployvmssextension.ps1" = "deployvmssextension.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -workDirectory ""$workingDir"" -location ""$Location"" -subscription ""$subscription""";
   "$scriptLocation/deploycustomlocation.ps1" = "deploycustomlocation.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -workDirectory ""$workingDir"" -location ""$Location"" -subscription ""$subscription""";
-  #"$scriptLocation/deploylnet.ps1" = "deploylnet.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -workDirectory ""$workingDir"" -location ""$Location"" -subscription ""$subscription""";
+  "$scriptLocation/deploylnet.ps1" = "deploylnet.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -workDirectory ""$workingDir"" -location ""$Location"" -subscription ""$subscription""";
 }
 
 foreach ($script in $scriptToExecute.GetEnumerator()) {
