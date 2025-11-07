@@ -2,12 +2,6 @@
 param (
     [Parameter()]
     [string]
-    $userName,
-    [Parameter()]
-    [string]
-    $password,
-    [Parameter()]
-    [string]
     $GroupName = "test-rg1",
     [Parameter()]
     [string]
@@ -26,6 +20,15 @@ param (
     $subscription,
     [Parameter()]
     [string]
+    $applianceName = "$vmName-appliance",
+    [Parameter()]
+    [string]
+    $ArcLnetName = "jumpstart-lnet",
+    [Parameter()]
+    [string]
+    $customLocationName = "$applianceName-cl",
+    [Parameter()]
+    [string]
     $workingDir = "E:\AKSArc"
 )
 # This is a continuation of jumpstart.ps1 to deploy ARB specific components
@@ -42,7 +45,8 @@ $scriptToExecute = [ordered] @{
   "$scriptLocation/deployaksarcextension.ps1" = "deployaksarcextension.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -workDirectory ""$workingDir"" -location ""$Location"" -subscription ""$subscription""";
   "$scriptLocation/deployvmssextension.ps1" = "deployvmssextension.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -workDirectory ""$workingDir"" -location ""$Location"" -subscription ""$subscription""";
   "$scriptLocation/deploycustomlocation.ps1" = "deploycustomlocation.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -workDirectory ""$workingDir"" -location ""$Location"" -subscription ""$subscription""";
-  "$scriptLocation/deploylnet.ps1" = "deploylnet.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -workDirectory ""$workingDir"" -location ""$Location"" -subscription ""$subscription""";
+  "$scriptLocation/deploylnet.ps1" = "deploylnet.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -lnetName ""$ArcLnetName"" -customLocationName ""$customLocationName"" -location ""$Location"" -subscription ""$subscription""";
+  "$scriptLocation/deployaksarccluster.ps1" = "deployaksarccluster.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -lnetName ""$ArcLnetName"" -customLocationName ""$customLocationName"" -subscription ""$subscription""";
 }
 
 foreach ($script in $scriptToExecute.GetEnumerator()) {
