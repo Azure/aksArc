@@ -8,19 +8,19 @@ param (
   $password,
   [Parameter()]
   [string]
-  $GroupName = "test-rg1",
+  $GroupName = "jumpstart-rg",
   [Parameter()]
   [string]
   $Location = "eastus2",
   [Parameter()]
   [string]
-  $vnetName = "test-vnet1",
+  $vnetName = "jumpstartVNet",
   [Parameter()]
   [string]
-  $vmName = "test-vm1",
+  $vmName = "jumpstartVM",
   [Parameter()]
   [string]
-  $subnetName = "test-subnet1",
+  $subnetName = "jumpstartSubnet",
   [Parameter()]
   [string]
   $subscriptionId
