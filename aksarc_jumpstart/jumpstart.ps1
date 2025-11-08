@@ -1,40 +1,40 @@
 [CmdletBinding()]
 param (
-    [Parameter()]
-    [string]
-    $userName,
-    [Parameter()]
-    [string]
-    $password,
-    [Parameter()]
-    [string]
-    $GroupName = "test-rg1",
-    [Parameter()]
-    [string]
-    $Location = "eastus2",
-    [Parameter()]
-    [string]
-    $vnetName = "test-vnet1",
-    [Parameter()]
-    [string]
-    $vmName = "test-vm1",
-    [Parameter()]
-    [string]
-    $subnetName = "test-subnet1",
-    [Parameter()]
-    [string]
-    $subscriptionId
+  [Parameter()]
+  [string]
+  $userName,
+  [Parameter()]
+  [string]
+  $password,
+  [Parameter()]
+  [string]
+  $GroupName = "test-rg1",
+  [Parameter()]
+  [string]
+  $Location = "eastus2",
+  [Parameter()]
+  [string]
+  $vnetName = "test-vnet1",
+  [Parameter()]
+  [string]
+  $vmName = "test-vm1",
+  [Parameter()]
+  [string]
+  $subnetName = "test-subnet1",
+  [Parameter()]
+  [string]
+  $subscriptionId
 )
 
 # Create Resource Group
 az group create --name $GroupName --location $Location 
 # Create Vnet and VM
-az deployment group create --resource-group $GroupName --template-file .\configuration\vnet-template.json --parameters vnetName=$vnetName location=$Location subnetName=$subnetName
-az deployment group create --resource-group $GroupName --template-file .\configuration\vm-template.json --parameters adminUsername=$userName adminPassword=$password vmName=$vmName location=$Location vnetName=$vnetName vmSize="Standard_E16s_v4" subnetName=$subnetName
+az deployment group create --resource-group $GroupName --template-file ./configuration/vnet-template.json --parameters vnetName=$vnetName location=$Location subnetName=$subnetName
+az deployment group create --resource-group $GroupName --template-file ./configuration/vm-template.json --parameters adminUsername=$userName adminPassword=$password vmName=$vmName location=$Location vnetName=$vnetName vmSize="Standard_E16s_v4" subnetName=$subnetName
 
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "Azure CLI command failed with exit code $LASTEXITCODE"
-    exit $LASTEXITCODE
+  Write-Host "Azure CLI command failed with exit code $LASTEXITCODE"
+  exit $LASTEXITCODE
 }
 
 # Assign Managed Identity and Contributor Role to VM
@@ -46,29 +46,29 @@ az role assignment create --assignee $principalId --role Contributor --scope /su
 # Enable Nested Virtualization
 az vm update   --resource-group $GroupName   --name $vmName --set additionalCapabilities.enableNestedVirtualization=true
 
-$gitSource = (git config --get remote.origin.url).Replace("github.com","raw.githubusercontent.com").Replace("aksArc.git","aksArc")
+$gitSource = (git config --get remote.origin.url).Replace("github.com", "raw.githubusercontent.com").Replace("aksArc.git", "aksArc")
 $branch = (git branch --show-current)
 $scriptLocation = "$gitSource/refs/heads/$branch/aksarc_jumpstart/scripts"
 
 $scriptToExecute = [ordered] @{
   "$scriptLocation/initializedisk.ps1" = "initializedisk.ps1";
-  "$scriptLocation/0.ps1" = "0.ps1";
-  "$scriptLocation/1.ps1" = "1.ps1";
-  "$scriptLocation/deployazcli.ps1" = "deployazcli.ps1";
-  "$scriptLocation/deploymoc.ps1" = "deploymoc.ps1";
+  "$scriptLocation/0.ps1"              = "0.ps1";
+  "$scriptLocation/1.ps1"              = "1.ps1";
+  "$scriptLocation/deployazcli.ps1"    = "deployazcli.ps1";
+  "$scriptLocation/deploymoc.ps1"      = "deploymoc.ps1";
 }
 
 foreach ($script in $scriptToExecute.GetEnumerator()) {
-    $scriptUrl = $script.Key
-    $scriptName = $script.Value
-    $deploymentName = "executescript-$($vmName)-$($scriptName.Replace('.ps1',''))"
-    $commandToExecute = "powershell.exe -ExecutionPolicy Unrestricted -File $scriptName"
-    Write-Host "Executing $scriptName from $scriptUrl on VM $vmName ..."
-    az deployment group create --name $deploymentName --resource-group $GroupName --template-file .\configuration\executescript-template.json --parameters location=$Location vmName=$vmName scriptFileUri=$scriptUrl commandToExecute=$commandToExecute
-    if ($LASTEXITCODE -ne 0) {
-      Write-Host "Azure CLI command failed with exit code $LASTEXITCODE"
-      exit $LASTEXITCODE
-    }
+  $scriptUrl = $script.Key
+  $scriptName = $script.Value
+  $deploymentName = "executescript-$($vmName)-$($scriptName.Replace('.ps1',''))"
+  $commandToExecute = "powershell.exe -ExecutionPolicy Unrestricted -File $scriptName"
+  Write-Host "Executing $scriptName from $scriptUrl on VM $vmName ..."
+  az deployment group create --name $deploymentName --resource-group $GroupName --template-file ./configuration/executescript-template.json --parameters location=$Location vmName=$vmName scriptFileUri=$scriptUrl commandToExecute=$commandToExecute
+  if ($LASTEXITCODE -ne 0) {
+    Write-Host "Azure CLI command failed with exit code $LASTEXITCODE"
+    exit $LASTEXITCODE
+  }
 }
 
 Write-Host "Login to the VM using Bastion or RDP. Wait for MOC install to finish. Then continue with aksarc deployment by running the script deployaksarc.ps1."
