@@ -1,9 +1,9 @@
 param(
-    [string]$resource_group = "test-rg",
-    [string]$appliance_name = "aks_arc_appliance",
-    [string] $workDirectory = "E:\AKSArc",
-    [string] $location = "eastus2",
-    [string] $subscription
+  [string]$resource_group = "test-rg",
+  [string]$appliance_name = "aks_arc_appliance",
+  [string] $workDirectory = "E:\AKSArc",
+  [string] $location = "eastus2",
+  [string] $subscription
 )
 
 Start-Transcript -Path "E:\log\deployvmssextension.ps1.log" -Append
@@ -11,7 +11,7 @@ $release_train = "stable"
 $arcvmversion = "5.12.10"
 $arcvmExtName = "vmss-hci"
 
-ipmo ((Get-Module "ArcHci" -ListAvailable | Sort-Object Version -Descending)[0].ModuleBase + "\ArcHci.psm1")
+Import-Module ((Get-Module "ArcHci" -ListAvailable | Sort-Object Version -Descending)[0].ModuleBase + "\ArcHci.psm1")
 
 $vmExtensionConfigFileName = "vm-extension-config.json"
 $vmExtensionConfigFilePath = join-path $workDirectory $vmExtensionConfigFileName
@@ -22,7 +22,7 @@ Add-ExtensionConfigToFile -configFilePath $vmExtensionConfigFilePath -key "infra
 
 az login --identity
 az account set -s $subscription
-ipmo ArcHci 
+Import-Module ArcHci 
 
 $mocConfigFilePath = join-path $workDirectory "\hci-config.json"
 New-ArcHciIdentityFiles -workDirectory $workDirectory

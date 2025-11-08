@@ -8,7 +8,7 @@ Initialize-Disk -Number $disk.Number -PartitionStyle GPT
 New-Partition -DiskNumber $disk.Number -UseMaximumSize -AssignDriveLetter
 
 # Format the volume as NTFS
-$driveLetter =  (Get-Partition -DiskNumber $disk.Number | select -Last 1).DriveLetter
+$driveLetter = (Get-Partition -DiskNumber $disk.Number | Select-Object -Last 1).DriveLetter
 Format-Volume -DriveLetter $driveLetter -FileSystem NTFS -Confirm:$false
 
 # Initialize log directory
