@@ -1,5 +1,5 @@
 param(
-    [string]$resource_group = "test-rg",
+    [string]$resource_group = "jumpstart-rg",
     [string] $location,
     [string] $lnetName,
     [string] $customLocationName,

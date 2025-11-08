@@ -4,11 +4,11 @@
   "parameters": {
     "location": {
       "type": "string",
-      "defaultValue": "canadacentral"
+      "defaultValue": "eastus2"
     },
     "vnetName": {
       "type": "string",
-      "defaultValue": "myCanadaVNet"
+      "defaultValue": "jumpstartVNet"
     },
     "addressPrefix": {
       "type": "string",
@@ -16,7 +16,7 @@
     },
      "subnetName": {
       "type": "string",
-      "defaultValue": "myCanadaSubnet"
+      "defaultValue": "jumpstartSubnet"
     },
     "subnetPrefix": {
       "type": "string",
