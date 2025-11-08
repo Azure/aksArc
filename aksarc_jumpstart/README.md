@@ -21,11 +21,6 @@ powershell .\deployaksarc.ps1 -subscription  <subscriptionid> -GroupName <> -Loc
 
 ```
 
-Sample Commands:
-powershell .\jumpstart.ps1 -userName ssarwa -password MySecurePassword123! -subscription 94fafc52-3b96-4240-97de-d6ba159ce309 -GroupName sarwa-jumpstart2 -Location australiaeast -VnetName sjumpvnet2 -subnet sjumpsubnet2 -vmname sarwaaksarcjump2
-
-powershell .\deployaksarc.ps1 -subscription 94fafc52-3b96-4240-97de-d6ba159ce309 -GroupName sarwa-jumpstart2 -aksArcClusterName sarwa-jumpstart-cluster -Location australiaeast -VnetName sjumpvnet2 -subnet sjumpsubnet2 -vmname sarwaaksarcjump2
-
 ### Steps to Cleanup
 
 ```
