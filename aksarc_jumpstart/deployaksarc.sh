@@ -23,8 +23,8 @@ while [[ $# -gt 0 ]]; do
       subnetName="$2"
       shift 2
       ;;
-    --subscription)
-      subscription="$2"
+    --subscriptionId)
+      subscriptionId="$2"
       shift 2
       ;;
     --applianceName)
@@ -63,8 +63,8 @@ subnetName="${subnetName:-test-subnet1}"
 workingDir="${workingDir:-E:\\AKSArc}"
 
 # Check required parameter
-if [ -z "$subscription" ]; then
-  echo "Error: --subscription is required"
+if [ -z "$subscriptionId" ]; then
+  echo "Error: --subscriptionId is required"
   exit 1
 fi
 
@@ -101,12 +101,12 @@ declare -a scriptNames=(
 
 declare -a scriptParams=(
   "-arcHciVersion \"1.3.15\""
-  "-resource_group \"$GroupName\" -appliance_name \"$applianceName\" -workDirectory \"$workingDir\" -location \"$Location\" -subscription \"$subscription\""
-  "-resource_group \"$GroupName\" -appliance_name \"$applianceName\" -workDirectory \"$workingDir\" -location \"$Location\" -subscription \"$subscription\""
-  "-resource_group \"$GroupName\" -appliance_name \"$applianceName\" -workDirectory \"$workingDir\" -location \"$Location\" -subscription \"$subscription\""
-  "-resource_group \"$GroupName\" -appliance_name \"$applianceName\" -customLocationName \"$customLocationName\" -subscription \"$subscription\""
-  "-resource_group \"$GroupName\" -lnetName \"$ArcLnetName\" -customLocationName \"$customLocationName\" -location \"$Location\" -subscription \"$subscription\""
-  "-resource_group \"$GroupName\" -aksArcClusterName \"$aksArcClusterName\" -lnetName \"$ArcLnetName\" -customLocationName \"$customLocationName\" -subscription \"$subscription\""
+  "-resource_group \"$GroupName\" -appliance_name \"$applianceName\" -workDirectory \"$workingDir\" -location \"$Location\" -subscription \"$subscriptionId\""
+  "-resource_group \"$GroupName\" -appliance_name \"$applianceName\" -workDirectory \"$workingDir\" -location \"$Location\" -subscription \"$subscriptionId\""
+  "-resource_group \"$GroupName\" -appliance_name \"$applianceName\" -workDirectory \"$workingDir\" -location \"$Location\" -subscription \"$subscriptionId\""
+  "-resource_group \"$GroupName\" -appliance_name \"$applianceName\" -customLocationName \"$customLocationName\" -subscription \"$subscriptionId\""
+  "-resource_group \"$GroupName\" -lnetName \"$ArcLnetName\" -customLocationName \"$customLocationName\" -location \"$Location\" -subscription \"$subscriptionId\""
+  "-resource_group \"$GroupName\" -aksArcClusterName \"$aksArcClusterName\" -lnetName \"$ArcLnetName\" -customLocationName \"$customLocationName\" -subscription \"$subscriptionId\""
 )
 
 for i in "${!scriptNames[@]}"; do
