@@ -1,5 +1,5 @@
 param(
-  [string]$resource_group = "test-rg",
+  [string]$resource_group = "jumpstart-rg",
   [string]$appliance_name = "aks_arc_appliance",
   [string] $workDirectory = "E:\AKSArc",
   [string] $location = "eastus2",

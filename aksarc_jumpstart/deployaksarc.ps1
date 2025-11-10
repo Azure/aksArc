@@ -1,15 +1,15 @@
 [CmdletBinding()]
 param (
     [Parameter()]
-    [string] $GroupName = "test-rg1",
+    [string] $GroupName = "jumpstart-rg",
     [Parameter()]
     [string] $Location = "eastus2",
     [Parameter()]
-    [string] $vnetName = "test-vnet1",
+    [string] $vnetName = "jumpstartVNet",
     [Parameter()]
-    [string] $vmName = "test-vm1",
+    [string] $vmName = "jumpstartVM",
     [Parameter()]
-    [string] $subnetName = "test-subnet1",
+    [string] $subnetName = "jumpstartSubnet",
     [Parameter(Mandatory = $true)]
     [string] $subscription,
     [Parameter()]
