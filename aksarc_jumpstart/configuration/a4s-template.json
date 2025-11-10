@@ -4,11 +4,11 @@
   "parameters": {
     "location": {
       "type": "string",
-      "defaultValue": "canadacentral"
+      "defaultValue": "eastus2"
     },
     "vmName": {
       "type": "string",
-      "defaultValue": "myCanadaVM"
+      "defaultValue": "jumpstartVM"
     },
     "tenantId": {
       "type": "string",
