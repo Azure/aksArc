@@ -1,9 +1,10 @@
 param(
-    [string]$resource_group = "jumpstart-rg",
+    [string] $resource_group = "jumpstart-rg",
     [string] $aksArcClusterName,
     [string] $lnetName,
     [string] $customLocationName,
-    [string] $subscription
+    [string] $subscription,
+    [string] $additionalParameters = "--generate-ssh-keys"
 )
 
 Start-Transcript -Path "E:\log\deployaksarccluster.ps1.log" -Append
@@ -14,6 +15,7 @@ az account set -s $subscription
 $clId = az customlocation show --name $customLocationName --resource-group $resource_group --query "id" -o tsv
 
 $lnetId = az stack-hci-vm network lnet show --name $lnetName -g $resource_group --query id -o tsv
-az aksarc create --name $aksArcClusterName --resource-group $resource_group --custom-location $clId --vnet-ids $lnetId  --generate-ssh-keys
+
+az aksarc create --name $aksArcClusterName --resource-group $resource_group --custom-location $clId --vnet-ids $lnetId $additionalParameters
 
 Stop-Transcript

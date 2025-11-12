@@ -14,6 +14,7 @@ VNET_NAME="jumpstartVNet"
 VM_NAME="jumpstartVM"
 SUBNET_NAME="jumpstartSubnet"
 WORKING_DIR="E:\\AKSArc"
+AKS_ADDITIONAL_PARAMS="--generate-ssh-keys"
 
 # Function to print usage
 usage() {
@@ -27,12 +28,20 @@ usage() {
     echo "  -n, --subnet-name <name>         Subnet name (default: $SUBNET_NAME)"
     echo "  -a, --appliance-name <name>      Appliance name (default: \${VM_NAME}-appliance)"
     echo "  -c, --custom-location <name>     Custom location name (default: \${APPLIANCE_NAME}-cl)"
-    echo "  -k, --aks-cluster <name>         AKS Arc cluster name (default: generated)"
+    echo "  -k, --aks-cluster <name>         AKS Arc cluster name (default: \${VM_NAME}-aksarc)"
+    echo "  -p, --aks-params <params>        Additional parameters for az aksarc create (default: --generate-ssh-keys)"
     echo "  -w, --working-dir <path>         Working directory (default: $WORKING_DIR)"
     echo "  -h, --help                       Show this help message"
     echo ""
-    echo "Example:"
-    echo "  $0 -s 12345678-1234-1234-1234-123456789012 -g my-rg -l eastus2"
+    echo "Examples:"
+    echo "  Basic deployment:"
+    echo "    $0 -s 12345678-1234-1234-1234-123456789012 -g my-rg -l eastus2"
+    echo ""
+    echo "  With custom cluster name and Azure RBAC enabled:"
+    echo "    $0 -s 12345678-1234-1234-1234-123456789012 -k my-aks-cluster -p \"--enable-azure-rbac --generate-ssh-keys\""
+    echo ""
+    echo "  With workload identity and OIDC issuer:"
+    echo "    $0 -s 12345678-1234-1234-1234-123456789012 -p \"--enable-workload-identity --enable-oidc-issuer --generate-ssh-keys\""
     exit 1
 }
 
@@ -113,6 +122,10 @@ while [[ $# -gt 0 ]]; do
             AKS_ARC_CLUSTER_NAME="$2"
             shift 2
             ;;
+        -p|--aks-params)
+            AKS_ADDITIONAL_PARAMS="$2"
+            shift 2
+            ;;
         -w|--working-dir)
             WORKING_DIR="$2"
             shift 2
@@ -163,6 +176,7 @@ log "  Appliance Name: $APPLIANCE_NAME"
 log "  Custom Location: $CUSTOM_LOCATION_NAME"
 log "  ARC Logical Network: $ARC_LNET_NAME"
 log "  AKS Arc Cluster: $AKS_ARC_CLUSTER_NAME"
+log "  AKS Additional Parameters: $AKS_ADDITIONAL_PARAMS"
 log "  Working Directory: $WORKING_DIR"
 log "  Subscription ID: $SUBSCRIPTION_ID"
 
@@ -239,7 +253,7 @@ execute_script "deploycustomlocation.ps1" "-resource_group \"$GROUP_NAME\" -appl
 
 execute_script "deploylnet.ps1" "-resource_group \"$GROUP_NAME\" -lnetName \"$ARC_LNET_NAME\" -customLocationName \"$CUSTOM_LOCATION_NAME\" -location \"$LOCATION\" -subscription \"$SUBSCRIPTION_ID\""
 
-execute_script "deployaksarccluster.ps1" "-resource_group \"$GROUP_NAME\" -aksArcClusterName \"$AKS_ARC_CLUSTER_NAME\" -lnetName \"$ARC_LNET_NAME\" -customLocationName \"$CUSTOM_LOCATION_NAME\" -subscription \"$SUBSCRIPTION_ID\""
+execute_script "deployaksarccluster.ps1" "-resource_group \"$GROUP_NAME\" -aksArcClusterName \"$AKS_ARC_CLUSTER_NAME\" -lnetName \"$ARC_LNET_NAME\" -customLocationName \"$CUSTOM_LOCATION_NAME\" -subscription \"$SUBSCRIPTION_ID\" -additionalParameters \"$AKS_ADDITIONAL_PARAMS\""
 
 log "AKS Arc deployment completed successfully!"
 log ""
