@@ -158,13 +158,22 @@ After successful deployment, you can:
    az connectedk8s show --resource-group <resource-group> --name <cluster-name>
    ```
 
-2. **Get cluster credentials**:
+2. **[OPTIONAL] Enable Microsoft Entra ID (Azure AD) with Kubernetes RBAC**:
+
+   ```bash
+   az aksarc update \
+     --name <cluster-name> \
+     --resource-group <resource-group> \
+     --aad-admin-group-object-ids <group-object-id>
+   ```
+
+3. **Get cluster credentials**:
 
    ```bash
    az connectedk8s proxy --resource-group <resource-group> --name <cluster-name>
    ```
 
-3. **Connect using kubectl** to manage your AKS Arc cluster
+4. **Connect using kubectl** to manage your AKS Arc cluster
 
 ## Cleanup
 
