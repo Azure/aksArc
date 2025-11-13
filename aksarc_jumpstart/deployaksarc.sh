@@ -253,7 +253,7 @@ execute_script "deploycustomlocation.ps1" "-resource_group \"$GROUP_NAME\" -appl
 
 execute_script "deploylnet.ps1" "-resource_group \"$GROUP_NAME\" -lnetName \"$ARC_LNET_NAME\" -customLocationName \"$CUSTOM_LOCATION_NAME\" -location \"$LOCATION\" -subscription \"$SUBSCRIPTION_ID\""
 
-execute_script "deployaksarccluster.ps1" "-resource_group \"$GROUP_NAME\" -aksArcClusterName \"$AKS_ARC_CLUSTER_NAME\" -lnetName \"$ARC_LNET_NAME\" -customLocationName \"$CUSTOM_LOCATION_NAME\" -subscription \"$SUBSCRIPTION_ID\" -additionalParameters \"$AKS_ADDITIONAL_PARAMS\""
+execute_script "deployaksarccluster.ps1" "-resource_group \"$GROUP_NAME\" -aksArcClusterName \"$AKS_ARC_CLUSTER_NAME\" -lnetName \"$ARC_LNET_NAME\" -customLocationName \"$CUSTOM_LOCATION_NAME\" -subscription \"$SUBSCRIPTION_ID\" -additionalParameters '$AKS_ADDITIONAL_PARAMS'"
 
 log "AKS Arc deployment completed successfully!"
 log ""
