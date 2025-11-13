@@ -16,8 +16,13 @@ $clId = az customlocation show --name $customLocationName --resource-group $reso
 
 $lnetId = az stack-hci-vm network lnet show --name $lnetName -g $resource_group --query id -o tsv
 
-# Build the command with additional parameters properly expanded
-$command = "az aksarc create --name $aksArcClusterName --resource-group $resource_group --custom-location $clId --vnet-ids $lnetId $additionalParameters"
-Invoke-Expression $command
+# Remove any surrounding quotes from additionalParameters if present
+$cleanParams = $additionalParameters.Trim("'").Trim('"')
+
+# Split parameters and build argument array
+$paramArray = $cleanParams -split '\s+'
+$azCommand = @('aksarc', 'create', '--name', $aksArcClusterName, '--resource-group', $resource_group, '--custom-location', $clId, '--vnet-ids', $lnetId) + $paramArray
+
+& az @azCommand
 
 Stop-Transcript
