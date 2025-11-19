@@ -6,7 +6,7 @@ param(
     [string] $subscription
 )
 
-Start-Transcript -Path "E:\log\deploylnet.ps1.log" -Append
+Start-Transcript -Path "$env:LogDirectory\deploylnet.ps1.log" -Append
 
 $ipAllocationMethod = "Static"  
 $vmSwitchName = "InternalNAT"  
