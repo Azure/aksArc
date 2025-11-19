@@ -33,6 +33,9 @@ if ([string]::IsNullOrEmpty($customLocationName)) {
 if ([string]::IsNullOrEmpty($ArcLnetName)) {
     $ArcLnetName = "$applianceName-lnet"
 }
+if ([string]::IsNullOrEmpty($aksArcClusterName)) {
+    $aksArcClusterName = "$applianceName-aksarc"
+}
 # This is a continuation of jumpstart.ps1 to deploy ARB specific components
 # At this point, MOC is expected to be installed.
 
