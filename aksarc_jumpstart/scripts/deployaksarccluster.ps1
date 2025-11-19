@@ -6,7 +6,7 @@ param(
     [string] $subscription
 )
 
-Start-Transcript -Path "E:\log\deployaksarccluster.ps1.log" -Append
+Start-Transcript -Path "$env:LogDirectory\deployaksarccluster.ps1.log" -Append
 
 az login --identity
 az account set -s $subscription

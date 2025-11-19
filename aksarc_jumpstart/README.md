@@ -188,4 +188,4 @@ az group delete --name <groupname> --yes
 - **Permission Issues**: Ensure you have Contributor access to the Azure subscription
 - **Quota Issues**: Verify your subscription has quota for E16s v4 VMs in the target region
 - **Network Issues**: Check that the VM can access GitHub for script downloads
-- **MOC Installation**: If MOC install fails, RDP to the VM and check the PowerShell logs in `E:\log\`
+- **MOC Installation**: If MOC install fails, RDP to the VM and check the PowerShell logs in `$env:LogDirectory\`
