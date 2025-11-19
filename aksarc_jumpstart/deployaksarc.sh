@@ -229,12 +229,11 @@ execute_script() {
 # Execute scripts in the required order
 execute_script "installazmodules.ps1" "-arcHciVersion \"1.3.15\""
 
-execute_script "deployappliance.ps1" "-resource_group \"$GROUP_NAME\" -appliance_name \"$APPLIANCE_NAME\" -workDirectory \"$WORKING_DIR\" -location \"$LOCATION\" -subscription \"$SUBSCRIPTION_ID\""
+execute_script "deployappliance.ps1" "-resource_group \"$GROUP_NAME\" -appliance_name \"$APPLIANCE_NAME\" -location \"$LOCATION\" -subscription \"$SUBSCRIPTION_ID\""
 
-execute_script "deployaksarcextension.ps1" "-resource_group \"$GROUP_NAME\" -appliance_name \"$APPLIANCE_NAME\" -workDirectory \"$WORKING_DIR\" -location \"$LOCATION\" -subscription \"$SUBSCRIPTION_ID\""
+execute_script "deployaksarcextension.ps1" "-resource_group \"$GROUP_NAME\" -appliance_name \"$APPLIANCE_NAME\" -location \"$LOCATION\" -subscription \"$SUBSCRIPTION_ID\""
 
-execute_script "deployvmssextension.ps1" "-resource_group \"$GROUP_NAME\" -appliance_name \"$APPLIANCE_NAME\" -workDirectory \"$WORKING_DIR\" -location \"$LOCATION\" -subscription \"$SUBSCRIPTION_ID\""
-
+execute_script "deployvmssextension.ps1" "-resource_group \"$GROUP_NAME\" -appliance_name \"$APPLIANCE_NAME\" -location \"$LOCATION\" -subscription \"$SUBSCRIPTION_ID\""
 execute_script "deploycustomlocation.ps1" "-resource_group \"$GROUP_NAME\" -appliance_name \"$APPLIANCE_NAME\" -customLocationName \"$CUSTOM_LOCATION_NAME\" -subscription \"$SUBSCRIPTION_ID\""
 
 execute_script "deploylnet.ps1" "-resource_group \"$GROUP_NAME\" -lnetName \"$ARC_LNET_NAME\" -customLocationName \"$CUSTOM_LOCATION_NAME\" -location \"$LOCATION\" -subscription \"$SUBSCRIPTION_ID\""
