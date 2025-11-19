@@ -2,7 +2,7 @@ param(
     [string]$arcHciVersion = "1.3.15"
 )
 
-Start-Transcript -Path "E:\log\installazmodules.ps1.log" -Append
+Start-Transcript -Path "$env:LogDirectory\installazmodules.ps1.log" -Append
 
 $VerbosePreference = "Continue"
 Install-Module -Name ArcHci -Repository PSGallery -AcceptLicense -Force -RequiredVersion $arcHciVersion

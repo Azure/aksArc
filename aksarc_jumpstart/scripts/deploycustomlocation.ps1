@@ -5,7 +5,7 @@ param(
     [string] $customLocationName
 )
 
-Start-Transcript -Path "E:\log\deploycustomlocation.ps1.log" -Append
+Start-Transcript -Path "$env:LogDirectory\deploycustomlocation.ps1.log" -Append
 
 $aksarcExtName = "hybridaksextension"
 $arcvmExtName = "vmss-hci"

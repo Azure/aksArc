@@ -5,7 +5,7 @@
 # DHCP Scope: 172.16.100.0 - 172.16.100.255
 # Everything else, is static
 
-Start-Transcript -Path "E:\log\1.ps1.log" -Append
+Start-Transcript -Path "$env:LogDirectory\1.ps1.log" -Append
 
 # Wait for Hyper-V to be ready. If we attempt too quickly, we would end up getting
 # Hyper-V encountered an error trying to access an object on computer '<some comupter name>' because the object was not found.
