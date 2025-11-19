@@ -1,12 +1,15 @@
 param(
   [string]$resource_group = "jumpstart-rg",
   [string]$appliance_name = "aks_arc_appliance",
-  [string] $workDirectory = "E:\AKSArc",
+  [string] $workDirectory,
   [string] $location = "eastus2",
   [string] $subscription
 )
 
-Start-Transcript -Path "E:\log\deployvmssextension.ps1.log" -Append
+if ([string]::IsNullOrEmpty($workDirectory)) {
+    $workDirectory = "$env:WorkingDir"
+}
+Start-Transcript -Path "$env:LogDirectory\deployvmssextension.ps1.log" -Append
 $release_train = "stable"
 $arcvmversion = "5.12.10"
 $arcvmExtName = "vmss-hci"

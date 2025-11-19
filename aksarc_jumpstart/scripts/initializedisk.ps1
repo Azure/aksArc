@@ -11,5 +11,12 @@ New-Partition -DiskNumber $disk.Number -UseMaximumSize -AssignDriveLetter
 $driveLetter = (Get-Partition -DiskNumber $disk.Number | Select-Object -Last 1).DriveLetter
 Format-Volume -DriveLetter $driveLetter -FileSystem NTFS -Confirm:$false
 
+$workingDir = "$($driveLetter):\AKSArc"
+$logDirectory = "$workingDir\log"
+
+[System.Environment]::SetEnvironmentVariable("WorkingDir", "$workingDir" , "Machine")
+[System.Environment]::SetEnvironmentVariable("LogDirectory", "$logDirectory" , "Machine")
 # Initialize log directory
-mkdir e:\log
+mkdir $logDirectory
+
+Restart-Computer -Force -Confirm:$false

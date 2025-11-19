@@ -1,5 +1,5 @@
 
-Start-Transcript -Path "E:\log\deploymoc.ps1.log" -Append
+Start-Transcript -Path "$env:LogDirectory\deploymoc.ps1.log" -Append
 #Get-NetFirewallRule -Name FPS-SMB* | Set-NetFirewallRule -Enabled True
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -Confirm:$false
 Install-Module -Name PowershellGet -Force -Confirm:$false -SkipPublisherCheck
@@ -14,7 +14,7 @@ netsh int ipv4 add ex tcp 65000 1 store=persistent
 New-NetFirewallRule -Name WSSDAgents-TCP-In -LocalPort 45000,55000,45001,65000 -DisplayName WSSDAgents -Protocol TCP
 
 $scriptContent = @"
-Set-MocConfig -workingDir "E:\MOC" -catalog "aks-hci-asz-stable-catalogs-int" -ring "monthly" 
+Set-MocConfig -workingDir $env:WorkingDir -catalog "aks-hci-asz-stable-catalogs-int" -ring "monthly" 
 Install-Moc
 "@
 

@@ -1,12 +1,16 @@
 param(
     [string]$resource_group = "jumpstart-rg",
     [string]$appliance_name = "aks_arc_appliance",
-    [string] $workDirectory = "E:\AKSArc",
+    [string] $workDirectory,
     [string] $location = "eastus2",
     [string] $subscription
 )
 
-Start-Transcript -Path "E:\log\deployaksarcextension.ps1.log" -Append
+if ([string]::IsNullOrEmpty($workDirectory)) {
+    $workDirectory = "$env:WorkingDir"
+}
+
+Start-Transcript -Path "$env:LogDirectory\deployaksarcextension.ps1.log" -Append
 $release_train = "stable"
 $aksarcversion = "4.0.69"
 $aksarcExtName = "hybridaksextension"
