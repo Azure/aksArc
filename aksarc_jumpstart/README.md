@@ -15,6 +15,26 @@ Before starting the deployment, ensure you have the following prerequisites inst
 - **Git**: For cloning the repository
 - **jq**: JSON processor (for bash scripts) - `sudo apt install jq` (Ubuntu/Debian) or `brew install jq` (macOS)
 - **Valid Azure Subscription** with sufficient quotas for Standard E16s v4 VMs (16 vCPUs, 128 GiB memory)
+- **Azure Resource Providers Registered**: The following resource providers must be registered in your subscription:
+  ```bash
+  az provider register --namespace Microsoft.Kubernetes --wait --verbose
+  az provider register --namespace Microsoft.KubernetesConfiguration --wait --verbose
+  az provider register --namespace Microsoft.ExtendedLocation --wait --verbose
+  az provider register --namespace Microsoft.ResourceConnector --wait --verbose
+  az provider register --namespace Microsoft.AzureStackHCI --wait --verbose
+  az provider register --namespace Microsoft.HybridConnectivity --wait --verbose
+  az provider register --namespace Microsoft.HybridContainerService --wait --verbose
+  ```
+  Verify registration status:
+  ```bash
+  az provider show -n Microsoft.Kubernetes -o table
+  az provider show -n Microsoft.KubernetesConfiguration -o table
+  az provider show -n Microsoft.ExtendedLocation -o table
+  az provider show -n Microsoft.ResourceConnector -o table
+  az provider show -n Microsoft.AzureStackHCI -o table
+  az provider show -n Microsoft.HybridConnectivity -o table
+  az provider show -n Microsoft.HybridContainerService -o table
+  ```
 
 ## Script Parameters
 
