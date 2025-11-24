@@ -5,9 +5,6 @@
     "provisionedClusterName": {
       "type": "string"
     },
-    "connectedClustersApiVersion": {
-      "type": "string"
-    },
     "provisionedClustersApiVersion": {
       "type": "string"
     },
@@ -23,30 +20,42 @@
     "agentOsType": {
       "type": "string"
     },
-    "location": {
-      "type": "string"
+    "enableAutoScaling": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "minCount": {
+      "type": "int",
+      "defaultValue": 1
+    },
+    "maxCount": {
+      "type": "int",
+      "defaultValue": 5
+    },
+    "nodeLabels": {
+      "type": "object",
+      "defaultValue": {}
+    },
+    "nodeTaints": {
+      "type": "array",
+      "defaultValue": []
     }
   },
   "resources": [
-    {
-      "type": "Microsoft.Kubernetes/connectedClusters",
-      "apiVersion": "[parameters('connectedClustersApiVersion')]",
-      "name": "[parameters('provisionedClusterName')]",
-      "location": "[parameters('location')]",
-      "condition": false
-    },
     {
       "type": "microsoft.hybridcontainerservice/provisionedclusterinstances/agentpools",
       "apiVersion": "[parameters('provisionedClustersApiVersion')]",
       "name": "[concat('default/', parameters('agentName'))]",
       "scope": "[resourceId('microsoft.Kubernetes/connectedClusters', parameters('provisionedClusterName'))]",
-      "dependsOn": [
-        "[resourceId('microsoft.Kubernetes/connectedClusters', parameters('provisionedClusterName'))]"
-      ],
       "properties": {
         "count": "[parameters('agentCount')]",
         "osType": "[parameters('agentOsType')]",
-        "vmSize": "[parameters('agentVMSize')]"
+        "vmSize": "[parameters('agentVMSize')]",
+        "enableAutoScaling": "[parameters('enableAutoScaling')]",
+        "minCount": "[if(parameters('enableAutoScaling'), parameters('minCount'), json('null'))]",
+        "maxCount": "[if(parameters('enableAutoScaling'), parameters('maxCount'), json('null'))]",
+        "nodeLabels": "[if(greater(length(parameters('nodeLabels')), 0), parameters('nodeLabels'), json('null'))]",
+        "nodeTaints": "[if(greater(length(parameters('nodeTaints')), 0), parameters('nodeTaints'), json('null'))]"
       }
     }
   ]
