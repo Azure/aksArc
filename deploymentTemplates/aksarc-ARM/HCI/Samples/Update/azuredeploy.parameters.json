@@ -2,18 +2,16 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "location": {
+        "provisionedClusterName": {
             "value": "TODO: Fill in parameter value"
         },
         "customLocation": {
             "value": "TODO: Fill in parameter value"
         },
-        "vnetSubnetIds": {
-            "value": [
-                "TODO: Fill in parameter value"
-            ]
+        "provisionedClustersApiVersion": {
+            "value": "TODO: Fill in parameter value"
         },
-        "provisionedClusterName": {
+        "kubernetesVersion": {
             "value": "TODO: Fill in parameter value"
         },
         "sshRSAPublicKey": {
@@ -22,14 +20,22 @@
         "controlPlaneIp": {
             "value": "TODO: Fill in parameter value"
         },
-        "kubernetesVersion": {
-            "value": "TODO: Fill in parameter value"
-        },
         "controlPlaneVMSize": {
             "value": "TODO: Fill in parameter value"
         },
         "controlPlaneNodeCount": {
-            "value": 0 
+            "value": "TODO: Fill in parameter value"
+        },
+        "networkPolicy": {
+            "value": "TODO: Fill in parameter value"
+        },
+        "loadBalancerCount": {
+            "value": 0
+        },
+        "vnetSubnetIds": {
+            "value": [
+                "TODO: Fill in parameter value"
+            ]
         },
         "agentName": {
             "value": "TODO: Fill in parameter value"
@@ -41,19 +47,7 @@
             "value": "TODO: Fill in parameter value"
         },
         "agentCount": {
-            "value": 0 
-        },
-        "networkPolicy": {
-            "value": "TODO: Fill in parameter value"
-        },
-        "loadBalancerCount": {
-            "value": 0 
-        },
-        "connectedClustersApiVersion": {
-            "value": "TODO: Fill in parameter value"
-        },
-        "provisionedClustersApiVersion": {
-            "value": "TODO: Fill in parameter value"
+            "value": 1
         },
         "nodepoolLabel": {
             "value": "TODO: Fill in parameter value"
@@ -61,8 +55,14 @@
         "nodepoolLabelValue": {
             "value": "TODO: Fill in parameter value"
         },
-        "nodepoolTaint": {
-            "value": "TODO: Fill in parameter value"
+        "enableAzureHybridBenefit": {
+            "value": "False"
+        },
+        "enableNfsCsiDriver": {
+            "value": true
+        },
+        "enableSmbCsiDriver": {
+            "value": true
         }
     }
 }
