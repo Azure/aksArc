@@ -7,7 +7,7 @@ param provisionedClusterName string
 // Logical network
 param logicalNetworkName string
 
-// Provisioned cluster
+// Aks Arc cluster
 param sshPublicKey string
 param controlPlaneHostIP string
 param kubernetesVersion string
