@@ -63,9 +63,6 @@
         },
         "nodepoolTaints": {
             "value": []
-        },
-        "nodepoolTaint": {
-            "value": "TODO: Fill in parameter value"
         }
     }
 }
