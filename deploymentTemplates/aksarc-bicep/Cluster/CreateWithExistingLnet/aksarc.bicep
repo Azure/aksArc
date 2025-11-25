@@ -5,7 +5,7 @@ param customLocationResourceID string
 param logicalNetworkName string
 
 // Provisioned cluster
-param connectedClusterName string
+param provisionedClusterName string
 param sshPublicKey string
 param controlPlaneHostIP string
 param kubernetesVersion string
@@ -18,11 +18,14 @@ param nodePoolOSType string
 param nodePoolCount int
 param nodePoolLabel string
 param nodePoolLabelValue string
-param nodePoolTaint string
+param nodePoolTaints array
 param netWorkProfilNetworkPolicy string
 param networkProfileLoadBalancerCount int
+param enableAzureHybridBenefit string
+param enableNfsCsiDriver bool
+param enableSmbCsiDriver bool
 
-// You can replace the creation code with the below commented-out code to reference an existing logical network.
+// Reference an existing logical network.
 resource logicalNetwork 'Microsoft.AzureStackHCI/logicalNetworks@2024-01-01' existing = {
   name: logicalNetworkName
 }
@@ -31,7 +34,7 @@ resource logicalNetwork 'Microsoft.AzureStackHCI/logicalNetworks@2024-01-01' exi
 // This is the Arc representation of the AKS cluster, used to create a Managed Identity for the provisioned cluster.
 resource connectedCluster 'Microsoft.Kubernetes/ConnectedClusters@2024-01-01' = {
   location: azureLocation
-  name: connectedClusterName
+  name: provisionedClusterName
   identity: {
     type: 'SystemAssigned'
   }
@@ -87,9 +90,7 @@ resource provisionedClusterInstance 'Microsoft.HybridContainerService/provisione
         nodeLabels: {
           '${nodePoolLabel}': nodePoolLabelValue
         }
-        nodeTaints: [
-          nodePoolTaint
-        ]
+        nodeTaints: empty(nodePoolTaints) ? null : nodePoolTaints
       }
     ]
     cloudProviderProfile: {
@@ -99,12 +100,15 @@ resource provisionedClusterInstance 'Microsoft.HybridContainerService/provisione
         ]
       }
     }
+    licenseProfile: {
+      azureHybridBenefit: enableAzureHybridBenefit
+    }
     storageProfile: {
       nfsCsiDriver: {
-        enabled: true
+        enabled: enableNfsCsiDriver
       }
       smbCsiDriver: {
-        enabled: true
+        enabled: enableSmbCsiDriver
       }
     }
   }
