@@ -1,0 +1,134 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "provisionedClusterName": {
+            "type": "string"
+        },
+        "customLocation": {
+            "type": "string"
+        },
+        "provisionedClustersApiVersion": {
+            "type": "string"
+        },
+        "kubernetesVersion": {
+            "type": "string"
+        },
+        "sshRSAPublicKey": {
+            "type": "string"
+        },
+        "controlPlaneIp": {
+            "type": "string"
+        },
+        "controlPlaneVMSize": {
+            "type": "string"
+        },
+        "controlPlaneNodeCount": {
+            "type": "int"
+        },
+        "networkPolicy": {
+            "type": "string"
+        },
+        "loadBalancerCount": {
+            "type": "int"
+        },
+        "vnetSubnetIds": {
+            "type": "array"
+        },
+        "agentName": {
+            "type": "string"
+        },
+        "agentVMSize": {
+            "type": "string"
+        },
+        "agentOsType": {
+            "type": "string"
+        },
+        "agentCount": {
+            "type": "int"
+        },
+        "nodepoolLabel": {
+            "type": "string"
+        },
+        "nodepoolLabelValue": {
+            "type": "string"
+        },
+        "enableAzureHybridBenefit": {
+            "type": "string",
+            "allowedValues": [
+                "True",
+                "False"
+            ]
+        },
+        "enableNfsCsiDriver": {
+            "type": "bool"
+        },
+        "enableSmbCsiDriver": {
+            "type": "bool"
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.HybridContainerService/provisionedClusterInstances",
+            "apiVersion": "[parameters('provisionedClustersApiVersion')]",
+            "name": "default",
+            "extendedLocation": {
+                "type": "CustomLocation",
+                "name": "[parameters('customLocation')]"
+            },
+            "properties": {
+                "kubernetesVersion": "[parameters('kubernetesVersion')]",
+                "linuxProfile": {
+                    "ssh": {
+                        "publicKeys": [
+                            {
+                                "keyData": "[parameters('sshRSAPublicKey')]"
+                            }
+                        ]
+                    }
+                },
+                "controlPlane": {
+                    "count": "[parameters('controlPlaneNodeCount')]",
+                    "controlPlaneEndpoint": {
+                        "hostIP": "[parameters('controlPlaneIp')]"
+                    },
+                    "vmSize": "[parameters('controlPlaneVMSize')]"
+                },
+                "networkProfile": {
+                    "networkPolicy": "[parameters('networkPolicy')]",
+                    "loadBalancerProfile": {
+                        "count": "[parameters('loadBalancerCount')]"
+                    }
+                },
+                "agentPoolProfiles": [
+                    {
+                        "name": "[parameters('agentName')]",
+                        "count": "[parameters('agentCount')]",
+                        "vmSize": "[parameters('agentVMSize')]",
+                        "osType": "[parameters('agentOsType')]",
+                        "nodeLabels": {
+                            "[parameters('nodepoolLabel')]": "[parameters('nodepoolLabelValue')]"
+                        }
+                    }
+                ],
+                "cloudProviderProfile": {
+                    "infraNetworkProfile": {
+                        "vnetSubnetIds": "[parameters('vnetSubnetIds')]"
+                    }
+                },
+                "licenseProfile": {
+                    "azureHybridBenefit": "[parameters('enableAzureHybridBenefit')]"
+                },
+                "storageProfile": {
+                    "nfsCsiDriver": {
+                        "enabled": "[parameters('enableNfsCsiDriver')]"
+                    },
+                    "smbCsiDriver": {
+                        "enabled": "[parameters('enableSmbCsiDriver')]"
+                    }
+                }
+            },
+            "scope": "[format('Microsoft.Kubernetes/connectedClusters/{0}', parameters('provisionedClusterName'))]"
+        }
+    ]
+}

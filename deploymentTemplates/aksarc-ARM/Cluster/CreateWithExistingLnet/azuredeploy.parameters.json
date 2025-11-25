@@ -61,8 +61,8 @@
         "nodepoolLabelValue": {
             "value": "TODO: Fill in parameter value"
         },
-        "nodepoolTaint": {
-            "value": "TODO: Fill in parameter value"
+        "nodepoolTaints": {
+            "value": []
         }
     }
 }
