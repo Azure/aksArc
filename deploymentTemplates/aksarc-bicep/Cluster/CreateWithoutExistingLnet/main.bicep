@@ -1,8 +1,7 @@
 
-targetScope='subscription'
+targetScope='resourceGroup'
 
 param azureLocation string
-param deploymentResourceGroupName string
 param customLocationResourceID string
 
 // Logical network
@@ -17,7 +16,7 @@ param vipPoolEnd string
 param nextHopIpAddress string
 
 // Provisioned cluster
-param connectedClusterName string
+param provisionedClusterName string
 param sshPublicKey string
 param controlPlaneHostIP string
 param kubernetesVersion string
@@ -29,18 +28,15 @@ param nodePoolOSType string
 param nodePoolCount int
 param nodePoolLabel string
 param nodePoolLabelValue string
-param nodePoolTaint string
+param nodePoolTaints array
 param netWorkProfilNetworkPolicy string
 param networkProfileLoadBalancerCount int
-
-resource deploymentResourceGroup'Microsoft.Resources/resourceGroups@2024-03-01' = {
-  name: deploymentResourceGroupName
-  location: azureLocation
-}
+param enableAzureHybridBenefit string
+param enableNfsCsiDriver bool
+param enableSmbCsiDriver bool
 
 module aksarcModule 'aksarc.bicep' = {
   name: '${deployment().name}-aksarc'
-  scope: resourceGroup(deploymentResourceGroupName)
   params:{
     kubernetesVersion: kubernetesVersion
     controlPlaneVMSize: controlPlaneVMSize
@@ -49,10 +45,10 @@ module aksarcModule 'aksarc.bicep' = {
     nodePoolVMSize: nodePoolVMSize
     nodePoolLabel: nodePoolLabel
     nodePoolLabelValue: nodePoolLabelValue
-    nodePoolTaint: nodePoolTaint
+    nodePoolTaints: nodePoolTaints
     networkProfileLoadBalancerCount: networkProfileLoadBalancerCount
     netWorkProfilNetworkPolicy: netWorkProfilNetworkPolicy
-    connectedClusterName: connectedClusterName
+    provisionedClusterName: provisionedClusterName
     controlPlaneHostIP: controlPlaneHostIP
     sshPublicKey: sshPublicKey
     nodePoolOSType: nodePoolOSType
@@ -68,8 +64,8 @@ module aksarcModule 'aksarc.bicep' = {
     vipPoolEnd: vipPoolEnd
     nextHopIpAddress: nextHopIpAddress
     logicalNetworkName: logicalNetworkName
+    enableAzureHybridBenefit: enableAzureHybridBenefit
+    enableNfsCsiDriver: enableNfsCsiDriver
+    enableSmbCsiDriver: enableSmbCsiDriver
   }
-  dependsOn: [
-    deploymentResourceGroup
-  ]
 }
