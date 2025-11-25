@@ -84,8 +84,9 @@
          "nodepoolLabelValue":{
             "type": "string"
         },
-        "nodepoolTaint":{
-            "type": "string"
+        "nodepoolTaints":{
+            "type": "array",
+            "defaultValue": []
         }
     },
     "resources": [
@@ -196,7 +197,7 @@
                         "nodeLabels": {
                             "[parameters('nodepoolLabel')]": "[parameters('nodepoolLabelValue')]"
                         },
-                        "nodeTaints": ["[parameters('nodepoolTaint')]"]
+                        "nodeTaints": "[if(greater(length(parameters('nodepoolTaints')), 0), parameters('nodepoolTaints'), json('null'))]"
                     }
                 ],
                 "cloudProviderProfile": {

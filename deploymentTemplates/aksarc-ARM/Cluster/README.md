@@ -4,9 +4,9 @@ This template deploys an AKS Arc Kubernetes cluster with workload identity feder
 
 ## Folder Structure
 
-- **Samples/Create1/**: Deploy a cluster using an existing logical network
-- **Samples/Create2/**: Deploy a cluster and create a new logical network
-- **Samples/Update/**: Update an existing provisioned cluster's configuration
+- **CreateWithExistingLnet/**: Deploy a cluster using an existing logical network
+- **CreateWithoutExistingLnet/**: Deploy a cluster and create a new logical network
+- **Update/**: Update an existing provisioned cluster's configuration
 
 ## Instructions
 
@@ -22,7 +22,7 @@ az deployment group create -g $resourceGroup --template-file azuredeploy.json -p
 
 ## Update Existing Cluster
 
-The **Samples/Update/** folder contains a template to update an existing AKS Arc provisioned cluster. ARM template updates use PUT operations which require the complete resource specification.
+The **Update/** folder contains a template to update an existing AKS Arc provisioned cluster. ARM template updates use PUT operations which require the complete resource specification.
 
 ### Updatable Fields
 
@@ -46,7 +46,7 @@ Some parameters you can modify to update your cluster:
 
 4. **Deploy the update:**
    ```bash
-   az deployment group create -g <resource-group> --template-file deploymentTemplates/aksarc-ARM/HCI/Samples/Update/azuredeploy.json -p deploymentTemplates/aksarc-ARM/HCI/Samples/Update/azuredeploy.parameters.json
+   az deployment group create -g <resource-group> --template-file deploymentTemplates/aksarc-ARM/Cluster/Update/azuredeploy.json -p deploymentTemplates/aksarc-ARM/Cluster/Update/azuredeploy.parameters.json
    ```
 
 ### Example: Scale Control Plane
@@ -64,7 +64,7 @@ To scale the control plane from 1 to 3 nodes:
 
 ### Important Note
 
-**Nodepool-specific settings** (node count, autoscaling, labels, taints) should be updated using the [nodepool deployment template](../aks-nodepool/) instead of the cluster update template.
+**Nodepool-specific settings** (node count, autoscaling, labels, taints) should be updated using the [nodepool deployment template](../Nodepool/) instead of the cluster update template. Updating the nodepool spec through the cluster template will **not** work as intended and should **not** be used.
 
 ## Additional Resources
 
