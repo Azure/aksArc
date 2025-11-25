@@ -8,8 +8,29 @@
         "customLocation": {
             "type": "string"
         },
-        "vnetSubnetIds": {
+        "lnetName": {
+            "type": "string"
+        },
+        "dnsServers": {
             "type": "array"
+        },
+        "addressPrefix": {
+            "type": "string"
+        },
+        "ipAllocationMethod": {
+            "type": "string"
+        },
+         "vmSwitchName": {
+             "type": "string"
+         },
+        "vippoolstart": {
+            "type": "string"
+        },
+        "vippoolend": {
+            "type": "string"
+        },
+        "nextHopIpAddress": {
+            "type": "string"
         },
         "provisionedClusterName": {
             "type": "string"
@@ -63,11 +84,58 @@
          "nodepoolLabelValue":{
             "type": "string"
         },
-        "nodepoolTaint":{
-            "type": "string"
+        "nodepoolTaints":{
+            "type": "array",
+            "defaultValue": []
         }
     },
     "resources": [
+        {
+            "type": "Microsoft.AzureStackHCI/logicalNetworks",
+            "apiVersion": "2024-01-01",
+            "name": "[parameters('lnetName')]",
+            "location": "[parameters('location')]",
+            "extendedLocation": {
+                "type": "CustomLocation",
+                "name": "[parameters('customLocation')]"
+            },
+            "properties": {
+                "dhcpOptions": {
+                    "dnsServers": "[parameters('dnsServers')]"
+                },
+                "subnets": [
+                    {
+                        "name": "armSubnet",
+                        "properties": {
+                            "addressPrefix": "[parameters('addressPrefix')]",
+                            "ipAllocationMethod": "[parameters('ipAllocationMethod')]",
+                            "ipPools": [
+                                {
+                                    "name": "armIPPool",
+                                    "start": "[parameters('vippoolstart')]",
+                                    "end": "[parameters('vippoolend')]",
+                                    "ipPoolType": "vippool"
+                                }
+                            ],
+                            "routeTable": {
+                                "properties": {
+                                    "routes": [
+                                        {
+                                            "name": "defaultRoute",
+                                            "properties": {
+                                                "addressPrefix": "0.0.0.0/0",
+                                                "nextHopIpAddress": "[parameters('nextHopIpAddress')]"
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                ],
+                "vmSwitchName": "[parameters('vmSwitchName')]"
+            }
+        },
         {
             "type": "Microsoft.Kubernetes/connectedClusters",
             "apiVersion": "[parameters('connectedClustersApiVersion')]",
@@ -93,7 +161,8 @@
                 "name": "[parameters('customLocation')]"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Kubernetes/connectedClusters', parameters('provisionedClusterName'))]"
+                "[resourceId('Microsoft.Kubernetes/connectedClusters', parameters('provisionedClusterName'))]",
+                "[resourceId('Microsoft.AzureStackHCI/logicalNetworks', parameters('lnetName'))]"
             ],
             "properties": {
                 "kubernetesVersion": "[parameters('kubernetesVersion')]",
@@ -128,12 +197,14 @@
                         "nodeLabels": {
                             "[parameters('nodepoolLabel')]": "[parameters('nodepoolLabelValue')]"
                         },
-                        "nodeTaints": ["[parameters('nodepoolTaint')]"]
+                        "nodeTaints": "[if(greater(length(parameters('nodepoolTaints')), 0), parameters('nodepoolTaints'), json('null'))]"
                     }
                 ],
                 "cloudProviderProfile": {
                     "infraNetworkProfile": {
-                        "vnetSubnetIds": "[parameters('vnetSubnetIds')]"
+                        "vnetSubnetIds": [
+                            "[resourceId('Microsoft.AzureStackHCI/logicalNetworks', parameters('lnetName'))]"
+                        ]
                     }
                 },
                 "storageProfile": {
