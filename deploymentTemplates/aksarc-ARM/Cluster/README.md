@@ -6,11 +6,11 @@ This template deploys an AKS Arc Kubernetes cluster with workload identity feder
 
 - **CreateWithExistingLnet/**: Deploy a cluster using an existing logical network
 - **CreateWithoutExistingLnet/**: Deploy a cluster and create a new logical network
-- **Update/**: Update an existing provisioned cluster's configuration
+- **Update/**: Update an existing Aks Arc cluster's configuration
 
 ## Instructions
 
-Update azuredeploy.parameters.json with provisioned cluster name, ssh public key, and ARM IDs of vnet and custom location.
+Update azuredeploy.parameters.json with Aks Arc cluster name, ssh public key, and ARM IDs of vnet and custom location.
 
 ## Deploy
 
@@ -22,7 +22,7 @@ az deployment group create -g $resourceGroup --template-file azuredeploy.json -p
 
 ## Update Existing Cluster
 
-The **Update/** folder contains a template to update an existing AKS Arc provisioned cluster. ARM template updates use PUT operations which require the complete resource specification.
+The **Update/** folder contains a template to update an existing AKS Arc cluster. ARM template updates use PUT operations which require the complete resource specification.
 
 ### Updatable Fields
 

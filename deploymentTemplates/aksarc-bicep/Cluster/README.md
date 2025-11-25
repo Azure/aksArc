@@ -6,11 +6,11 @@ This template deploys an AKS Arc Kubernetes cluster with workload identity feder
 
 - **CreateWithExistingLnet/**: Deploy a cluster using an existing logical network
 - **CreateWithoutExistingLnet/**: Deploy a cluster and create a new logical network
-- **Update/**: Update an existing provisioned cluster's configuration
+- **Update/**: Update an existing Aks Arc cluster's configuration
 
 ## Instructions
 
-Update the `.bicepparam` file with your provisioned cluster name, ssh public key, and resource IDs of the logical network and custom location.
+Update the `.bicepparam` file with your Aks Arc cluster name, ssh public key, and resource IDs of the logical network and custom location.
 
 ## Deploy
 
@@ -38,7 +38,7 @@ az deployment group create \
 
 ## Update Existing Cluster
 
-The **Update/** folder contains a template to update an existing AKS Arc provisioned cluster. Bicep deployment updates use PUT operations which require the complete resource specification.
+The **Update/** folder contains a template to update an existing AKS Arc cluster. Bicep deployment updates use PUT operations which require the complete resource specification.
 
 ### Updatable Fields
 
