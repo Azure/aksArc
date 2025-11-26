@@ -63,6 +63,15 @@
         },
         "nodepoolTaints": {
             "value": []
+        },
+        "enableAzureHybridBenefit": {
+            "value": "TODO: Fill in parameter value"
+        },
+        "enableNfsCsiDriver": {
+            "value": true
+        },
+        "enableSmbCsiDriver": {
+            "value": true
         }
     }
 }

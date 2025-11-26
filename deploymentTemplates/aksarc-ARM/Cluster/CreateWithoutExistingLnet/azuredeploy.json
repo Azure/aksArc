@@ -87,6 +87,19 @@
         "nodepoolTaints":{
             "type": "array",
             "defaultValue": []
+        },
+        "enableAzureHybridBenefit": {
+            "type": "string",
+            "allowedValues": [
+                "True",
+                "False"
+            ]
+        },
+        "enableNfsCsiDriver": {
+            "type": "bool"
+        },
+        "enableSmbCsiDriver": {
+            "type": "bool"
         }
     },
     "resources": [
@@ -162,7 +175,7 @@
             },
             "dependsOn": [
                 "[resourceId('Microsoft.Kubernetes/connectedClusters', parameters('connectedClusterName'))]",
-                "[resourceId('Microsoft.AzureStackHCI/logicalNetworks', parameters('logicalNetworkName'))]"
+                "[resourceId('Microsoft.AzureStackHCI/logicalNetworks', parameters('lnetName'))]"
             ],
             "properties": {
                 "kubernetesVersion": "[parameters('kubernetesVersion')]",
@@ -207,12 +220,15 @@
                         ]
                     }
                 },
+                "licenseProfile": {
+                    "azureHybridBenefit": "[parameters('enableAzureHybridBenefit')]"
+                },
                 "storageProfile": {
                     "nfsCsiDriver": {
-                        "enabled": true
+                        "enabled": "[parameters('enableNfsCsiDriver')]"
                     },
                     "smbCsiDriver": {
-                        "enabled": true
+                        "enabled": "[parameters('enableSmbCsiDriver')]"
                     }
                 }
             },
