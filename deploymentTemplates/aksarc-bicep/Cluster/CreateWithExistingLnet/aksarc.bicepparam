@@ -8,7 +8,7 @@ param customLocationResourceID = '<TODO>'
 param logicalNetworkName = '<TODO>'
 
 // Aks Arc cluster
-param provisionedClusterName = 'bicepConnectedCluster' // TODO: add your Aks Arc cluster name.
+param connectedClusterName = 'bicepConnectedCluster' // TODO: add your Aks Arc cluster name.
 param sshPublicKey = '<TODO>' // Full public key copied from the .pub file.
 param controlPlaneHostIP = '<TODO>'
 param kubernetesVersion = '<TODO>'

@@ -32,7 +32,7 @@
         "nextHopIpAddress": {
             "value": "TODO: Fill in parameter value" 
         },
-        "provisionedClusterName": {
+        "connectedClusterName": {
             "value": "TODO: Fill in parameter value"
         },
         "sshRSAPublicKey": {

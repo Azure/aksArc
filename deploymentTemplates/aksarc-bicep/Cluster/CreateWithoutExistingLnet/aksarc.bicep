@@ -13,7 +13,7 @@ param vipPoolEnd string
 param nextHopIpAddress string
 
 // Aks Arc cluster
-param provisionedClusterName string
+param connectedClusterName string
 param sshPublicKey string
 param controlPlaneHostIP string
 param kubernetesVersion string
@@ -89,7 +89,7 @@ resource logicalNetwork 'Microsoft.AzureStackHCI/logicalNetworks@2024-01-01' = {
 // This is the Arc representation of the AKS cluster, used to create a Managed Identity for the Aks Arc cluster.
 resource connectedCluster 'Microsoft.Kubernetes/ConnectedClusters@2024-01-01' = {
   location: azureLocation
-  name: provisionedClusterName
+  name: connectedClusterName
   identity: {
     type: 'SystemAssigned'
   }

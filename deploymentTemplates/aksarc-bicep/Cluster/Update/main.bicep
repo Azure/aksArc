@@ -2,7 +2,7 @@
 targetScope='resourceGroup'
 
 param customLocationResourceID string
-param provisionedClusterName string
+param connectedClusterName string
 
 // Logical network
 param logicalNetworkName string
@@ -39,7 +39,7 @@ module aksarcModule 'aksarc.bicep' = {
     nodePoolTaints: nodePoolTaints
     networkProfileLoadBalancerCount: networkProfileLoadBalancerCount
     netWorkProfilNetworkPolicy: netWorkProfilNetworkPolicy
-    provisionedClusterName: provisionedClusterName
+    connectedClusterName: connectedClusterName
     controlPlaneHostIP: controlPlaneHostIP
     sshPublicKey: sshPublicKey
     nodePoolOSType: nodePoolOSType
