@@ -1,12 +1,12 @@
 using 'main.bicep'
 
 param customLocationResourceID = '<TODO>' // The custom location resource ID
-param provisionedClusterName = '<TODO>' // The existing provisioned cluster name
+param connectedClusterName = '<TODO>' // The existing Aks Arc cluster name
 
 // Logical network - existing logical network reference
 param logicalNetworkName = '<TODO>'
 
-// Provisioned cluster
+// Aks Arc cluster
 param sshPublicKey = '<TODO>' // Full public key copied from the .pub file.
 param controlPlaneHostIP = '<TODO>'
 param kubernetesVersion = '<TODO>'

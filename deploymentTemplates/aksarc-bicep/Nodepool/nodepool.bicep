@@ -1,4 +1,4 @@
-param provisionedClusterName string
+param connectedClusterName string
 param nodePoolName string
 param nodePoolVMSize string
 param nodePoolCount int
@@ -12,7 +12,7 @@ param nodeTaints array = []
 
 // Reference the existing connected cluster
 resource connectedCluster 'Microsoft.Kubernetes/ConnectedClusters@2024-01-01' existing = {
-  name: provisionedClusterName
+  name: connectedClusterName
 }
 
 // Create or update the nodepool

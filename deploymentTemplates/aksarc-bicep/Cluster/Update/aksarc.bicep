@@ -1,10 +1,10 @@
 param customLocationResourceID string
-param provisionedClusterName string
+param connectedClusterName string
 
 // Logical network
 param logicalNetworkName string
 
-// Provisioned cluster
+// Aks Arc cluster
 param sshPublicKey string
 param controlPlaneHostIP string
 param kubernetesVersion string
@@ -31,10 +31,10 @@ resource logicalNetwork 'Microsoft.AzureStackHCI/logicalNetworks@2024-01-01' exi
 
 // Reference the existing connected cluster.
 resource connectedCluster 'Microsoft.Kubernetes/ConnectedClusters@2024-01-01' existing = {
-  name: provisionedClusterName
+  name: connectedClusterName
 }
 
-// Update the provisioned cluster instance.
+// Update the Aks Arc cluster instance.
 resource provisionedClusterInstance 'Microsoft.HybridContainerService/provisionedClusterInstances@2024-01-01' = {
   name: 'default'
   scope: connectedCluster
