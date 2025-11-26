@@ -16,7 +16,7 @@ param vipPoolEnd string
 param nextHopIpAddress string
 
 // Aks Arc cluster
-param provisionedClusterName string
+param connectedClusterName string
 param sshPublicKey string
 param controlPlaneHostIP string
 param kubernetesVersion string
@@ -48,7 +48,7 @@ module aksarcModule 'aksarc.bicep' = {
     nodePoolTaints: nodePoolTaints
     networkProfileLoadBalancerCount: networkProfileLoadBalancerCount
     netWorkProfilNetworkPolicy: netWorkProfilNetworkPolicy
-    provisionedClusterName: provisionedClusterName
+    connectedClusterName: connectedClusterName
     controlPlaneHostIP: controlPlaneHostIP
     sshPublicKey: sshPublicKey
     nodePoolOSType: nodePoolOSType

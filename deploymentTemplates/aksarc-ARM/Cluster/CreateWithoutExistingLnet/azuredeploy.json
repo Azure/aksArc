@@ -32,7 +32,7 @@
         "nextHopIpAddress": {
             "type": "string"
         },
-        "provisionedClusterName": {
+        "connectedClusterName": {
             "type": "string"
         },
         "sshRSAPublicKey": {
@@ -139,7 +139,7 @@
         {
             "type": "Microsoft.Kubernetes/connectedClusters",
             "apiVersion": "[parameters('connectedClustersApiVersion')]",
-            "name": "[parameters('provisionedClusterName')]",
+            "name": "[parameters('connectedClusterName')]",
             "location": "[parameters('location')]",
             "kind": "ProvisionedCluster",
             "identity": {
@@ -161,8 +161,8 @@
                 "name": "[parameters('customLocation')]"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Kubernetes/connectedClusters', parameters('provisionedClusterName'))]",
-                "[resourceId('Microsoft.AzureStackHCI/logicalNetworks', parameters('lnetName'))]"
+                "[resourceId('Microsoft.Kubernetes/connectedClusters', parameters('connectedClusterName'))]",
+                "[resourceId('Microsoft.AzureStackHCI/logicalNetworks', parameters('logicalNetworkName'))]"
             ],
             "properties": {
                 "kubernetesVersion": "[parameters('kubernetesVersion')]",
@@ -216,7 +216,7 @@
                     }
                 }
             },
-            "scope": "[format('Microsoft.Kubernetes/connectedClusters/{0}', parameters('provisionedClusterName'))]"
+            "scope": "[format('Microsoft.Kubernetes/connectedClusters/{0}', parameters('connectedClusterName'))]"
         }
     ]
 }

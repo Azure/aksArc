@@ -2,7 +2,7 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "provisionedClusterName": {
+    "connectedClusterName": {
       "type": "string"
     },
     "provisionedClustersApiVersion": {
@@ -46,7 +46,7 @@
       "type": "microsoft.hybridcontainerservice/provisionedclusterinstances/agentpools",
       "apiVersion": "[parameters('provisionedClustersApiVersion')]",
       "name": "[concat('default/', parameters('agentName'))]",
-      "scope": "[resourceId('microsoft.Kubernetes/connectedClusters', parameters('provisionedClusterName'))]",
+      "scope": "[resourceId('microsoft.Kubernetes/connectedClusters', parameters('connectedClusterName'))]",
       "properties": {
         "count": "[parameters('agentCount')]",
         "osType": "[parameters('agentOsType')]",

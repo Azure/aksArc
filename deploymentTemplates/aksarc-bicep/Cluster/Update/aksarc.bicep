@@ -1,5 +1,5 @@
 param customLocationResourceID string
-param provisionedClusterName string
+param connectedClusterName string
 
 // Logical network
 param logicalNetworkName string
@@ -31,7 +31,7 @@ resource logicalNetwork 'Microsoft.AzureStackHCI/logicalNetworks@2024-01-01' exi
 
 // Reference the existing connected cluster.
 resource connectedCluster 'Microsoft.Kubernetes/ConnectedClusters@2024-01-01' existing = {
-  name: provisionedClusterName
+  name: connectedClusterName
 }
 
 // Update the Aks Arc cluster instance.

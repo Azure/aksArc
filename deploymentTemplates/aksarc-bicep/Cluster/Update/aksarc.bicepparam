@@ -1,7 +1,7 @@
 using 'main.bicep'
 
 param customLocationResourceID = '<TODO>' // The custom location resource ID
-param provisionedClusterName = '<TODO>' // The existing Aks Arc cluster name
+param connectedClusterName = '<TODO>' // The existing Aks Arc cluster name
 
 // Logical network - existing logical network reference
 param logicalNetworkName = '<TODO>'
