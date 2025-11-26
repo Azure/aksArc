@@ -1,6 +1,6 @@
 using 'main.bicep'
 
-param provisionedClusterName = '<TODO>' // TODO: AKS Arc Cluster Name
+param connectedClusterName = '<TODO>' // TODO: AKS Arc Cluster Name
 param nodePoolName = '<TODO>' // TODO: Node Pool Name
 param nodePoolVMSize = 'Standard_A4_v2' // TODO: add your node pool VM size
 param nodePoolCount = 3 // TODO: add your node pool node count

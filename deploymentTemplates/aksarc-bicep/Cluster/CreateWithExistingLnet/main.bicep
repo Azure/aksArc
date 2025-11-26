@@ -7,8 +7,8 @@ param customLocationResourceID string
 // Logical network
 param logicalNetworkName string
 
-// Provisioned cluster
-param provisionedClusterName string
+// Aks Arc cluster
+param connectedClusterName string
 param sshPublicKey string
 param controlPlaneHostIP string
 param kubernetesVersion string
@@ -40,7 +40,7 @@ module aksarcModule 'aksarc.bicep' = {
     nodePoolTaints: nodePoolTaints
     networkProfileLoadBalancerCount: networkProfileLoadBalancerCount
     netWorkProfilNetworkPolicy: netWorkProfilNetworkPolicy
-    provisionedClusterName: provisionedClusterName
+    connectedClusterName: connectedClusterName
     controlPlaneHostIP: controlPlaneHostIP
     sshPublicKey: sshPublicKey
     nodePoolOSType: nodePoolOSType

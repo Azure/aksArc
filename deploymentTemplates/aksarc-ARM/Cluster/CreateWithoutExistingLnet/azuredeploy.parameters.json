@@ -32,7 +32,7 @@
         "nextHopIpAddress": {
             "value": "TODO: Fill in parameter value" 
         },
-        "provisionedClusterName": {
+        "connectedClusterName": {
             "value": "TODO: Fill in parameter value"
         },
         "sshRSAPublicKey": {
@@ -82,6 +82,15 @@
         },
         "nodepoolTaints": {
             "value": []
+        },
+        "enableAzureHybridBenefit": {
+            "value": "TODO: Fill in parameter value"
+        },
+        "enableNfsCsiDriver": {
+            "value": true
+        },
+        "enableSmbCsiDriver": {
+            "value": true
         }
     }
 }

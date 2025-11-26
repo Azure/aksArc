@@ -11,7 +11,7 @@
         "vnetSubnetIds": {
             "type": "array"
         },
-        "provisionedClusterName": {
+        "connectedClusterName": {
             "type": "string"
         },
         "sshRSAPublicKey": {
@@ -66,13 +66,26 @@
         "nodepoolTaints":{
             "type": "array",
             "defaultValue": []
+        },
+        "enableAzureHybridBenefit": {
+            "type": "string",
+            "allowedValues": [
+                "True",
+                "False"
+            ]
+        },
+        "enableNfsCsiDriver": {
+            "type": "bool"
+        },
+        "enableSmbCsiDriver": {
+            "type": "bool"
         }
     },
     "resources": [
         {
             "type": "Microsoft.Kubernetes/connectedClusters",
             "apiVersion": "[parameters('connectedClustersApiVersion')]",
-            "name": "[parameters('provisionedClusterName')]",
+            "name": "[parameters('connectedClusterName')]",
             "location": "[parameters('location')]",
             "kind": "ProvisionedCluster",
             "identity": {
@@ -94,7 +107,7 @@
                 "name": "[parameters('customLocation')]"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Kubernetes/connectedClusters', parameters('provisionedClusterName'))]"
+                "[resourceId('Microsoft.Kubernetes/connectedClusters', parameters('connectedClusterName'))]"
             ],
             "properties": {
                 "kubernetesVersion": "[parameters('kubernetesVersion')]",
@@ -137,16 +150,19 @@
                         "vnetSubnetIds": "[parameters('vnetSubnetIds')]"
                     }
                 },
+                "licenseProfile": {
+                    "azureHybridBenefit": "[parameters('enableAzureHybridBenefit')]"
+                },
                 "storageProfile": {
                     "nfsCsiDriver": {
-                        "enabled": true
+                        "enabled": "[parameters('enableNfsCsiDriver')]"
                     },
                     "smbCsiDriver": {
-                        "enabled": true
+                        "enabled": "[parameters('enableSmbCsiDriver')]"
                     }
                 }
             },
-            "scope": "[format('Microsoft.Kubernetes/connectedClusters/{0}', parameters('provisionedClusterName'))]"
+            "scope": "[format('Microsoft.Kubernetes/connectedClusters/{0}', parameters('connectedClusterName'))]"
         }
     ]
 }

@@ -1,7 +1,7 @@
 
 targetScope='resourceGroup'
 
-param provisionedClusterName string
+param connectedClusterName string
 param nodePoolName string
 param nodePoolVMSize string
 param nodePoolCount int
@@ -15,7 +15,7 @@ param nodeTaints array
 module nodepoolModule 'nodepool.bicep' = {
   name: '${deployment().name}-nodepool'
   params: {
-    provisionedClusterName: provisionedClusterName
+    connectedClusterName: connectedClusterName
     nodePoolName: nodePoolName
     nodePoolVMSize: nodePoolVMSize
     nodePoolCount: nodePoolCount
