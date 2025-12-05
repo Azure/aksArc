@@ -72,6 +72,12 @@
         },
         "enableSmbCsiDriver": {
             "value": true
+        },
+        "enableWorkloadIdentity": {
+            "value": false
+        },
+        "enableOidcIssuer": {
+            "value": false
         }
     }
 }
