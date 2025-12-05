@@ -106,9 +106,7 @@
                         "count": "[parameters('agentCount')]",
                         "vmSize": "[parameters('agentVMSize')]",
                         "osType": "[parameters('agentOsType')]",
-                        "nodeLabels": {
-                            "[parameters('nodepoolLabel')]": "[parameters('nodepoolLabelValue')]"
-                        }
+                        "nodeLabels": "[if(not(empty(parameters('nodepoolLabel'))), createObject(parameters('nodepoolLabel'), parameters('nodepoolLabelValue')), json('null'))]"
                     }
                 ],
                 "cloudProviderProfile": {

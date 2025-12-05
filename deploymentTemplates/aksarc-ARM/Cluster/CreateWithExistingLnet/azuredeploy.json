@@ -79,6 +79,14 @@
         },
         "enableSmbCsiDriver": {
             "type": "bool"
+        },
+        "enableWorkloadIdentity": {
+            "type": "bool",
+            "defaultValue": false
+        },
+        "enableOidcIssuer": {
+            "type": "bool",
+            "defaultValue": false
         }
     },
     "resources": [
@@ -95,6 +103,14 @@
                 "agentPublicKeyCertificate": "",
                 "aadProfile": {
                     "enableAzureRBAC": false
+                },
+                "securityProfile": {
+                    "workloadIdentity": {
+                        "enabled": "[parameters('enableWorkloadIdentity')]"
+                    }
+                },
+                "oidcIssuerProfile": {
+                    "enabled": "[parameters('enableOidcIssuer')]"
                 }
             }
         },
@@ -139,9 +155,7 @@
                         "count": "[parameters('agentCount')]",
                         "vmSize": "[parameters('agentVMSize')]",
                         "osType": "[parameters('agentOsType')]",
-                        "nodeLabels": {
-                            "[parameters('nodepoolLabel')]": "[parameters('nodepoolLabelValue')]"
-                        },
+                        "nodeLabels": "[if(not(empty(parameters('nodepoolLabel'))), createObject(parameters('nodepoolLabel'), parameters('nodepoolLabelValue')), json('null'))]",
                         "nodeTaints": "[if(greater(length(parameters('nodepoolTaints')), 0), parameters('nodepoolTaints'), json('null'))]"
                     }
                 ],
