@@ -64,8 +64,6 @@ To scale the control plane from 1 to 3 nodes:
 
 ### Important Notes
 
-- **Workload identity** is not currently supported via ARM templates. If you need to enable workload identity, please use the Azure CLI instead.
-
 - **Nodepool-specific settings** (node count, autoscaling, labels, taints) should be updated using the [nodepool deployment template](../Nodepool/) instead of the cluster update template. Updating the nodepool spec through the cluster template will **not** work as intended and should **not** be used.
 
 ## Additional Resources

@@ -50,7 +50,7 @@
             "value": 0 
         },
         "connectedClustersApiVersion": {
-            "value": "TODO: Fill in parameter value"
+            "value": "2025-12-01-preview"
         },
         "provisionedClustersApiVersion": {
             "value": "TODO: Fill in parameter value"
@@ -72,6 +72,12 @@
         },
         "enableSmbCsiDriver": {
             "value": true
+        },
+        "enableWorkloadIdentity": {
+            "value": false
+        },
+        "enableOidcIssuer": {
+            "value": false
         }
     }
 }

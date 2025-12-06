@@ -26,6 +26,8 @@ param networkProfileLoadBalancerCount int
 param enableAzureHybridBenefit string
 param enableNfsCsiDriver bool
 param enableSmbCsiDriver bool
+param enableWorkloadIdentity bool = false
+param enableOidcIssuer bool = false
 
 module aksarcModule 'aksarc.bicep' = {
   name: '${deployment().name}-aksarc'
@@ -51,5 +53,7 @@ module aksarcModule 'aksarc.bicep' = {
     enableAzureHybridBenefit: enableAzureHybridBenefit
     enableNfsCsiDriver: enableNfsCsiDriver
     enableSmbCsiDriver: enableSmbCsiDriver
+    enableWorkloadIdentity: enableWorkloadIdentity
+    enableOidcIssuer: enableOidcIssuer
   }
 }
