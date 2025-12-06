@@ -89,7 +89,7 @@ resource logicalNetwork 'Microsoft.AzureStackHCI/logicalNetworks@2024-01-01' = {
 
 // Create the connected cluster.
 // This is the Arc representation of the AKS cluster, used to create a Managed Identity for the Aks Arc cluster.
-resource connectedCluster 'Microsoft.Kubernetes/ConnectedClusters@2024-07-15-preview' = {
+resource connectedCluster 'Microsoft.Kubernetes/ConnectedClusters@2025-12-01-preview' = {
   location: azureLocation
   name: connectedClusterName
   identity: {
