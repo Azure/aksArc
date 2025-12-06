@@ -24,6 +24,8 @@ param networkProfileLoadBalancerCount int
 param enableAzureHybridBenefit string
 param enableNfsCsiDriver bool
 param enableSmbCsiDriver bool
+param enableWorkloadIdentity bool
+param enableOidcIssuer bool
 
 // Reference an existing logical network.
 resource logicalNetwork 'Microsoft.AzureStackHCI/logicalNetworks@2024-01-01' existing = {
@@ -32,7 +34,7 @@ resource logicalNetwork 'Microsoft.AzureStackHCI/logicalNetworks@2024-01-01' exi
 
 // Create the connected cluster.
 // This is the Arc representation of the AKS cluster, used to create a Managed Identity for the Aks Arc cluster.
-resource connectedCluster 'Microsoft.Kubernetes/ConnectedClusters@2024-01-01' = {
+resource connectedCluster 'Microsoft.Kubernetes/ConnectedClusters@2024-07-15-preview' = {
   location: azureLocation
   name: connectedClusterName
   identity: {
@@ -44,6 +46,14 @@ resource connectedCluster 'Microsoft.Kubernetes/ConnectedClusters@2024-01-01' = 
     agentPublicKeyCertificate: ''
     aadProfile: {
       enableAzureRBAC: false
+    }
+    securityProfile: {
+      workloadIdentity: {
+        enabled: enableWorkloadIdentity
+      }
+    }
+    oidcIssuerProfile: {
+      enabled: enableOidcIssuer
     }
   }
 }
@@ -87,7 +97,7 @@ resource provisionedClusterInstance 'Microsoft.HybridContainerService/provisione
         count: nodePoolCount
         vmSize: nodePoolVMSize
         osType: nodePoolOSType
-        nodeLabels: {
+        nodeLabels: empty(nodePoolLabel) ? null : {
           '${nodePoolLabel}': nodePoolLabelValue
         }
         nodeTaints: empty(nodePoolTaints) ? null : nodePoolTaints

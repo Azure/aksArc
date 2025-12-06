@@ -27,3 +27,5 @@ param networkProfileLoadBalancerCount = 0 // TODO: add your networkProfile's loa
 param enableAzureHybridBenefit = 'False' // TODO: 'True' or 'False'
 param enableNfsCsiDriver = true // TODO: true or false
 param enableSmbCsiDriver = true // TODO: true or false
+param enableWorkloadIdentity = false // TODO: true or false
+param enableOidcIssuer = false // TODO: true or false
