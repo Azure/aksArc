@@ -72,7 +72,7 @@ resource provisionedClusterInstance 'Microsoft.HybridContainerService/provisione
         count: nodePoolCount
         vmSize: nodePoolVMSize
         osType: nodePoolOSType
-        nodeLabels: {
+        nodeLabels: empty(nodePoolLabel) ? null : {
           '${nodePoolLabel}': nodePoolLabelValue
         }
         nodeTaints: empty(nodePoolTaints) ? null : nodePoolTaints
