@@ -69,7 +69,7 @@
             "value": 0 
         },
         "connectedClustersApiVersion": {
-            "value": "2024-07-15-preview"
+            "value": "2025-12-01-preview"
         },
         "provisionedClustersApiVersion": {
             "value": "TODO: Fill in parameter value"
