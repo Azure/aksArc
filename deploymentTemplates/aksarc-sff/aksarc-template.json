@@ -1,0 +1,215 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "languageVersion": "2.0",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "arcNodes": {
+        "type": "array",
+        "metadata": {
+          "description": "Array of Arc for server nodes"
+        }
+      },
+      "subscriptionId": {
+        "type": "string",
+        "defaultValue": "[subscription().subscriptionId]",
+        "metadata": {
+          "description" : "Subscription id, default to the currently selected subscription."
+        }
+      },
+      "resourceGroupName": {
+        "type": "string",
+        "defaultValue": "[resourceGroup().name]",
+        "metadata": {
+          "description" : "Resource group name, default uses deployment resource group."
+        }
+      },
+      "controlPlaneEndpoint": {
+        "type": "string",
+        "defaultValue": "",
+        "metadata": {
+          "description" : "Control plane IPv4 address, default Arc for server IPv4 address."
+        }
+      },
+      "kubernetesVersion": {
+        "type": "string",
+        "defaultValue": "",
+        "metadata": {
+          "description" : "Kubernetes version to deploy, default latest available version."
+        }
+      },
+      "clusterName": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 24,
+        "defaultValue": "[variables('clusterName')]",
+        "metadata": {
+          "description" : "Kubernetes cluster name, default name will be testClus-randomSuffix."
+        }
+      },
+      "devicePoolName": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 24,
+        "defaultValue": "[variables('devicePoolName')]",
+        "metadata": {
+          "description" : "Device pool name, default is devicePool-randomSuffix"
+        }
+      },
+      "location": {
+        "type": "string",
+        "defaultValue": "[resourceGroup().location]",
+        "metadata": {
+          "description" : "Resource location, default uses resource group location."
+        }
+      },
+      "tenantId": {
+        "type": "string",
+        "defaultValue": "[subscription().tenantId]",
+        "metadata": {
+          "description" : "Tenant ID, default value is the subscription's tenant ID."
+        }
+      },
+      "customLocationName": {
+        "defaultValue": "[variables('customLocationName')]",
+        "type": "string",
+        "metadata": {
+          "description": "The custom location for deploying a hci cluster, default is devicePool-randomSuffix-cl."
+        }
+      }
+    },
+    "variables": {
+      "randomSuffix": "[toLower(substring(uniqueString(resourceGroup().id), 0, 4))]",
+      "devicePoolName": "[format('devicePool-{0}', variables('randomSuffix'))]",
+      "clusterName": "[format('testClus-{0}', variables('randomSuffix'))]",
+      "customLocationName" : "[format('devicePool-{0}-cl', variables('randomSuffix'))]"
+    },
+    "resources": {
+      "edgeMachines" : {
+        "copy": {
+          "name": "edgeMachinesCopy",
+          "count": "[length(parameters('arcNodes'))]"
+        },
+        "type": "Microsoft.AzureStackHCI/edgeMachines",
+        "apiVersion": "2024-11-01-preview",
+        "name": "[concat(parameters('arcNodes')[copyIndex()], '/')]",
+        "location": "[parameters('location')]",
+        "identity": {
+           "type": "SystemAssigned"
+         },
+        "properties": {
+            "onboardingMachineResourceGroupId": "[resourceId('Microsoft.HybridCompute/machines', parameters('arcNodes')[copyIndex()])]"
+
+        }
+      },
+      "DevicePools": {
+        "type": "Microsoft.AzureStackHCI/devicePools",
+        "apiVersion": "2024-11-01-preview",
+        "name": "[parameters('devicePoolName')]",
+        "dependsOn": [
+          "edgeMachines"
+        ],
+        "location": "[parameters('location')]",
+        "properties": {
+          "copy": [
+            {
+              "name": "devices",
+              "count": "[length(parameters('arcNodes'))]",
+              "input": {
+                "deviceResourceId": "[resourceId('Microsoft.AzureStackHCI/edgeMachines', parameters('arcNodes')[copyIndex('devices')])]"
+              }
+            }
+          ]
+        }
+      },
+      "connectedClusters": {
+        "type": "Microsoft.Kubernetes/connectedClusters",
+        "apiVersion": "2024-01-01",
+        "name": "[format('{0}-k8s', parameters('clusterName'))]",
+        "dependsOn": [
+          "[resourceId('microsoft.azurestackhci/devicePools', parameters('devicePoolName'))]"
+        ],
+        "location": "[parameters('location')]",
+        "kind": "ProvisionedCluster",
+        "identity": {
+          "type": "SystemAssigned"
+        },
+        "properties": {
+          "agentPublicKeyCertificate": "",
+          "privateLinkState": "Disabled",
+          "aadProfile": {
+            "enableAzureRBAC": false,
+            "adminGroupObjectIDs": []
+          },
+          "arcAgentProfile": {
+            "desiredAgentVersion": "",
+            "agentAutoUpgrade": "Enabled"
+          }
+        }
+        },
+        "provisionedClusterInstances": {
+          "type": "Microsoft.HybridContainerService/provisionedClusterInstances",
+          "apiVersion": "2024-09-01-preview",
+          "name": "default",
+          "extendedLocation": {
+              "type": "CustomLocation",
+              "name": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.ExtendedLocation/customLocations/{2}', parameters('subscriptionId'), parameters('resourceGroupName'), parameters('customLocationName'))]"
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Kubernetes/connectedClusters', format('{0}-k8s', parameters('clusterName')))]"
+          ],
+          "properties": {
+            "controlPlane": {
+              "count": "[length(parameters('arcNodes'))]",
+              "controlPlaneEndpoint": {
+                "hostIP": "[parameters('controlPlaneEndpoint')]"
+              }
+            },
+            "kubernetesVersion": "[parameters('kubernetesVersion')]",
+            "kubernetesDistribution": "K8s",
+            "networkProfile": {
+              "networkPolicy": "cilium"
+            },
+            "storageProfile": {
+              "smbCsiDriver": {
+                "enabled": false
+              },
+              "nfsCsiDriver": {
+                "enabled": false
+              },
+              "localPathProvisionerDriver": {
+                "enabled": false
+              }
+            },
+            "agentPoolProfiles": []
+          },
+          "scope": "[resourceId('Microsoft.Kubernetes/connectedClusters', format('{0}-k8s', parameters('clusterName')))]"
+        }
+      },
+      "outputs": {
+        "clusterName" : {
+          "type": "string",
+          "value": "[parameters('clusterName')]"
+        },
+        "controlPlaneEndpoint" : {
+          "type": "string",
+          "value": "[parameters('controlPlaneEndpoint')]"
+        },
+        "devicePoolName" : {
+          "type": "string",
+          "value": "[parameters('devicePoolName')]"
+        },
+        "customLocationName" : {
+          "type": "string",
+          "value": "[parameters('customLocationName')]"
+        },
+        "subscriptionId" : {
+          "type": "string",
+          "value": "[parameters('subscriptionId')]"
+        },
+        "resourceGroupName" : {
+          "type": "string",
+          "value": "[parameters('resourceGroupName')]"
+        }
+      }
+  }
+  
