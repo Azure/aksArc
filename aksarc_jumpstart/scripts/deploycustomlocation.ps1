@@ -1,8 +1,9 @@
 param(
-    [string]$resource_group = "jumpstart-rg",
-    [string]$appliance_name = "aks_arc_appliance",
+    [string]$resource_group = "matt-aksarc-demo-rg",
+    [string]$appliance_name = "jumpstartVM-appliance",
     [string] $subscription,
-    [string] $customLocationName
+    [string] $customLocationName,
+    [string] $location
 )
 
 Start-Transcript -Path "E:\log\deploycustomlocation.ps1.log" -Append
@@ -18,7 +19,7 @@ $ArcvmClusterExtensionResourceId=az k8s-extension show -g $resource_group -c $ap
 az login --identity
 az account set -s $subscription
 
-az customlocation create -g $resource_group -n $customLocationName --namespace "default" --host-resource-id $ArcApplianceResourceId --cluster-extension-ids $AksarcClusterExtensionResourceId $ArcvmClusterExtensionResourceId
+az customlocation create -g $resource_group -n $customLocationName --namespace "default" --host-resource-id $ArcApplianceResourceId --cluster-extension-ids $AksarcClusterExtensionResourceId $ArcvmClusterExtensionResourceId --location $location
 
 $clId = az customlocation show --name $customLocationName --resource-group $resource_group --query "id" -o tsv
 Stop-Transcript

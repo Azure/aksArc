@@ -6,5 +6,5 @@ Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI
 Start-Process msiexec.exe -ArgumentList '/I AzureCLI.msi /quiet' -NoNewWindow -Wait; 
 Remove-Item .\AzureCLI.msi
 
-Install-Module -Name Az.AksArc -Repository PSGallery -AcceptLicense -Force -RequiredVersion 0.1.1
+Install-Module -Name Az.AksArc -Repository PSGallery -Force -RequiredVersion 0.1.1
 Stop-Transcript

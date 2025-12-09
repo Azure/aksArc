@@ -35,8 +35,8 @@ netsh dhcp add securitygroups; Restart-Service dhcpserver
 
 Set-ItemProperty -Path registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\ServerManager\Roles\12 -Name ConfigurationState -Value 2
 Set-DhcpServerv4DnsSetting -DynamicUpdates "Always" -DeleteDnsRRonLeaseExpiry $True -UpdateDnsRRForOlderClients $True -DisableDnsPtrRRUpdate $false; 
-Add-DhcpServerv4Scope -name "172.16.0.0" -StartRange 172.16.100.0 -EndRange 172.16.100.255 -SubnetMask 255.255.255.0 -State Active -LeaseDuration 1.00:00:00; 
-Set-DhcpServerv4OptionValue -OptionID 3 -Value 172.16.0.1 -ScopeID 172.16.0.0; 
+Add-DhcpServerv4Scope -name "172.16.0.0" -StartRange 172.16.100.1 -EndRange 172.16.100.254 -SubnetMask 255.255.255.0 -State Active -LeaseDuration 1.00:00:00; 
+Set-DhcpServerv4OptionValue -OptionID 3 -Value 172.16.0.1 -ScopeID 172.16.100.0; 
 Set-DhcpServerv4OptionValue -DnsDomain aksarc.local -DnsServer 172.16.0.1
 
 Stop-Transcript

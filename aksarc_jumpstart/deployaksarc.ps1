@@ -3,7 +3,7 @@ param (
     [Parameter()]
     [string] $GroupName = "jumpstart-rg",
     [Parameter()]
-    [string] $Location = "eastus2",
+    [string] $Location = "southeastasia",
     [Parameter()]
     [string] $vnetName = "jumpstartVNet",
     [Parameter()]
@@ -33,6 +33,9 @@ if ([string]::IsNullOrEmpty($customLocationName)) {
 if ([string]::IsNullOrEmpty($ArcLnetName)) {
     $ArcLnetName = "$applianceName-lnet"
 }
+if ([string]::IsNullOrEmpty($aksArcClusterName)) {
+    $aksArcClusterName = "$applianceName-aksarc"
+}
 # This is a continuation of jumpstart.ps1 to deploy ARB specific components
 # At this point, MOC is expected to be installed.
 
@@ -46,9 +49,9 @@ $scriptToExecute = [ordered] @{
     "$scriptLocation/deployappliance.ps1"       = "deployappliance.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -workDirectory ""$workingDir"" -location ""$Location"" -subscription ""$subscription"" ";
     "$scriptLocation/deployaksarcextension.ps1" = "deployaksarcextension.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -workDirectory ""$workingDir"" -location ""$Location"" -subscription ""$subscription""";
     "$scriptLocation/deployvmssextension.ps1"   = "deployvmssextension.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -workDirectory ""$workingDir"" -location ""$Location"" -subscription ""$subscription""";
-    "$scriptLocation/deploycustomlocation.ps1"  = "deploycustomlocation.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -customLocationName ""$customLocationName"" -subscription ""$subscription""";
+    "$scriptLocation/deploycustomlocation.ps1"  = "deploycustomlocation.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -location ""$Location"" -customLocationName ""$customLocationName"" -subscription ""$subscription""";
     "$scriptLocation/deploylnet.ps1"            = "deploylnet.ps1 -resource_group ""$GroupName""  -lnetName ""$ArcLnetName"" -customLocationName ""$customLocationName"" -location ""$Location"" -subscription ""$subscription""";
-    "$scriptLocation/deployaksarccluster.ps1"   = "deployaksarccluster.ps1 -resource_group ""$GroupName"" -aksArcClusterName ""$aksArcClusterName"" -lnetName ""$ArcLnetName"" -customLocationName ""$customLocationName"" -subscription ""$subscription""";
+    "$scriptLocation/deployaksarccluster.ps1"   = "deployaksarccluster.ps1 -resource_group ""$GroupName"" -aksArcClusterName ""$aksArcClusterName"" -lnetName ""$ArcLnetName"" -location ""$Location"" -customLocationName ""$customLocationName"" -subscription ""$subscription""";
 }
 
 foreach ($script in $scriptToExecute.GetEnumerator()) {

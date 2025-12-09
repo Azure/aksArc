@@ -4,7 +4,7 @@
   "parameters": {
     "location": {
       "type": "string",
-      "defaultValue": "eastus2"
+      "defaultValue": "southeastasia"
     },
     "vnetName": {
       "type": "string",
@@ -44,7 +44,7 @@
               "sourceAddressPrefix": "Internet",
               "destinationAddressPrefix": "*",
               "access": "Allow",
-              "priority": 100,
+              "priority": 115,
               "direction": "Inbound"
             }
           },
@@ -90,7 +90,7 @@
           {
             "name": "AllowSshInboundForBastion",
             "properties": {
-              "priority": 101,
+              "priority": 102,
               "access": "Allow",
               "direction": "Inbound",
               "protocol": "Tcp",
@@ -103,7 +103,7 @@
           {
             "name": "AllowRdpInboundForBastion",
             "properties": {
-              "priority": 102,
+              "priority": 100,
               "access": "Allow",
               "direction": "Inbound",
               "protocol": "Tcp",

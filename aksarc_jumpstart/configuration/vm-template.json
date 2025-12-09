@@ -4,7 +4,7 @@
   "parameters": {
     "location": {
       "type": "string",
-      "defaultValue": "eastus2"
+      "defaultValue": "southeastasia"
     },
     "vmName": {
       "type": "string",
