@@ -229,12 +229,11 @@ execute_script() {
 # Execute scripts in the required order
 execute_script "installazmodules.ps1" "-arcHciVersion \"1.3.15\""
 
-execute_script "deployappliance.ps1" "-resource_group \"$GROUP_NAME\" -appliance_name \"$APPLIANCE_NAME\" -workDirectory \"$WORKING_DIR\" -location \"$LOCATION\" -subscription \"$SUBSCRIPTION_ID\""
+execute_script "deployappliance.ps1" "-resource_group \"$GROUP_NAME\" -appliance_name \"$APPLIANCE_NAME\" -location \"$LOCATION\" -subscription \"$SUBSCRIPTION_ID\""
 
-execute_script "deployaksarcextension.ps1" "-resource_group \"$GROUP_NAME\" -appliance_name \"$APPLIANCE_NAME\" -workDirectory \"$WORKING_DIR\" -location \"$LOCATION\" -subscription \"$SUBSCRIPTION_ID\""
+execute_script "deployaksarcextension.ps1" "-resource_group \"$GROUP_NAME\" -appliance_name \"$APPLIANCE_NAME\" -location \"$LOCATION\" -subscription \"$SUBSCRIPTION_ID\""
 
-execute_script "deployvmssextension.ps1" "-resource_group \"$GROUP_NAME\" -appliance_name \"$APPLIANCE_NAME\" -workDirectory \"$WORKING_DIR\" -location \"$LOCATION\" -subscription \"$SUBSCRIPTION_ID\""
-
+execute_script "deployvmssextension.ps1" "-resource_group \"$GROUP_NAME\" -appliance_name \"$APPLIANCE_NAME\" -location \"$LOCATION\" -subscription \"$SUBSCRIPTION_ID\""
 execute_script "deploycustomlocation.ps1" "-resource_group \"$GROUP_NAME\" -appliance_name \"$APPLIANCE_NAME\" -customLocationName \"$CUSTOM_LOCATION_NAME\" -subscription \"$SUBSCRIPTION_ID\""
 
 execute_script "deploylnet.ps1" "-resource_group \"$GROUP_NAME\" -lnetName \"$ARC_LNET_NAME\" -customLocationName \"$CUSTOM_LOCATION_NAME\" -location \"$LOCATION\" -subscription \"$SUBSCRIPTION_ID\""
@@ -254,9 +253,12 @@ log "Next Steps:"
 log "1. Verify the AKS Arc cluster is running:"
 log "   az connectedk8s show --resource-group $GROUP_NAME --name $AKS_ARC_CLUSTER_NAME"
 log ""
-log "2. Get cluster credentials:"
+log "2. [OPTIONAL] Enable Microsoft Entra ID (Azure AD) with Kubernetes RBAC:"
+log "   az aksarc update --name $AKS_ARC_CLUSTER_NAME --resource-group $GROUP_NAME --aad-admin-group-object-ids <group-object-id>"
+log ""
+log "3. Get cluster credentials:"
 log "   az connectedk8s proxy --resource-group $GROUP_NAME --name $AKS_ARC_CLUSTER_NAME"
 log ""
-log "3. Connect to the cluster using kubectl"
+log "4. Connect to the cluster using kubectl"
 log ""
 log "Setup is ready for AKS Arc workload deployment!"

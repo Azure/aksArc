@@ -15,6 +15,26 @@ Before starting the deployment, ensure you have the following prerequisites inst
 - **Git**: For cloning the repository
 - **jq**: JSON processor (for bash scripts) - `sudo apt install jq` (Ubuntu/Debian) or `brew install jq` (macOS)
 - **Valid Azure Subscription** with sufficient quotas for Standard E16s v4 VMs (16 vCPUs, 128 GiB memory)
+- **Azure Resource Providers Registered**: The following resource providers must be registered in your subscription:
+  ```bash
+  az provider register --namespace Microsoft.Kubernetes --wait --verbose
+  az provider register --namespace Microsoft.KubernetesConfiguration --wait --verbose
+  az provider register --namespace Microsoft.ExtendedLocation --wait --verbose
+  az provider register --namespace Microsoft.ResourceConnector --wait --verbose
+  az provider register --namespace Microsoft.AzureStackHCI --wait --verbose
+  az provider register --namespace Microsoft.HybridConnectivity --wait --verbose
+  az provider register --namespace Microsoft.HybridContainerService --wait --verbose
+  ```
+  Verify registration status:
+  ```bash
+  az provider show -n Microsoft.Kubernetes -o table
+  az provider show -n Microsoft.KubernetesConfiguration -o table
+  az provider show -n Microsoft.ExtendedLocation -o table
+  az provider show -n Microsoft.ResourceConnector -o table
+  az provider show -n Microsoft.AzureStackHCI -o table
+  az provider show -n Microsoft.HybridConnectivity -o table
+  az provider show -n Microsoft.HybridContainerService -o table
+  ```
 
 ## Script Parameters
 
@@ -158,13 +178,22 @@ After successful deployment, you can:
    az connectedk8s show --resource-group <resource-group> --name <cluster-name>
    ```
 
-2. **Get cluster credentials**:
+2. **[OPTIONAL] Enable Microsoft Entra ID (Azure AD) with Kubernetes RBAC**:
+
+   ```bash
+   az aksarc update \
+     --name <cluster-name> \
+     --resource-group <resource-group> \
+     --aad-admin-group-object-ids <group-object-id>
+   ```
+
+3. **Get cluster credentials**:
 
    ```bash
    az connectedk8s proxy --resource-group <resource-group> --name <cluster-name>
    ```
 
-3. **Connect using kubectl** to manage your AKS Arc cluster
+4. **Connect using kubectl** to manage your AKS Arc cluster
 
 ## Cleanup
 
@@ -179,4 +208,4 @@ az group delete --name <groupname> --yes
 - **Permission Issues**: Ensure you have Contributor access to the Azure subscription
 - **Quota Issues**: Verify your subscription has quota for E16s v4 VMs in the target region
 - **Network Issues**: Check that the VM can access GitHub for script downloads
-- **MOC Installation**: If MOC install fails, RDP to the VM and check the PowerShell logs in `E:\log\`
+- **MOC Installation**: If MOC install fails, RDP to the VM and check the PowerShell logs in `$env:LogDirectory\`

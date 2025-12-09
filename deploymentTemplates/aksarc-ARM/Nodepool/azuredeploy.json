@@ -1,0 +1,62 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "connectedClusterName": {
+      "type": "string"
+    },
+    "provisionedClustersApiVersion": {
+      "type": "string"
+    },
+    "agentName": {
+      "type": "string"
+    },
+    "agentVMSize": {
+      "type": "string"
+    },
+    "agentCount": {
+      "type": "int"
+    },
+    "agentOsType": {
+      "type": "string"
+    },
+    "enableAutoScaling": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "minCount": {
+      "type": "int",
+      "defaultValue": 1
+    },
+    "maxCount": {
+      "type": "int",
+      "defaultValue": 5
+    },
+    "nodeLabels": {
+      "type": "object",
+      "defaultValue": {}
+    },
+    "nodeTaints": {
+      "type": "array",
+      "defaultValue": []
+    }
+  },
+  "resources": [
+    {
+      "type": "microsoft.hybridcontainerservice/provisionedclusterinstances/agentpools",
+      "apiVersion": "[parameters('provisionedClustersApiVersion')]",
+      "name": "[concat('default/', parameters('agentName'))]",
+      "scope": "[resourceId('microsoft.Kubernetes/connectedClusters', parameters('connectedClusterName'))]",
+      "properties": {
+        "count": "[parameters('agentCount')]",
+        "osType": "[parameters('agentOsType')]",
+        "vmSize": "[parameters('agentVMSize')]",
+        "enableAutoScaling": "[parameters('enableAutoScaling')]",
+        "minCount": "[if(parameters('enableAutoScaling'), parameters('minCount'), json('null'))]",
+        "maxCount": "[if(parameters('enableAutoScaling'), parameters('maxCount'), json('null'))]",
+        "nodeLabels": "[if(greater(length(parameters('nodeLabels')), 0), parameters('nodeLabels'), json('null'))]",
+        "nodeTaints": "[if(greater(length(parameters('nodeTaints')), 0), parameters('nodeTaints'), json('null'))]"
+      }
+    }
+  ]
+}

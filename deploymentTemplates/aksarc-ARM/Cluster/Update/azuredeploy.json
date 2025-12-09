@@ -2,16 +2,16 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "location": {
+        "connectedClusterName": {
             "type": "string"
         },
         "customLocation": {
             "type": "string"
         },
-        "vnetSubnetIds": {
-            "type": "array"
+        "provisionedClustersApiVersion": {
+            "type": "string"
         },
-        "provisionedClusterName": {
+        "kubernetesVersion": {
             "type": "string"
         },
         "sshRSAPublicKey": {
@@ -20,29 +20,10 @@
         "controlPlaneIp": {
             "type": "string"
         },
-        "kubernetesVersion": {
-            "type": "string"
-        },
         "controlPlaneVMSize": {
             "type": "string"
         },
         "controlPlaneNodeCount": {
-            "type": "int"
-        },
-        "agentName": {
-            "type": "string"
-        },
-        "agentVMSize": {
-            "type": "string"
-        },
-        "agentOsType": {
-            "allowedValues": [
-                "Linux",
-                "Windows"
-            ],
-            "type": "string"
-        },
-        "agentCount": {
             "type": "int"
         },
         "networkPolicy": {
@@ -51,39 +32,42 @@
         "loadBalancerCount": {
             "type": "int"
         },
-        "connectedClustersApiVersion":{
+        "vnetSubnetIds": {
+            "type": "array"
+        },
+        "agentName": {
             "type": "string"
         },
-        "provisionedClustersApiVersion": {
+        "agentVMSize": {
             "type": "string"
         },
-        "nodepoolLabel":{
+        "agentOsType": {
             "type": "string"
         },
-         "nodepoolLabelValue":{
+        "agentCount": {
+            "type": "int"
+        },
+        "nodepoolLabel": {
             "type": "string"
         },
-        "nodepoolTaint":{
+        "nodepoolLabelValue": {
             "type": "string"
+        },
+        "enableAzureHybridBenefit": {
+            "type": "string",
+            "allowedValues": [
+                "True",
+                "False"
+            ]
+        },
+        "enableNfsCsiDriver": {
+            "type": "bool"
+        },
+        "enableSmbCsiDriver": {
+            "type": "bool"
         }
     },
     "resources": [
-        {
-            "type": "Microsoft.Kubernetes/connectedClusters",
-            "apiVersion": "[parameters('connectedClustersApiVersion')]",
-            "name": "[parameters('provisionedClusterName')]",
-            "location": "[parameters('location')]",
-            "kind": "ProvisionedCluster",
-            "identity": {
-                "type": "SystemAssigned"
-            },
-            "properties": {
-                "agentPublicKeyCertificate": "",
-                "aadProfile": {
-                    "enableAzureRBAC": false
-                }
-            }
-        },
         {
             "type": "Microsoft.HybridContainerService/provisionedClusterInstances",
             "apiVersion": "[parameters('provisionedClustersApiVersion')]",
@@ -92,9 +76,6 @@
                 "type": "CustomLocation",
                 "name": "[parameters('customLocation')]"
             },
-            "dependsOn": [
-                "[resourceId('Microsoft.Kubernetes/connectedClusters', parameters('provisionedClusterName'))]"
-            ],
             "properties": {
                 "kubernetesVersion": "[parameters('kubernetesVersion')]",
                 "linuxProfile": {
@@ -125,10 +106,7 @@
                         "count": "[parameters('agentCount')]",
                         "vmSize": "[parameters('agentVMSize')]",
                         "osType": "[parameters('agentOsType')]",
-                        "nodeLabels": {
-                            "[parameters('nodepoolLabel')]": "[parameters('nodepoolLabelValue')]"
-                        },
-                        "nodeTaints": ["[parameters('nodepoolTaint')]"]
+                        "nodeLabels": "[if(not(empty(parameters('nodepoolLabel'))), createObject(parameters('nodepoolLabel'), parameters('nodepoolLabelValue')), json('null'))]"
                     }
                 ],
                 "cloudProviderProfile": {
@@ -136,16 +114,19 @@
                         "vnetSubnetIds": "[parameters('vnetSubnetIds')]"
                     }
                 },
+                "licenseProfile": {
+                    "azureHybridBenefit": "[parameters('enableAzureHybridBenefit')]"
+                },
                 "storageProfile": {
                     "nfsCsiDriver": {
-                        "enabled": true
+                        "enabled": "[parameters('enableNfsCsiDriver')]"
                     },
                     "smbCsiDriver": {
-                        "enabled": true
+                        "enabled": "[parameters('enableSmbCsiDriver')]"
                     }
                 }
             },
-            "scope": "[format('Microsoft.Kubernetes/connectedClusters/{0}', parameters('provisionedClusterName'))]"
+            "scope": "[format('Microsoft.Kubernetes/connectedClusters/{0}', parameters('connectedClusterName'))]"
         }
     ]
 }

@@ -1,0 +1,252 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string"
+        },
+        "customLocation": {
+            "type": "string"
+        },
+        "lnetName": {
+            "type": "string"
+        },
+        "dnsServers": {
+            "type": "array"
+        },
+        "addressPrefix": {
+            "type": "string"
+        },
+        "ipAllocationMethod": {
+            "type": "string"
+        },
+         "vmSwitchName": {
+             "type": "string"
+         },
+        "vippoolstart": {
+            "type": "string"
+        },
+        "vippoolend": {
+            "type": "string"
+        },
+        "nextHopIpAddress": {
+            "type": "string"
+        },
+        "connectedClusterName": {
+            "type": "string"
+        },
+        "sshRSAPublicKey": {
+            "type": "string"
+        },
+        "controlPlaneIp": {
+            "type": "string"
+        },
+        "kubernetesVersion": {
+            "type": "string"
+        },
+        "controlPlaneVMSize": {
+            "type": "string"
+        },
+        "controlPlaneNodeCount": {
+            "type": "int"
+        },
+        "agentName": {
+            "type": "string"
+        },
+        "agentVMSize": {
+            "type": "string"
+        },
+        "agentOsType": {
+            "allowedValues": [
+                "Linux",
+                "Windows"
+            ],
+            "type": "string"
+        },
+        "agentCount": {
+            "type": "int"
+        },
+        "networkPolicy": {
+            "type": "string"
+        },
+        "loadBalancerCount": {
+            "type": "int"
+        },
+        "connectedClustersApiVersion":{
+            "type": "string"
+        },
+        "provisionedClustersApiVersion": {
+            "type": "string"
+        },
+        "nodepoolLabel":{
+            "type": "string"
+        },
+         "nodepoolLabelValue":{
+            "type": "string"
+        },
+        "nodepoolTaints":{
+            "type": "array",
+            "defaultValue": []
+        },
+        "enableAzureHybridBenefit": {
+            "type": "string",
+            "allowedValues": [
+                "True",
+                "False"
+            ]
+        },
+        "enableNfsCsiDriver": {
+            "type": "bool"
+        },
+        "enableSmbCsiDriver": {
+            "type": "bool"
+        },
+        "enableWorkloadIdentity": {
+            "type": "bool",
+            "defaultValue": false
+        },
+        "enableOidcIssuer": {
+            "type": "bool",
+            "defaultValue": false
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.AzureStackHCI/logicalNetworks",
+            "apiVersion": "2024-01-01",
+            "name": "[parameters('lnetName')]",
+            "location": "[parameters('location')]",
+            "extendedLocation": {
+                "type": "CustomLocation",
+                "name": "[parameters('customLocation')]"
+            },
+            "properties": {
+                "dhcpOptions": {
+                    "dnsServers": "[parameters('dnsServers')]"
+                },
+                "subnets": [
+                    {
+                        "name": "armSubnet",
+                        "properties": {
+                            "addressPrefix": "[parameters('addressPrefix')]",
+                            "ipAllocationMethod": "[parameters('ipAllocationMethod')]",
+                            "ipPools": [
+                                {
+                                    "name": "armIPPool",
+                                    "start": "[parameters('vippoolstart')]",
+                                    "end": "[parameters('vippoolend')]",
+                                    "ipPoolType": "vippool"
+                                }
+                            ],
+                            "routeTable": {
+                                "properties": {
+                                    "routes": [
+                                        {
+                                            "name": "defaultRoute",
+                                            "properties": {
+                                                "addressPrefix": "0.0.0.0/0",
+                                                "nextHopIpAddress": "[parameters('nextHopIpAddress')]"
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                ],
+                "vmSwitchName": "[parameters('vmSwitchName')]"
+            }
+        },
+        {
+            "type": "Microsoft.Kubernetes/connectedClusters",
+            "apiVersion": "[parameters('connectedClustersApiVersion')]",
+            "name": "[parameters('connectedClusterName')]",
+            "location": "[parameters('location')]",
+            "kind": "ProvisionedCluster",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "agentPublicKeyCertificate": "",
+                "aadProfile": {
+                    "enableAzureRBAC": false
+                },
+                "securityProfile": {
+                    "workloadIdentity": {
+                        "enabled": "[parameters('enableWorkloadIdentity')]"
+                    }
+                },
+                "oidcIssuerProfile": {
+                    "enabled": "[parameters('enableOidcIssuer')]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.HybridContainerService/provisionedClusterInstances",
+            "apiVersion": "[parameters('provisionedClustersApiVersion')]",
+            "name": "default",
+            "extendedLocation": {
+                "type": "CustomLocation",
+                "name": "[parameters('customLocation')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Kubernetes/connectedClusters', parameters('connectedClusterName'))]",
+                "[resourceId('Microsoft.AzureStackHCI/logicalNetworks', parameters('lnetName'))]"
+            ],
+            "properties": {
+                "kubernetesVersion": "[parameters('kubernetesVersion')]",
+                "linuxProfile": {
+                    "ssh": {
+                        "publicKeys": [
+                            {
+                                "keyData": "[parameters('sshRSAPublicKey')]"
+                            }
+                        ]
+                    }
+                },
+                "controlPlane": {
+                    "count": "[parameters('controlPlaneNodeCount')]",
+                    "controlPlaneEndpoint": {
+                        "hostIP": "[parameters('controlPlaneIp')]"
+                    },
+                    "vmSize": "[parameters('controlPlaneVMSize')]"
+                },
+                "networkProfile": {
+                    "networkPolicy": "[parameters('networkPolicy')]",
+                    "loadBalancerProfile": {
+                        "count": "[parameters('loadBalancerCount')]"
+                    }
+                },
+                "agentPoolProfiles": [
+                    {
+                        "name": "[parameters('agentName')]",
+                        "count": "[parameters('agentCount')]",
+                        "vmSize": "[parameters('agentVMSize')]",
+                        "osType": "[parameters('agentOsType')]",
+                        "nodeLabels": "[if(not(empty(parameters('nodepoolLabel'))), createObject(parameters('nodepoolLabel'), parameters('nodepoolLabelValue')), json('null'))]",
+                        "nodeTaints": "[if(greater(length(parameters('nodepoolTaints')), 0), parameters('nodepoolTaints'), json('null'))]"
+                    }
+                ],
+                "cloudProviderProfile": {
+                    "infraNetworkProfile": {
+                        "vnetSubnetIds": [
+                            "[resourceId('Microsoft.AzureStackHCI/logicalNetworks', parameters('lnetName'))]"
+                        ]
+                    }
+                },
+                "licenseProfile": {
+                    "azureHybridBenefit": "[parameters('enableAzureHybridBenefit')]"
+                },
+                "storageProfile": {
+                    "nfsCsiDriver": {
+                        "enabled": "[parameters('enableNfsCsiDriver')]"
+                    },
+                    "smbCsiDriver": {
+                        "enabled": "[parameters('enableSmbCsiDriver')]"
+                    }
+                }
+            },
+            "scope": "[format('Microsoft.Kubernetes/connectedClusters/{0}', parameters('connectedClusterName'))]"
+        }
+    ]
+}

@@ -2,11 +2,8 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "provisionedClusterName": {
+    "connectedClusterName": {
       "value": "TODO: AKS Arc Cluster Name"
-    },
-    "location": {
-      "value": "eastus"
     },
     "agentName": {
       "value": "TODO: Node Pool Name"
@@ -20,10 +17,22 @@
     "agentOsType": {
       "value": "Linux"
     },
-    "provisionedClustersApiVersion": {
-      "value": "2024-01-01"
+    "enableAutoScaling": {
+      "value": false
     },
-    "connectedClustersApiVersion": {
+    "minCount": {
+      "value": 1
+    },
+    "maxCount": {
+      "value": 10
+    },
+    "nodeLabels": {
+      "value": {}
+    },
+    "nodeTaints": {
+      "value": []
+    },
+    "provisionedClustersApiVersion": {
       "value": "2024-01-01"
     }
   }

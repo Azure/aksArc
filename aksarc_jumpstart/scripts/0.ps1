@@ -1,4 +1,4 @@
-Start-Transcript -Path "E:\log\0.ps1.log" -Append
+Start-Transcript -Path "$env:LogDirectory\0.ps1.log" -Append
 
 Install-WindowsFeature -Name DNS -IncludeManagementTools -Verbose; 
 Install-WindowsFeature -Name DHCP -IncludeManagementTools -Verbose

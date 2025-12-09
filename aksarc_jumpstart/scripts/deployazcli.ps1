@@ -1,5 +1,5 @@
 # Install Az CLI
-Start-Transcript -Path "E:\log\deployazcli.ps1.log" -Append
+Start-Transcript -Path "$env:LogDirectory\deployazcli.ps1.log" -Append
 
 Write-Host "Installing Azure CLI... "
 Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; 

@@ -12,7 +12,7 @@ param vipPoolStart string
 param vipPoolEnd string
 param nextHopIpAddress string
 
-// Provisioned cluster
+// Aks Arc cluster
 param connectedClusterName string
 param sshPublicKey string
 param controlPlaneHostIP string
@@ -26,9 +26,14 @@ param nodePoolOSType string
 param nodePoolCount int
 param nodePoolLabel string
 param nodePoolLabelValue string
-param nodePoolTaint string
+param nodePoolTaints array
 param netWorkProfilNetworkPolicy string
 param networkProfileLoadBalancerCount int
+param enableAzureHybridBenefit string
+param enableNfsCsiDriver bool
+param enableSmbCsiDriver bool
+param enableWorkloadIdentity bool
+param enableOidcIssuer bool
 
 // You can replace the creation code with the below commented-out code to reference an existing logical network.
 // resource logicalNetwork 'Microsoft.AzureStackHCI/logicalNetworks@2024-01-01' existing = {
@@ -83,8 +88,8 @@ resource logicalNetwork 'Microsoft.AzureStackHCI/logicalNetworks@2024-01-01' = {
 }
 
 // Create the connected cluster.
-// This is the Arc representation of the AKS cluster, used to create a Managed Identity for the provisioned cluster.
-resource connectedCluster 'Microsoft.Kubernetes/ConnectedClusters@2024-01-01' = {
+// This is the Arc representation of the AKS cluster, used to create a Managed Identity for the Aks Arc cluster.
+resource connectedCluster 'Microsoft.Kubernetes/ConnectedClusters@2025-12-01-preview' = {
   location: azureLocation
   name: connectedClusterName
   identity: {
@@ -92,15 +97,23 @@ resource connectedCluster 'Microsoft.Kubernetes/ConnectedClusters@2024-01-01' = 
   }
   kind: 'ProvisionedCluster'
   properties: {
-    // agentPublicKeyCertificate must be empty for provisioned clusters that will be created next.
+    // agentPublicKeyCertificate must be empty for Aks Arc clusters that will be created next.
     agentPublicKeyCertificate: ''
     aadProfile: {
       enableAzureRBAC: false
     }
+    securityProfile: {
+      workloadIdentity: {
+        enabled: enableWorkloadIdentity
+      }
+    }
+    oidcIssuerProfile: {
+      enabled: enableOidcIssuer
+    }
   }
 }
 
-// Create the provisioned cluster instance. 
+// Create the Aks Arc cluster instance. 
 // This is the actual AKS cluster and provisioned on your Azure Local cluster via the Arc Resource Bridge.
 resource provisionedClusterInstance 'Microsoft.HybridContainerService/provisionedClusterInstances@2024-01-01' = {
   name: 'default'
@@ -139,12 +152,10 @@ resource provisionedClusterInstance 'Microsoft.HybridContainerService/provisione
         count: nodePoolCount
         vmSize: nodePoolVMSize
         osType: nodePoolOSType
-        nodeLabels: {
+        nodeLabels: empty(nodePoolLabel) ? null : {
           '${nodePoolLabel}': nodePoolLabelValue
         }
-        nodeTaints: [
-          nodePoolTaint
-        ]
+        nodeTaints: empty(nodePoolTaints) ? null : nodePoolTaints
       }
     ]
     cloudProviderProfile: {
@@ -154,12 +165,15 @@ resource provisionedClusterInstance 'Microsoft.HybridContainerService/provisione
         ]
       }
     }
+    licenseProfile: {
+      azureHybridBenefit: enableAzureHybridBenefit
+    }
     storageProfile: {
       nfsCsiDriver: {
-        enabled: true
+        enabled: enableNfsCsiDriver
       }
       smbCsiDriver: {
-        enabled: true
+        enabled: enableSmbCsiDriver
       }
     }
   }

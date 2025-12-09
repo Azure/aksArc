@@ -1,12 +1,15 @@
 param(
     [string]$resource_group = "jumpstart-rg",
     [string]$appliance_name = "aks_arc_appliance",
-    [string] $workDirectory = "E:\AKSArc",
+    [string] $workDirectory,
     [string] $location = "southeastasia",
     [string] $subscription
 )
 
-Start-Transcript -Path "E:\log\deployappliance.ps1.log" -Append
+if ([string]::IsNullOrEmpty($workDirectory)) {
+    $workDirectory = "$env:WorkingDir"
+}
+Start-Transcript -Path "$env:LogDirectory\deployappliance.ps1.log" -Append
 
 $VerbosePreference = "Continue"
 

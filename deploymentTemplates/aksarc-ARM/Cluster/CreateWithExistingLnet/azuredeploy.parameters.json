@@ -13,7 +13,7 @@
                 "TODO: Fill in parameter value"
             ]
         },
-        "provisionedClusterName": {
+        "connectedClusterName": {
             "value": "TODO: Fill in parameter value"
         },
         "sshRSAPublicKey": {
@@ -50,7 +50,7 @@
             "value": 0 
         },
         "connectedClustersApiVersion": {
-            "value": "TODO: Fill in parameter value"
+            "value": "2025-12-01-preview"
         },
         "provisionedClustersApiVersion": {
             "value": "TODO: Fill in parameter value"
@@ -61,8 +61,23 @@
         "nodepoolLabelValue": {
             "value": "TODO: Fill in parameter value"
         },
-        "nodepoolTaint": {
+        "nodepoolTaints": {
+            "value": []
+        },
+        "enableAzureHybridBenefit": {
             "value": "TODO: Fill in parameter value"
+        },
+        "enableNfsCsiDriver": {
+            "value": true
+        },
+        "enableSmbCsiDriver": {
+            "value": true
+        },
+        "enableWorkloadIdentity": {
+            "value": false
+        },
+        "enableOidcIssuer": {
+            "value": false
         }
     }
 }
