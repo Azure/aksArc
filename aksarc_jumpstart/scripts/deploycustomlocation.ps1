@@ -1,6 +1,6 @@
 param(
-    [string]$resource_group = "jumpstart-matt",
-    [string]$appliance_name = "jumpstartVM-appliance",
+    [string]$resource_group = "jumpstart-rg",
+    [string]$appliance_name = "aks_arc_appliance",
     [string] $subscription,
     [string] $customLocationName,
     [string] $location

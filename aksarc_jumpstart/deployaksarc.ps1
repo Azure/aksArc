@@ -3,7 +3,7 @@ param (
     [Parameter()]
     [string] $GroupName = "jumpstart-rg",
     [Parameter()]
-    [string] $Location = "southeastasia",
+    [string] $Location = "eastus2",
     [Parameter()]
     [string] $vnetName = "jumpstartVNet",
     [Parameter()]

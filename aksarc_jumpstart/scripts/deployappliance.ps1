@@ -2,7 +2,7 @@ param(
     [string]$resource_group = "jumpstart-rg",
     [string]$appliance_name = "aks_arc_appliance",
     [string] $workDirectory,
-    [string] $location = "southeastasia",
+    [string] $location = "eastus2",
     [string] $subscription,
     [switch] $useLockdown
 )
