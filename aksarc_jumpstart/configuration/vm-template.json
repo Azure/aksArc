@@ -57,6 +57,9 @@
       "dependsOn": [
         "[concat('Microsoft.Network/networkInterfaces/', parameters('vmName'), '-nic')]"
       ],
+      "identity": {
+        "type": "SystemAssigned"
+      },
       "properties": {
         "hardwareProfile": {
           "vmSize": "[parameters('vmSize')]"
@@ -100,12 +103,33 @@
       }
     },
     {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "apiVersion": "2019-03-01",
+      "name": "[concat(parameters('vmName'), '/Microsoft.Azure.Geneva.GenevaMonitoring')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Azure.Geneva",
+        "type": "GenevaMonitoring",
+        "typeHandlerVersion": "2.0",
+        "autoUpgradeMinorVersion": true,
+        "enableAutomaticUpgrade": true,
+        "settings": {},
+        "protectedSettings": {}
+      }
+    },
+    {
       "type": "Microsoft.Authorization/roleAssignments",
       "apiVersion": "2022-04-01",
       "name": "[guid(resourceGroup().id, parameters('vmName'), 'Contributor')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]"
+      ],
       "properties": {
         "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
-        "principalId": "[reference(resourceId('Microsoft.Compute/virtualMachines', parameters('vmName')), '2022-03-01', 'Full').identity.principalId  ]",
+        "principalId": "[reference(resourceId('Microsoft.Compute/virtualMachines', parameters('vmName')), '2022-08-01', 'Full').identity.principalId]",
         "scope": "[resourceGroup().id]"
       }
     }

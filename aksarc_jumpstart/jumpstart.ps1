@@ -23,13 +23,22 @@ param (
   $subnetName = "jumpstartSubnet",
   [Parameter()]
   [string]
-  $subscriptionId
+  $subscriptionId,
+  [Parameter()]
+  [switch]
+  $lockdown
 )
 
 # Create Resource Group
 az group create --name $GroupName --location $Location 
 # Create Vnet and VM
-az deployment group create --resource-group $GroupName --template-file ./configuration/vnet-template.json --parameters vnetName=$vnetName location=$Location subnetName=$subnetName
+if ($lockdown) {
+  Write-Host "Deploying with firewall and network isolation..."
+  az deployment group create --resource-group $GroupName --template-file ./configuration/vnet-fw-rt-template.json --parameters location=$Location vnetName=$vnetName vNetAddressPrefix="10.0.0.0/16" subnetName=$subnetName subnetPrefix="10.0.0.0/24" firewallSubnetPrefix="10.0.1.0/26" bastionSubnetPrefix="10.0.2.0/26" nsgName="$($vnetName)-nsg" firewallName="$($vnetName)-firewall" firewallPolicyName="$($vnetName)-firewall-policy" routeTableName="$($vnetName)-rt" bastionName="$($vnetName)-bastion" bastionPublicIpName="$($vnetName)-bastion-pip"
+} else {
+  Write-Host "Deploying with standard network configuration..."
+  az deployment group create --resource-group $GroupName --template-file ./configuration/vnet-template.json --parameters location=$Location vnetName=$vnetName subnetName=$subnetName
+}
 az deployment group create --resource-group $GroupName --template-file ./configuration/vm-template.json --parameters adminUsername=$userName adminPassword=$password vmName=$vmName location=$Location vnetName=$vnetName vmSize="Standard_E16s_v4" subnetName=$subnetName
 
 if ($LASTEXITCODE -ne 0) {
@@ -42,7 +51,7 @@ az vm identity assign --resource-group $GroupName --name $vmName
 $principalId = az vm show --resource-group $GroupName --name $vmName --query identity.principalId -o tsv
 az role assignment create --assignee $principalId --role Contributor --scope /subscriptions/$subscriptionId
 
-#az deployment group create --resource-group $GroupName --template-file a4s-template.json --parameters location=$Location vmName=$vmName arcResourceGroup=$GroupName subscriptionId=$subscriptionId tenantId=$tenantId
+az deployment group create --resource-group $GroupName --template-file a4s-template.json --parameters location=$Location vmName=$vmName arcResourceGroup=$GroupName subscriptionId=$subscriptionId tenantId=$tenantId
 # Enable Nested Virtualization
 az vm update   --resource-group $GroupName   --name $vmName --set additionalCapabilities.enableNestedVirtualization=true
 

@@ -1,0 +1,630 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "eastus2"
+    },
+    "vnetName": {
+      "type": "string",
+      "defaultValue": "jumpstartVNet"
+    },
+    "vNetAddressPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.0.0/16"
+    },
+     "subnetName": {
+      "type": "string",
+      "defaultValue": "jumpstartSubnet"
+    },
+    "subnetPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.0.0/24"
+    },
+    "firewallSubnetPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.1.0/26"
+    },
+    "bastionSubnetPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.2.0/26"
+    },
+    "nsgName": {
+      "type": "string",
+      "defaultValue": "bastion-nsg"
+    },
+    "firewallName": {
+      "type": "string",
+      "defaultValue": "jumpstartFirewall"
+    },
+    "firewallPolicyName": {
+      "type": "string",
+      "defaultValue": "jumpstartFirewallPolicy"
+    },
+    "routeTableName": {
+      "type": "string",
+      "defaultValue": "jumpstartRouteTable"
+    },
+    "bastionName": {
+      "type": "string",
+      "defaultValue": "jumpstartBastion"
+    },
+    "bastionPublicIpName": {
+      "type": "string",
+      "defaultValue": "jumpstartVNet-IPv4"
+    }
+  },
+  "variables": {
+    "firewallPublicIpName": "[concat(parameters('firewallName'), '-pip')]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2022-09-01",
+      "name": "[parameters('nsgName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "AllowHttpsInbound",
+            "properties": {
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "Internet",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 115,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AllowAzureCloudOutbound",
+            "properties": {
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "AzureCloud",
+              "access": "Allow",
+              "priority": 101,
+              "direction": "Outbound"
+            }
+          },
+          {
+            "name": "AllowRdpOutbound",
+            "properties": {
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 102,
+              "direction": "Outbound"
+            }
+          },
+          {
+            "name": "AllowSshOutbound",
+            "properties": {
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "22",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 103,
+              "direction": "Outbound"
+            }
+          },
+          {
+            "name": "AllowSshInboundForBastion",
+            "properties": {
+              "priority": 102,
+              "access": "Allow",
+              "direction": "Inbound",
+              "protocol": "Tcp",
+              "sourceAddressPrefix": "168.63.129.16",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "22"
+            }
+          },
+          {
+            "name": "AllowRdpInboundForBastion",
+            "properties": {
+              "priority": 100,
+              "access": "Allow",
+              "direction": "Inbound",
+              "protocol": "Tcp",
+              "sourceAddressPrefix": "168.63.129.16",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "3389"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/routeTables",
+      "apiVersion": "2022-09-01",
+      "name": "[parameters('routeTableName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "disableBgpRoutePropagation": false,
+        "routes": [
+          {
+            "name": "RouteToFirewall",
+            "properties": {
+              "addressPrefix": "0.0.0.0/0",
+              "nextHopType": "VirtualAppliance",
+              "nextHopIpAddress": "10.0.1.4"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2022-09-01",
+      "name": "[variables('firewallPublicIpName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Static",
+        "publicIPAddressVersion": "IPv4",
+        "ipTags": [
+          {
+            "ipTagType": "FirstPartyUsage",
+            "tag": "/NonProd"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2022-09-01",
+      "name": "[parameters('bastionPublicIpName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Static",
+        "publicIPAddressVersion": "IPv4",
+        "ipTags": [
+          {
+            "ipTagType": "FirstPartyUsage",
+            "tag": "/NonProd"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/firewallPolicies",
+      "apiVersion": "2022-09-01",
+      "name": "[parameters('firewallPolicyName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "sku": {
+          "tier": "Standard"
+        },
+        "threatIntelMode": "Alert",
+        "explicitProxy": {
+          "enableExplicitProxy": true,
+          "httpPort": 8080,
+          "httpsPort": 8443,
+          "enablePacFile": false
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Network/firewallPolicies/ruleCollectionGroups",
+      "apiVersion": "2022-09-01",
+      "name": "[concat(parameters('firewallPolicyName'), '/DefaultNetworkRuleCollectionGroup')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/firewallPolicies', parameters('firewallPolicyName'))]"
+      ],
+      "properties": {
+        "priority": 200,
+        "ruleCollections": [
+          {
+            "ruleCollectionType": "FirewallPolicyFilterRuleCollection",
+            "action": {
+              "type": "Allow"
+            },
+            "rules": [
+              {
+                "ruleType": "NetworkRule",
+                "name": "AllowAzureCloudTCP",
+                "ipProtocols": [
+                  "TCP"
+                ],
+                "sourceAddresses": [
+                  "*"
+                ],
+                "sourceIpGroups": [],
+                "destinationAddresses": [
+                  "AzureCloud"
+                ],
+                "destinationIpGroups": [],
+                "destinationFqdns": [],
+                "destinationPorts": [
+                  "443",
+                  "9000"
+                ]
+              },
+              {
+                "ruleType": "NetworkRule",
+                "name": "AllowAzureCloudUDP",
+                "ipProtocols": [
+                  "UDP"
+                ],
+                "sourceAddresses": [
+                  "*"
+                ],
+                "sourceIpGroups": [],
+                "destinationAddresses": [
+                  "AzureCloud"
+                ],
+                "destinationIpGroups": [],
+                "destinationFqdns": [],
+                "destinationPorts": [
+                  "123",
+                  "1194"
+                ]
+              },
+              {
+                "ruleType": "NetworkRule",
+                "name": "AllowDNS",
+                "ipProtocols": [
+                  "UDP"
+                ],
+                "sourceAddresses": [
+                  "*"
+                ],
+                "sourceIpGroups": [],
+                "destinationAddresses": [
+                  "*"
+                ],
+                "destinationIpGroups": [],
+                "destinationFqdns": [],
+                "destinationPorts": [
+                  "53"
+                ]
+              }
+            ],
+            "name": "NetworkRuleCollection",
+            "priority": 200
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/firewallPolicies/ruleCollectionGroups",
+      "apiVersion": "2022-09-01",
+      "name": "[concat(parameters('firewallPolicyName'), '/DefaultApplicationRuleCollectionGroup')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/firewallPolicies', parameters('firewallPolicyName'))]",
+        "[resourceId('Microsoft.Network/firewallPolicies/ruleCollectionGroups', parameters('firewallPolicyName'), 'DefaultNetworkRuleCollectionGroup')]"
+      ],
+      "properties": {
+        "priority": 300,
+        "ruleCollections": [
+          {
+            "ruleCollectionType": "FirewallPolicyFilterRuleCollection",
+            "action": {
+              "type": "Allow"
+            },
+            "rules": [
+              {
+                "ruleType": "ApplicationRule",
+                "name": "AllowAzureServices",
+                "protocols": [
+                  {
+                    "protocolType": "Https",
+                    "port": 443
+                  },
+                  {
+                    "protocolType": "Http",
+                    "port": 80
+                  }
+                ],
+                "fqdnTags": [
+                  "AzureKubernetesService"
+                ],
+                "targetFqdns": [],
+                "targetUrls": [],
+                "terminateTLS": false,
+                "sourceAddresses": [
+                  "*"
+                ],
+                "destinationAddresses": [],
+                "sourceIpGroups": []
+              },
+              {
+                "ruleType": "ApplicationRule",
+                "name": "AllowGitHubRaw",
+                "protocols": [
+                  {
+                    "protocolType": "Https",
+                    "port": 443
+                  }
+                ],
+                "fqdnTags": [],
+                "targetFqdns": [
+                  "raw.githubusercontent.com"
+                ],
+                "targetUrls": [],
+                "terminateTLS": false,
+                "sourceAddresses": [
+                  "*"
+                ],
+                "destinationAddresses": [],
+                "sourceIpGroups": []
+              },
+              {
+                "ruleType": "ApplicationRule",
+                "name": "AllowAzCli",
+                "protocols": [
+                    {
+                        "protocolType": "Https",
+                        "port": 443
+                    },
+                    {
+                        "protocolType": "Http",
+                        "port": 80
+                    }
+                ],
+                "fqdnTags": [],
+                "webCategories": [],
+                "targetFqdns": [
+                    "management.core.windows.net",
+                    "management.azure.com",
+                    "batch.core.windows.net",
+                    "gallery.azure.com",
+                    "login.microsoftonline.com",
+                    "graph.windows.net",
+                    "graph.microsoft.com",
+                    "datalake.azure.net",
+                    "raw.githubusercontent.com",
+                    "rest.media.azure.net",
+                    "ossrdbms-aad.database.windows.net",
+                    "api.applicationinsights.io",
+                    "api.loganalytics.io",
+                    "dc.applicationinsights.azure.com",
+                    "dev.azuresynapse.net",
+                    "attest.azure.net",
+                    "portal.azure.com",
+                    "*.core.windows.net",
+                    "*.afs.azure.net",
+                    "*.vault.azure.net",
+                    "*.managedhsm.azure.net",
+                    "*.database.windows.net",
+                    "*.mysql.database.azure.com",
+                    "*.postgres.database.azure.com",
+                    "*.mariadb.database.azure.com",
+                    "*.azuredatalakestore.net",
+                    "*.azuredatalakeanalytics.net",
+                    "*.azurecr.io",
+                    "*.dev.azuresynapse.net",
+                    "*.attest.azure.net",
+                    "aka.ms",
+                    "azcliextensionsync.blob.core.windows.net",
+                    "azcliprod.blob.core.windows.net",
+                    "azurecliextensionsync.blob.core.windows.net",
+                    "go.microsoft.com",
+                    "cdn.oneget.org",
+                    "powershellgallery.com",
+                    "*.powershellgallery.com"
+                ],
+                "targetUrls": [],
+                "terminateTLS": false,
+                "sourceAddresses": [
+                    "*"
+                ],
+                "destinationAddresses": [],
+                "sourceIpGroups": [],
+                "httpHeadersToInsert": []
+              },
+              {
+                "ruleType": "ApplicationRule",
+                "name": "AllowARB",
+                "protocols": [
+                    {
+                        "protocolType": "Https",
+                        "port": 443
+                    },
+                    {
+                        "protocolType": "Http",
+                        "port": 80
+                    }
+                ],
+                "fqdnTags": [],
+                "webCategories": [],
+                "targetFqdns": [
+                    "msk8s.api.cdp.microsoft.com",
+                    "msk8s.sb.tlu.dl.delivery.mp.microsoft.com",
+                    "mcr.microsoft.com",
+                    "*.data.mcr.microsoft.com",
+                    "time.windows.com",
+                    "management.azure.com",
+                    "graph.microsoft.com",
+                    "login.microsoftonline.com",
+                    "*.login.microsoft.com",
+                    "login.windows.net",
+                    "*.dp.prod.appliances.azure.com",
+                    "*.blob.core.windows.net",
+                    "ecpacr.azurecr.io",
+                    "*.his.arc.azure.com",
+                    "azurearcfork8s.azurecr.io",
+                    "adhs.events.data.microsoft.com",
+                    "v20.events.data.microsoft.com",
+                    "linuxgeneva-microsoft.azurecr.io",
+                    "kvamanagementoperator.azurecr.io",
+                    "packages.microsoft.com",
+                    "sts.windows.net",
+                    "guestnotificationservice.azure.com",
+                    "gcs.prod.monitoring.core.windows.net",
+                    "*.prod.microsoftmetrics.com",
+                    "*.prod.hot.ingest.monitor.core.windows.net",
+                    "*.prod.warm.ingest.monitor.core.windows.net",
+                    "*.arc.azure.net",
+                    "*.servicebus.windows.net",
+                    "*.web.core.windows.net",
+                    "*.dp.kubernetesconfiguration.azure.com",
+                    "pypi.org",
+                    "*.pypi.org",
+                    "pythonhosted.org",
+                    "*.pythonhosted.org"
+                ],
+                "targetUrls": [],
+                "terminateTLS": false,
+                "sourceAddresses": [
+                    "*"
+                ],
+                "destinationAddresses": [],
+                "sourceIpGroups": [],
+                "httpHeadersToInsert": []
+              }
+            ],
+            "name": "ApplicationRuleCollection",
+            "priority": 300
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2022-09-01",
+      "name": "[parameters('vnetName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsgName'))]",
+        "[resourceId('Microsoft.Network/routeTables', parameters('routeTableName'))]"
+      ],
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[parameters('vNetAddressPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[parameters('subnetName')]",
+            "properties": {
+              "addressPrefix": "[parameters('subnetPrefix')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsgName'))]"
+              },
+              "routeTable": {
+                "id": "[resourceId('Microsoft.Network/routeTables', parameters('routeTableName'))]"
+              }
+            }
+          },
+          {
+            "name": "AzureFirewallSubnet",
+            "properties": {
+              "addressPrefix": "[parameters('firewallSubnetPrefix')]"
+            }
+          },
+          {
+            "name": "AzureBastionSubnet",
+            "properties": {
+              "addressPrefix": "[parameters('bastionSubnetPrefix')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/azureFirewalls",
+      "apiVersion": "2022-09-01",
+      "name": "[parameters('firewallName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]",
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('firewallPublicIpName'))]",
+        "[resourceId('Microsoft.Network/firewallPolicies', parameters('firewallPolicyName'))]",
+        "[resourceId('Microsoft.Network/firewallPolicies/ruleCollectionGroups', parameters('firewallPolicyName'), 'DefaultNetworkRuleCollectionGroup')]",
+        "[resourceId('Microsoft.Network/firewallPolicies/ruleCollectionGroups', parameters('firewallPolicyName'), 'DefaultApplicationRuleCollectionGroup')]"
+      ],
+      "properties": {
+        "sku": {
+          "name": "AZFW_VNet",
+          "tier": "Standard"
+        },
+        "threatIntelMode": "Alert",
+        "ipConfigurations": [
+          {
+            "name": "firewallConfig",
+            "properties": {
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('firewallPublicIpName'))]"
+              },
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), 'AzureFirewallSubnet')]"
+              }
+            }
+          }
+        ],
+        "firewallPolicy": {
+          "id": "[resourceId('Microsoft.Network/firewallPolicies', parameters('firewallPolicyName'))]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Network/bastionHosts",
+      "apiVersion": "2023-09-01",
+      "name": "[parameters('bastionName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]",
+        "[resourceId('Microsoft.Network/publicIPAddresses', parameters('bastionPublicIpName'))]"
+      ],
+      "sku": {
+        "name": "Standard"
+      },
+      "properties": {
+        "scaleUnits": 2,
+        "enableTunneling": false,
+        "enableIpConnect": false,
+        "disableCopyPaste": false,
+        "enableShareableLink": false,
+        "enableKerberos": false,
+        "enableSessionRecording": false,
+        "enablePrivateOnlyBastion": false,
+        "ipConfigurations": [
+          {
+            "name": "bastionConfig",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), 'AzureBastionSubnet')]"
+              },
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('bastionPublicIpName'))]"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "outputs": {
+    "firewallPrivateIp": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Network/azureFirewalls', parameters('firewallName'))).ipConfigurations[0].properties.privateIPAddress]"
+    },
+    "firewallPublicIp": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', variables('firewallPublicIpName'))).ipAddress]"
+    }
+  }
+}
