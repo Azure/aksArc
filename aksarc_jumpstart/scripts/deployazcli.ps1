@@ -10,5 +10,5 @@ Start-Process msiexec.exe -ArgumentList '/I AzureCLI.msi /quiet' -NoNewWindow -W
 Remove-Item .\AzureCLI.msi
 
 Write-Host "Installing Az.AksArc module... "
-Install-Module -Name Az.AksArc -Repository PSGallery -Force
+Install-Module -Name Az.AksArc -Repository PSGallery -Force -AcceptLicense -AllowClobber
 Stop-Transcript
