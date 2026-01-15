@@ -2,8 +2,9 @@
 param (
     [Parameter()]
     [string] $GroupName = "jumpstart-rg",
-    [Parameter()]
-    [string] $Location = "eastus2",
+    [Parameter(Mandatory = $true)]
+    [ValidateSet("eastus", "australiaeast")]
+    [string] $Location = "eastus",
     [Parameter()]
     [string] $vnetName = "jumpstartVNet",
     [Parameter()]

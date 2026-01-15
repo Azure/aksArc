@@ -9,7 +9,7 @@ set -o pipefail  # Exit on pipe failures
 
 # Default values
 GROUP_NAME="jumpstart-rg"
-LOCATION="eastus2"
+LOCATION="eastus"
 VNET_NAME="jumpstartVNet"
 VM_NAME="jumpstartVM"
 SUBNET_NAME="jumpstartSubnet"
@@ -32,7 +32,7 @@ usage() {
     echo "  -h, --help                       Show this help message"
     echo ""
     echo "Example:"
-    echo "  $0 -s 12345678-1234-1234-1234-123456789012 -g my-rg -l eastus2"
+    echo "  $0 -s 12345678-1234-1234-1234-123456789012 -g my-rg -l eastus"
     exit 1
 }
 

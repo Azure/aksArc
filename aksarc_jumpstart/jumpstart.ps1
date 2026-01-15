@@ -11,7 +11,7 @@ param (
   $GroupName = "jumpstart-rg",
   [Parameter()]
   [string]
-  $Location = "eastus2",
+  $Location = "eastus",
   [Parameter()]
   [string]
   $vnetName = "jumpstartVNet",
@@ -28,10 +28,19 @@ param (
 
 # Create Resource Group
 az group create --name $GroupName --location $Location 
+if ($LASTEXITCODE -ne 0) {
+  Write-Host "Azure CLI command failed with exit code $LASTEXITCODE"
+  exit $LASTEXITCODE
+}
+
 # Create Vnet and VM
 az deployment group create --resource-group $GroupName --template-file ./configuration/vnet-template.json --parameters vnetName=$vnetName location=$Location subnetName=$subnetName
-az deployment group create --resource-group $GroupName --template-file ./configuration/vm-template.json --parameters adminUsername=$userName adminPassword=$password vmName=$vmName location=$Location vnetName=$vnetName vmSize="Standard_E16s_v4" subnetName=$subnetName
+if ($LASTEXITCODE -ne 0) {
+  Write-Host "Azure CLI command failed with exit code $LASTEXITCODE"
+  exit $LASTEXITCODE
+}
 
+az deployment group create --resource-group $GroupName --template-file ./configuration/vm-template.json --parameters adminUsername=$userName adminPassword=$password vmName=$vmName location=$Location vnetName=$vnetName vmSize="Standard_E16s_v4" subnetName=$subnetName
 if ($LASTEXITCODE -ne 0) {
   Write-Host "Azure CLI command failed with exit code $LASTEXITCODE"
   exit $LASTEXITCODE
