@@ -11,7 +11,7 @@ param (
   $GroupName = "jumpstart-rg",
   [Parameter()]
   [string]
-  $Location = "eastus2",
+  $Location = "eastus",
   [Parameter()]
   [string]
   $vnetName = "jumpstartVNet",
@@ -28,10 +28,19 @@ param (
 
 # Create Resource Group
 az group create --name $GroupName --location $Location 
+if ($LASTEXITCODE -ne 0) {
+  Write-Host "Azure CLI command failed with exit code $LASTEXITCODE"
+  exit $LASTEXITCODE
+}
+
 # Create Vnet and VM
 az deployment group create --resource-group $GroupName --template-file ./configuration/vnet-template.json --parameters vnetName=$vnetName location=$Location subnetName=$subnetName
-az deployment group create --resource-group $GroupName --template-file ./configuration/vm-template.json --parameters adminUsername=$userName adminPassword=$password vmName=$vmName location=$Location vnetName=$vnetName vmSize="Standard_E16s_v4" subnetName=$subnetName
+if ($LASTEXITCODE -ne 0) {
+  Write-Host "Azure CLI command failed with exit code $LASTEXITCODE"
+  exit $LASTEXITCODE
+}
 
+az deployment group create --resource-group $GroupName --template-file ./configuration/vm-template.json --parameters adminUsername=$userName adminPassword=$password vmName=$vmName location=$Location vnetName=$vnetName vmSize="Standard_E16s_v4" subnetName=$subnetName
 if ($LASTEXITCODE -ne 0) {
   Write-Host "Azure CLI command failed with exit code $LASTEXITCODE"
   exit $LASTEXITCODE
@@ -39,6 +48,10 @@ if ($LASTEXITCODE -ne 0) {
 
 # Assign Managed Identity and Contributor Role to VM
 az vm identity assign --resource-group $GroupName --name $vmName
+if ($LASTEXITCODE -ne 0) {
+  Write-Host "Azure CLI command failed with exit code $LASTEXITCODE"
+  exit $LASTEXITCODE
+}
 $principalId = az vm show --resource-group $GroupName --name $vmName --query identity.principalId -o tsv
 az role assignment create --assignee $principalId --role Contributor --scope /subscriptions/$subscriptionId
 
@@ -64,10 +77,14 @@ foreach ($script in $scriptToExecute.GetEnumerator()) {
   $deploymentName = "executescript-$($vmName)-$($scriptName.Replace('.ps1',''))"
   $commandToExecute = "powershell.exe -ExecutionPolicy Unrestricted -File $scriptName"
   Write-Host "Executing $scriptName from $scriptUrl on VM $vmName ..."
-  az deployment group create --name $deploymentName --resource-group $GroupName --template-file ./configuration/executescript-template.json --parameters location=$Location vmName=$vmName scriptFileUri=$scriptUrl commandToExecute=$commandToExecute
-  if ($LASTEXITCODE -ne 0) {
-    Write-Host "Azure CLI command failed with exit code $LASTEXITCODE"
-    exit $LASTEXITCODE
+  try {
+    az deployment group create --name $deploymentName --resource-group $GroupName --template-file ./configuration/executescript-template.json --parameters location=$Location vmName=$vmName scriptFileUri=$scriptUrl commandToExecute=$commandToExecute
+  }
+  catch {
+    Write-Error "An error occurred during AKS Arc cluster deployment: $_"
+    Write-Error "Exception details: $($_.Exception.Message)"
+    Write-Error "Stack trace: $($_.ScriptStackTrace)"
+    throw
   }
 }
 

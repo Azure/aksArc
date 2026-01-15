@@ -2,8 +2,9 @@
 param (
     [Parameter()]
     [string] $GroupName = "jumpstart-rg",
-    [Parameter()]
-    [string] $Location = "eastus2",
+    [Parameter(Mandatory = $true)]
+    [ValidateSet("eastus", "australiaeast")]
+    [string] $Location = "eastus",
     [Parameter()]
     [string] $vnetName = "jumpstartVNet",
     [Parameter()]
@@ -43,6 +44,8 @@ if ([string]::IsNullOrEmpty($aksArcClusterName)) {
 # This is a continuation of jumpstart.ps1 to deploy ARB specific components
 # At this point, MOC is expected to be installed.
 
+$ErrorActionPreference = "Stop"
+
 $gitSource = (git config --get remote.origin.url).Replace("github.com", "raw.githubusercontent.com").Replace("aksArc.git", "aksArc")
 $branch = (git branch --show-current)
 $scriptLocation = "$gitSource/refs/heads/$branch/aksarc_jumpstart/scripts"
@@ -65,10 +68,18 @@ foreach ($script in $scriptToExecute.GetEnumerator()) {
     $deploymentName = "executescript-$($vmName)-$($scriptName.Split(" ")[0].Replace('.ps1',''))"
     $commandToExecute = "powershell.exe -ExecutionPolicy Unrestricted -File $scriptName"
     Write-Host "Executing $commandToExecute  from $scriptUrl on VM $vmName ..."
-    az deployment group create --name $deploymentName --resource-group $GroupName --template-file ./configuration/executescript-template.json --parameters location=$Location vmName=$vmName scriptFileUri=$scriptUrl commandToExecute=$commandToExecute # --debug
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "Azure CLI command failed with exit code $LASTEXITCODE"  
-        exit $LASTEXITCODE
+    try {
+        az deployment group create --name $deploymentName --resource-group $GroupName --template-file ./configuration/executescript-template.json --parameters location=$Location vmName=$vmName scriptFileUri=$scriptUrl commandToExecute=$commandToExecute # --debug
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "Azure CLI command failed with exit code $LASTEXITCODE"
+            throw "Failed to execute script $scriptName on VM $vmName. Exit code: $LASTEXITCODE"
+        }
+    }
+    catch {
+        Write-Error "An error occurred during AKS Arc cluster deployment: $_"
+        Write-Error "Exception details: $($_.Exception.Message)"
+        Write-Error "Stack trace: $($_.ScriptStackTrace)"
+        throw
     }
 }
 

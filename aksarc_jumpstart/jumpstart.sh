@@ -8,10 +8,12 @@ set -o pipefail  # Exit on pipe failures
 
 # Default values
 GROUP_NAME="jumpstart-rg"
-LOCATION="eastus2"
 VNET_NAME="jumpstartVNet"
 VM_NAME="jumpstartVM"
 SUBNET_NAME="jumpstartSubnet"
+
+# Valid locations
+VALID_LOCATIONS=("eastus" "australiaeast")
 
 # Function to print usage
 usage() {
@@ -20,15 +22,15 @@ usage() {
     echo "  -u, --username <username>        VM admin username (required)"
     echo "  -p, --password <password>        VM admin password (required)"
     echo "  -s, --subscription <id>          Azure subscription ID (required)"
+    echo "  -l, --location <location>        Azure region (required, valid values: eastus, australiaeast)"
     echo "  -g, --group-name <name>          Resource group name (default: $GROUP_NAME)"
-    echo "  -l, --location <location>        Azure region (default: $LOCATION)"
     echo "  -v, --vnet-name <name>           Virtual network name (default: $VNET_NAME)"
     echo "  -m, --vm-name <name>             Virtual machine name (default: $VM_NAME)"
     echo "  -n, --subnet-name <name>         Subnet name (default: $SUBNET_NAME)"
     echo "  -h, --help                       Show this help message"
     echo ""
     echo "Example:"
-    echo "  $0 -u myuser -p mypassword -s 12345678-1234-1234-1234-123456789012"
+    echo "  $0 -u myuser -p mypassword -s 12345678-1234-1234-1234-123456789012 -l eastus"
     exit 1
 }
 
@@ -122,9 +124,23 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Validate required parameters
-if [[ -z "$USERNAME" || -z "$PASSWORD" || -z "$SUBSCRIPTION_ID" ]]; then
+if [[ -z "$USERNAME" || -z "$PASSWORD" || -z "$SUBSCRIPTION_ID" || -z "$LOCATION" ]]; then
     echo "Error: Missing required parameters"
     usage
+fi
+
+# Validate location parameter
+valid_location=false
+for loc in "${VALID_LOCATIONS[@]}"; do
+    if [[ "$LOCATION" == "$loc" ]]; then
+        valid_location=true
+        break
+    fi
+done
+
+if [[ "$valid_location" == false ]]; then
+    echo "Error: Invalid location '$LOCATION'. Valid values are: ${VALID_LOCATIONS[*]}"
+    exit 1
 fi
 
 # Validate prerequisites

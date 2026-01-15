@@ -46,7 +46,7 @@ The deployment scripts accept the following parameters:
 | `--password`     | VM admin password     | -               | ✅       |
 | `--subscription` | Azure subscription ID | -               | ✅       |
 | `--group-name`   | Resource group name   | jumpstart-rg    | ❌       |
-| `--location`     | Azure region          | eastus2         | ❌       |
+| `--location`     | Azure region          | eastus          | ✅       |
 | `--vnet-name`    | Virtual network name  | jumpstartVNet   | ❌       |
 | `--vm-name`      | Virtual machine name  | jumpstartVM     | ❌       |
 | `--subnet-name`  | Subnet name           | jumpstartSubnet | ❌       |
@@ -82,14 +82,14 @@ chmod +x jumpstart.sh deployaksarc.sh
   --password "YourSecurePassword123!" \
   --subscription "12345678-1234-1234-1234-123456789012" \
   --group-name "aksarc-demo-rg" \
-  --location "eastus2" \
+  --location "eastus" \
   --vm-name "aksarc-demo-vm"
 
 # After VM setup is complete, deploy AKS Arc components
 ./deployaksarc.sh \
   --subscription "12345678-1234-1234-1234-123456789012" \
   --group-name "aksarc-demo-rg" \
-  --location "eastus2" \
+  --location "eastus" \
   --vm-name "aksarc-demo-vm"
 ```
 
@@ -102,10 +102,10 @@ cd aksArc\aksarc_jumpstart
 az login --use-device-code
 
 # Deploy infrastructure
-powershell .\jumpstart.ps1 -userName "azureuser" -password "YourSecurePassword123!" -subscription "12345678-1234-1234-1234-123456789012" -GroupName "aksarc-demo-rg" -Location "eastus2" -VMName "aksarc-demo-vm"
+powershell .\jumpstart.ps1 -userName "azureuser" -password "YourSecurePassword123!" -subscription "12345678-1234-1234-1234-123456789012" -GroupName "aksarc-demo-rg" -Location "eastus" -VMName "aksarc-demo-vm"
 
 # Deploy AKS Arc components
-powershell .\deployaksarc.ps1 -subscription "12345678-1234-1234-1234-123456789012" -GroupName "aksarc-demo-rg" -Location "eastus2" -VMName "aksarc-demo-vm"
+powershell .\deployaksarc.ps1 -subscription "12345678-1234-1234-1234-123456789012" -GroupName "aksarc-demo-rg" -Location "eastus" -VMName "aksarc-demo-vm"
 ```
 
 ## Deployment Steps
