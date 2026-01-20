@@ -23,7 +23,7 @@ if ($useLockdown) {
         -resourceName $appliance_name -workDirectory $workDirectory -vnetName "appliance-vnet" `
         -vSwitchName "InternalNAT" -gateway "172.16.0.1" -dnsservers "172.16.0.1" -ipaddressprefix "172.16.0.0/16" `
         -k8snodeippoolstart "172.16.255.0" -k8snodeippoolend "172.16.255.12" -controlPlaneIP "172.16.255.250" `
-        -proxyServerHTTP "10.0.1.4:8080" -proxyServerHTTPS "10.0.1.4:8443" -proxyServerNoProxy "localhost,127.0.0.1,.svc,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
+        -proxyServerHTTP "http://10.0.1.4:8080" -proxyServerHTTPS "http://10.0.1.4:8443" -proxyServerNoProxy "localhost,127.0.0.1,.svc,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
 } else {
     Write-Host "Configuring appliance without proxy settings..."
     New-ArcHciAksConfigFiles -subscriptionID $subscription -location $location -resourceGroup $resource_group `

@@ -51,7 +51,7 @@ az vm identity assign --resource-group $GroupName --name $vmName
 $principalId = az vm show --resource-group $GroupName --name $vmName --query identity.principalId -o tsv
 az role assignment create --assignee $principalId --role Contributor --scope /subscriptions/$subscriptionId
 
-az deployment group create --resource-group $GroupName --template-file a4s-template.json --parameters location=$Location vmName=$vmName arcResourceGroup=$GroupName subscriptionId=$subscriptionId tenantId=$tenantId
+az deployment group create --resource-group $GroupName --template-file ./configuration/a4s-template.json --parameters location=$Location vmName=$vmName arcResourceGroup=$GroupName subscriptionId=$subscriptionId tenantId=$tenantId
 # Enable Nested Virtualization
 az vm update   --resource-group $GroupName   --name $vmName --set additionalCapabilities.enableNestedVirtualization=true
 
