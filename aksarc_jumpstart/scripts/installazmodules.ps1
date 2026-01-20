@@ -6,6 +6,7 @@ Start-Transcript -Path "$env:LogDirectory\installazmodules.ps1.log" -Append
 
 $VerbosePreference = "Continue"
 Install-Module -Name ArcHci -Repository PSGallery -AcceptLicense -Force -RequiredVersion $arcHciVersion
+az login --identity
 
 az provider register --namespace Microsoft.Kubernetes --wait
 az provider register --namespace Microsoft.KubernetesConfiguration --wait
