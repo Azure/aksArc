@@ -75,15 +75,16 @@ $scriptToExecute = [ordered] @{
 foreach ($script in $scriptToExecute.GetEnumerator()) {
     $scriptUrl = $script.Key
     $scriptName = $script.Value
+    $scriptBaseName = $scriptName.Split(" ")[0]
 
-    $deploymentName = "executescript-$($vmName)-$($scriptName.Split(" ")[0].Replace('.ps1',''))"
+    $deploymentName = "executescript-$($vmName)-$($scriptBaseName.Replace('.ps1',''))"
     $commandToExecute = "powershell.exe -ExecutionPolicy Unrestricted -File $scriptName"
     Write-Host "Executing $commandToExecute  from $scriptUrl on VM $vmName ..."
     try {
         az deployment group create --name $deploymentName --resource-group $GroupName --template-file ./configuration/executescript-template.json --parameters location=$Location vmName=$vmName scriptFileUri=$scriptUrl commandToExecute=$commandToExecute # --debug
         if ($LASTEXITCODE -ne 0) {
             $executionStatus.Status = "Failure"
-            $executionStatus.FailedStep = "ExecuteScript_$($scriptName.Split(' ')[0])"
+            $executionStatus.FailedStep = "ExecuteScript_$scriptBaseName"
             $executionStatus.ErrorMessage = "Failed to execute script '$scriptName' on VM '$vmName'. Azure CLI command failed with exit code $LASTEXITCODE"
             $executionStatus.ExitCode = $LASTEXITCODE
             $executionStatus.EndTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
@@ -98,11 +99,11 @@ foreach ($script in $scriptToExecute.GetEnumerator()) {
             Write-Host "============================"
             throw "Failed to execute script $scriptName on VM $vmName. Exit code: $LASTEXITCODE"
         }
-        $executionStatus.CompletedSteps += "ExecuteScript_$($scriptName.Split(' ')[0])"
+        $executionStatus.CompletedSteps += "ExecuteScript_$scriptBaseName"
     }
     catch {
         $executionStatus.Status = "Failure"
-        $executionStatus.FailedStep = "ExecuteScript_$($scriptName.Split(' ')[0])"
+        $executionStatus.FailedStep = "ExecuteScript_$scriptBaseName"
         $executionStatus.ErrorMessage = "An error occurred during AKS Arc cluster deployment: $_"
         $executionStatus.ExitCode = 1
         $executionStatus.EndTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"

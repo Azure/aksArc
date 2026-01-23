@@ -120,11 +120,45 @@ if ($LASTEXITCODE -ne 0) {
 $executionStatus.CompletedSteps += "AssignManagedIdentity"
 $principalId = az vm show --resource-group $GroupName --name $vmName --query identity.principalId -o tsv
 az role assignment create --assignee $principalId --role Contributor --scope /subscriptions/$subscriptionId
+if ($LASTEXITCODE -ne 0) {
+  $executionStatus.Status = "Failure"
+  $executionStatus.FailedStep = "AssignContributorRole"
+  $executionStatus.ErrorMessage = "Failed to assign Contributor role to VM identity. Azure CLI command failed with exit code $LASTEXITCODE"
+  $executionStatus.ExitCode = $LASTEXITCODE
+  $executionStatus.EndTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+  Write-Host "`n===== EXECUTION STATUS ====="
+  Write-Host "Status: $($executionStatus.Status)"
+  Write-Host "Failed Step: $($executionStatus.FailedStep)"
+  Write-Host "Error Message: $($executionStatus.ErrorMessage)"
+  Write-Host "Exit Code: $($executionStatus.ExitCode)"
+  Write-Host "Completed Steps: $($executionStatus.CompletedSteps -join ', ')"
+  Write-Host "Start Time: $($executionStatus.StartTime)"
+  Write-Host "End Time: $($executionStatus.EndTime)"
+  Write-Host "============================"
+  exit $LASTEXITCODE
+}
 $executionStatus.CompletedSteps += "AssignContributorRole"
 
 #az deployment group create --resource-group $GroupName --template-file a4s-template.json --parameters location=$Location vmName=$vmName arcResourceGroup=$GroupName subscriptionId=$subscriptionId tenantId=$tenantId
 # Enable Nested Virtualization
 az vm update   --resource-group $GroupName   --name $vmName --set additionalCapabilities.enableNestedVirtualization=true
+if ($LASTEXITCODE -ne 0) {
+  $executionStatus.Status = "Failure"
+  $executionStatus.FailedStep = "EnableNestedVirtualization"
+  $executionStatus.ErrorMessage = "Failed to enable nested virtualization on VM '$vmName'. Azure CLI command failed with exit code $LASTEXITCODE"
+  $executionStatus.ExitCode = $LASTEXITCODE
+  $executionStatus.EndTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+  Write-Host "`n===== EXECUTION STATUS ====="
+  Write-Host "Status: $($executionStatus.Status)"
+  Write-Host "Failed Step: $($executionStatus.FailedStep)"
+  Write-Host "Error Message: $($executionStatus.ErrorMessage)"
+  Write-Host "Exit Code: $($executionStatus.ExitCode)"
+  Write-Host "Completed Steps: $($executionStatus.CompletedSteps -join ', ')"
+  Write-Host "Start Time: $($executionStatus.StartTime)"
+  Write-Host "End Time: $($executionStatus.EndTime)"
+  Write-Host "============================"
+  exit $LASTEXITCODE
+}
 $executionStatus.CompletedSteps += "EnableNestedVirtualization"
 
 $gitSource = (git config --get remote.origin.url).Replace("github.com", "raw.githubusercontent.com").Replace("aksArc.git", "aksArc")
