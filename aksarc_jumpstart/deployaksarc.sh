@@ -15,6 +15,15 @@ VM_NAME="jumpstartVM"
 SUBNET_NAME="jumpstartSubnet"
 WORKING_DIR="E:\\AKSArc"
 
+# Initialize execution status tracking
+EXECUTION_STATUS="InProgress"
+SCRIPT_NAME="deployaksarc.sh"
+START_TIME=$(date +'%Y-%m-%d %H:%M:%S')
+COMPLETED_STEPS=()
+FAILED_STEP=""
+ERROR_MESSAGE=""
+EXIT_CODE=0
+
 # Function to print usage
 usage() {
     echo "Usage: $0 [OPTIONS]"
@@ -39,6 +48,38 @@ usage() {
 # Function to log messages
 log() {
     echo "[$(date +'%Y-%m-%d %H:%M:%S')] $1"
+}
+
+# Function to print execution status
+print_execution_status() {
+    local end_time=$(date +'%Y-%m-%d %H:%M:%S')
+    echo ""
+    echo "===== EXECUTION STATUS ====="
+    echo "Status: $EXECUTION_STATUS"
+    if [[ "$EXECUTION_STATUS" == "Failure" ]]; then
+        echo "Failed Step: $FAILED_STEP"
+        echo "Error Message: $ERROR_MESSAGE"
+    fi
+    echo "Exit Code: $EXIT_CODE"
+    echo "Completed Steps: ${COMPLETED_STEPS[*]}"
+    echo "Start Time: $START_TIME"
+    echo "End Time: $end_time"
+    echo "============================"
+}
+
+# Function to handle errors
+handle_error() {
+    local step_name="$1"
+    local error_msg="$2"
+    local exit_code="${3:-1}"
+    
+    EXECUTION_STATUS="Failure"
+    FAILED_STEP="$step_name"
+    ERROR_MESSAGE="$error_msg"
+    EXIT_CODE="$exit_code"
+    
+    print_execution_status
+    exit "$exit_code"
 }
 
 # Function to check if command exists
@@ -170,8 +211,7 @@ log "  Subscription ID: $SUBSCRIPTION_ID"
 log "Setting Azure subscription context..."
 az account set --subscription "$SUBSCRIPTION_ID"
 if [[ $? -ne 0 ]]; then
-    echo "Error: Failed to set subscription context"
-    exit 1
+    handle_error "SetSubscription" "Failed to set subscription context to '$SUBSCRIPTION_ID'"
 fi
 
 # Get git repository information
@@ -214,15 +254,11 @@ execute_script() {
             commandToExecute="$command_to_execute"
     
     if [[ $? -ne 0 ]]; then
-        echo "Error: Failed to execute script ${script_name%.*}"
-        echo "This may be due to:"
-        echo "  - MOC not being properly installed"
-        echo "  - Network connectivity issues"
-        echo "  - Azure resource quota limitations"
-        echo "  - Previous deployment steps not completed"
-        exit 1
+        local error_details="Failed to execute script '${script_name}' on VM '$VM_NAME'. This may be due to: MOC not being properly installed, network connectivity issues, Azure resource quota limitations, or previous deployment steps not completed."
+        handle_error "ExecuteScript_${script_name%.*}" "$error_details"
     fi
     
+    COMPLETED_STEPS+=("ExecuteScript_${script_name%.*}")
     log "Successfully completed: ${script_name%.*}"
 }
 
@@ -262,3 +298,7 @@ log ""
 log "4. Connect to the cluster using kubectl"
 log ""
 log "Setup is ready for AKS Arc workload deployment!"
+
+# Final execution status - Success
+EXECUTION_STATUS="Success"
+print_execution_status

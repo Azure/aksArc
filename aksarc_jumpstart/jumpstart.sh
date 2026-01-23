@@ -15,6 +15,15 @@ SUBNET_NAME="jumpstartSubnet"
 # Valid locations
 VALID_LOCATIONS=("eastus" "australiaeast")
 
+# Initialize execution status tracking
+EXECUTION_STATUS="InProgress"
+SCRIPT_NAME="jumpstart.sh"
+START_TIME=$(date +'%Y-%m-%d %H:%M:%S')
+COMPLETED_STEPS=()
+FAILED_STEP=""
+ERROR_MESSAGE=""
+EXIT_CODE=0
+
 # Function to print usage
 usage() {
     echo "Usage: $0 [OPTIONS]"
@@ -37,6 +46,38 @@ usage() {
 # Function to log messages
 log() {
     echo "[$(date +'%Y-%m-%d %H:%M:%S')] $1"
+}
+
+# Function to print execution status
+print_execution_status() {
+    local end_time=$(date +'%Y-%m-%d %H:%M:%S')
+    echo ""
+    echo "===== EXECUTION STATUS ====="
+    echo "Status: $EXECUTION_STATUS"
+    if [[ "$EXECUTION_STATUS" == "Failure" ]]; then
+        echo "Failed Step: $FAILED_STEP"
+        echo "Error Message: $ERROR_MESSAGE"
+    fi
+    echo "Exit Code: $EXIT_CODE"
+    echo "Completed Steps: ${COMPLETED_STEPS[*]}"
+    echo "Start Time: $START_TIME"
+    echo "End Time: $end_time"
+    echo "============================"
+}
+
+# Function to handle errors
+handle_error() {
+    local step_name="$1"
+    local error_msg="$2"
+    local exit_code="${3:-1}"
+    
+    EXECUTION_STATUS="Failure"
+    FAILED_STEP="$step_name"
+    ERROR_MESSAGE="$error_msg"
+    EXIT_CODE="$exit_code"
+    
+    print_execution_status
+    exit "$exit_code"
 }
 
 # Function to check if command exists
@@ -160,17 +201,16 @@ log "  Subscription ID: $SUBSCRIPTION_ID"
 log "Setting Azure subscription context..."
 az account set --subscription "$SUBSCRIPTION_ID"
 if [[ $? -ne 0 ]]; then
-    echo "Error: Failed to set subscription context"
-    exit 1
+    handle_error "SetSubscription" "Failed to set subscription context to '$SUBSCRIPTION_ID'"
 fi
 
 # Create Resource Group
 log "Creating resource group '$GROUP_NAME' in '$LOCATION'..."
 az group create --name "$GROUP_NAME" --location "$LOCATION"
 if [[ $? -ne 0 ]]; then
-    echo "Error: Failed to create resource group"
-    exit 1
+    handle_error "CreateResourceGroup" "Failed to create resource group '$GROUP_NAME' in location '$LOCATION'"
 fi
+COMPLETED_STEPS+=("CreateResourceGroup")
 
 # Check for required template files
 VNET_TEMPLATE="./configuration/vnet-template.json"
@@ -203,9 +243,9 @@ az deployment group create \
     --template-file "$VNET_TEMPLATE" \
     --parameters vnetName="$VNET_NAME" location="$LOCATION" subnetName="$SUBNET_NAME"
 if [[ $? -ne 0 ]]; then
-    echo "Error: Failed to create virtual network"
-    exit 1
+    handle_error "CreateVirtualNetwork" "Failed to create virtual network '$VNET_NAME' and subnet '$SUBNET_NAME'"
 fi
+COMPLETED_STEPS+=("CreateVirtualNetwork")
 
 # Create Virtual Machine
 log "Creating virtual machine..."
@@ -222,23 +262,22 @@ az deployment group create \
         vmSize="Standard_E16s_v4" \
         subnetName="$SUBNET_NAME"
 if [[ $? -ne 0 ]]; then
-    echo "Error: Failed to create virtual machine"
-    exit 1
+    handle_error "CreateVirtualMachine" "Failed to create virtual machine '$VM_NAME'"
 fi
+COMPLETED_STEPS+=("CreateVirtualMachine")
 
 # Assign Managed Identity and Contributor Role to VM
 log "Assigning managed identity to VM..."
 az vm identity assign --resource-group "$GROUP_NAME" --name "$VM_NAME"
 if [[ $? -ne 0 ]]; then
-    echo "Error: Failed to assign managed identity"
-    exit 1
+    handle_error "AssignManagedIdentity" "Failed to assign managed identity to VM '$VM_NAME'"
 fi
+COMPLETED_STEPS+=("AssignManagedIdentity")
 
 log "Getting VM principal ID..."
 PRINCIPAL_ID=$(az vm show --resource-group "$GROUP_NAME" --name "$VM_NAME" --query identity.principalId -o tsv)
 if [[ -z "$PRINCIPAL_ID" ]]; then
-    echo "Error: Failed to get VM principal ID"
-    exit 1
+    handle_error "GetPrincipalId" "Failed to get VM principal ID for '$VM_NAME'"
 fi
 
 log "Assigning Contributor role to VM identity..."
@@ -247,9 +286,9 @@ az role assignment create \
     --role Contributor \
     --scope "/subscriptions/$SUBSCRIPTION_ID"
 if [[ $? -ne 0 ]]; then
-    echo "Error: Failed to assign Contributor role"
-    exit 1
+    handle_error "AssignContributorRole" "Failed to assign Contributor role to VM identity"
 fi
+COMPLETED_STEPS+=("AssignContributorRole")
 
 # Enable Nested Virtualization
 log "Enabling nested virtualization on VM..."
@@ -258,9 +297,9 @@ az vm update \
     --name "$VM_NAME" \
     --set "additionalCapabilities.enableNestedVirtualization=true"
 if [[ $? -ne 0 ]]; then
-    echo "Error: Failed to enable nested virtualization"
-    exit 1
+    handle_error "EnableNestedVirtualization" "Failed to enable nested virtualization on VM '$VM_NAME'"
 fi
+COMPLETED_STEPS+=("EnableNestedVirtualization")
 
 # Get git repository information
 log "Getting git repository information..."
@@ -299,9 +338,9 @@ for script_name in "${SCRIPTS_TO_EXECUTE[@]}"; do
             commandToExecute="$command_to_execute"
     
     if [[ $? -ne 0 ]]; then
-        echo "Error: Failed to execute script $script_name"
-        exit 1
+        handle_error "ExecuteScript_$script_name" "Failed to execute script '$script_name' on VM '$VM_NAME'"
     fi
+    COMPLETED_STEPS+=("ExecuteScript_$script_name")
 done
 
 log "Jump start deployment completed successfully!"
@@ -316,3 +355,7 @@ log "VM Connection Details:"
 log "  Resource Group: $GROUP_NAME"
 log "  VM Name: $VM_NAME"
 log "  Location: $LOCATION"
+
+# Final execution status - Success
+EXECUTION_STATUS="Success"
+print_execution_status
