@@ -40,6 +40,13 @@
     "localDiskSizeGB": {
       "type": "int",
       "defaultValue": 1024
+    },
+    "availabilityZone": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Availability zone for VMs. Required for Premium SSD v2 shared disk. Leave empty for no zone."
+      }
     }
   },
   "resources": [
@@ -71,6 +78,7 @@
       "apiVersion": "2022-08-01",
       "name": "[concat(parameters('vmNamePrefix'), '-', copyIndex(1))]",
       "location": "[parameters('location')]",
+      "zones": "[if(empty(parameters('availabilityZone')), json('null'), array(parameters('availabilityZone')))]",
       "copy": {
         "name": "vmLoop",
         "count": "[parameters('nodeCount')]"

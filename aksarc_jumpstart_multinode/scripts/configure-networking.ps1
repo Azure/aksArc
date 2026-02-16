@@ -1,7 +1,10 @@
 param(
-    [int]$nodeIndex = 1,
-    [int]$nodeCount = 1
+    [string]$nodeIndex = "1",
+    [string]$nodeCount = "1"
 )
+
+[int]$nodeIndex = [int]$nodeIndex
+[int]$nodeCount = [int]$nodeCount
 
 # Configure networking: InternalNAT switch, IP, NAT.
 # DNS and DHCP are configured only on node 1.
@@ -57,9 +60,13 @@ if ($nodeIndex -eq 1) {
         Write-Host "Registered DNS: $nodeName -> $nodeAddr"
     }
 } else {
-    Write-Host "Node $nodeIndex: Pointing DNS to node 1 ($gatewayIP)..."
-    Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses ($gatewayIP)
+    Write-Host "Node ${nodeIndex}: Pointing DNS to node 1 (${gatewayIP})..."
+    # Find the primary Ethernet adapter (not the InternalNAT vSwitch)
+    $primaryAdapter = Get-NetAdapter | Where-Object { $_.Name -like "Ethernet*" -and $_.Status -eq "Up" -and $_.Name -notlike "*InternalNAT*" } | Select-Object -First 1
+    if ($primaryAdapter) {
+        Set-DnsClientServerAddress -InterfaceAlias $primaryAdapter.Name -ServerAddresses ($gatewayIP)
+    }
 }
 
-Write-Host "Networking configured for node $nodeIndex."
+Write-Host "Networking configured for node ${nodeIndex}."
 Stop-Transcript
