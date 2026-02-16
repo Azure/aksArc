@@ -8,8 +8,8 @@ param(
 )
 
 # Create an AD-less failover cluster across all nodes.
-# Runs on node 1, targeting all nodes.
-# Uses shared disk as cluster witness.
+# Runs on node 1 via CustomScriptExtension (SYSTEM context).
+# Uses a scheduled task running as admin user to handle cross-node auth.
 
 Start-Transcript -Path "$env:LogDirectory\create-cluster.ps1.log" -Append
 
@@ -19,19 +19,8 @@ try {
     for ($i = 1; $i -le $nodeCount; $i++) {
         $nodes += "$vmNamePrefix-$i"
     }
+    $nodesStr = ($nodes | ForEach-Object { "'$_'" }) -join ', '
     Write-Host "Cluster nodes: $($nodes -join ', ')"
-
-    # Setup credentials for cross-node access
-    if ($adminPassword) {
-        $secPassword = ConvertTo-SecureString $adminPassword -AsPlainText -Force
-        $cred = New-Object System.Management.Automation.PSCredential("$env:COMPUTERNAME\$adminUsername", $secPassword)
-
-        # Ensure WinRM trust for all nodes
-        foreach ($node in $nodes) {
-            Write-Host "Adding $node to TrustedHosts and storing credentials..."
-            cmdkey /add:$node /user:$adminUsername /pass:$adminPassword
-        }
-    }
 
     # Wait for all nodes to be reachable
     foreach ($node in $nodes) {
@@ -52,47 +41,99 @@ try {
         }
     }
 
-    # Validate cluster configuration
-    Write-Host "Validating cluster configuration..."
-    Test-Cluster -Node $nodes -Include "Inventory","Network","System Configuration" -ErrorAction SilentlyContinue
+    # Generate the cluster creation script to run as admin user
+    $setupDir = 'C:\ClusterSetup'
+    New-Item -Path $setupDir -ItemType Directory -Force | Out-Null
 
-    # Create AD-less failover cluster
-    Write-Host "Creating AD-less failover cluster '$clusterName'..."
-    if ($nodeCount -eq 1) {
-        New-Cluster -Name $clusterName -Node $nodes -StaticAddress $clusterIP -AdministrativeAccessPoint DNS -NoStorage
-    } else {
-        New-Cluster -Name $clusterName -Node $nodes -StaticAddress $clusterIP -AdministrativeAccessPoint DNS -NoStorage
+    $innerScript = @"
+`$ErrorActionPreference = 'Stop'
+Start-Transcript -Path '$setupDir\cluster-creation.log' -Force
+try {
+    `$nodes = @($nodesStr)
+    Write-Host "Creating AD-less failover cluster as `$env:USERNAME..."
+
+    foreach (`$node in `$nodes) {
+        Write-Host "Testing `$node..."
+        Test-WSMan -ComputerName `$node -ErrorAction Stop
     }
 
-    # Configure shared disk as cluster witness (disk witness)
-    Write-Host "Configuring shared disk..."
-    # The shared disk should appear as a raw disk on LUN 1
-    $sharedDisk = Get-Disk | Where-Object { $_.PartitionStyle -eq 'RAW' -and $_.Number -gt 0 }
-    if ($sharedDisk) {
-        Write-Host "Initializing shared disk (Disk $($sharedDisk.Number))..."
-        Initialize-Disk -Number $sharedDisk.Number -PartitionStyle GPT
-        New-Partition -DiskNumber $sharedDisk.Number -UseMaximumSize -AssignDriveLetter
-        $sharedDriveLetter = (Get-Partition -DiskNumber $sharedDisk.Number | Where-Object Type -ne 'Reserved' | Select-Object -Last 1).DriveLetter
-        Format-Volume -DriveLetter $sharedDriveLetter -FileSystem NTFS -NewFileSystemLabel "ClusterWitness" -Confirm:$false
+    New-Cluster -Name '$clusterName' -Node `$nodes -StaticAddress '$clusterIP' -AdministrativeAccessPoint DNS -NoStorage -Force -WarningAction SilentlyContinue
+    Write-Host "Cluster created!"
 
-        # Add disk to cluster and set as witness
-        $clusterDisk = Get-ClusterAvailableDisk | Add-ClusterDisk
-        if ($clusterDisk) {
-            Set-ClusterQuorum -DiskWitness $clusterDisk.Name
-            Write-Host "Shared disk configured as cluster witness."
+    # Configure shared disk as cluster witness
+    Write-Host "Configuring shared disk..."
+    `$sharedDisk = Get-Disk | Where-Object { `$_.PartitionStyle -eq 'RAW' -and `$_.Number -gt 0 }
+    if (`$sharedDisk) {
+        Write-Host "Initializing shared disk (Disk `$(`$sharedDisk.Number))..."
+        Initialize-Disk -Number `$sharedDisk.Number -PartitionStyle GPT
+        New-Partition -DiskNumber `$sharedDisk.Number -UseMaximumSize -AssignDriveLetter
+        `$letter = (Get-Partition -DiskNumber `$sharedDisk.Number | Where-Object Type -ne 'Reserved' | Select-Object -Last 1).DriveLetter
+        Format-Volume -DriveLetter `$letter -FileSystem NTFS -NewFileSystemLabel 'ClusterWitness' -Confirm:`$false
+        `$clusterDisk = Get-ClusterAvailableDisk | Add-ClusterDisk
+        if (`$clusterDisk) {
+            Set-ClusterQuorum -DiskWitness `$clusterDisk.Name
+            Write-Host "Shared disk set as cluster witness."
         } else {
-            Write-Warning "Could not add shared disk to cluster. Using node majority quorum."
+            Write-Warning "Could not add shared disk to cluster."
         }
     } else {
         Write-Warning "No shared disk found. Using node majority quorum."
     }
 
+    Get-Cluster | Format-List Name,Domain
+    Get-ClusterNode | Format-Table Name,State -AutoSize
+    'SUCCESS' | Out-File '$setupDir\result.txt' -Force
+} catch {
+    Write-Host "ERROR: `$_"
+    'FAILED' | Out-File '$setupDir\result.txt' -Force
+    throw
+}
+Stop-Transcript
+"@
+
+    $innerScript | Out-File "$setupDir\create-cluster-inner.ps1" -Force -Encoding UTF8
+
+    # Run as admin user via scheduled task (SYSTEM can't auth to other nodes)
+    $action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument "-ExecutionPolicy Unrestricted -File $setupDir\create-cluster-inner.ps1"
+    $trigger = New-ScheduledTaskTrigger -Once -At (Get-Date).AddSeconds(5)
+    $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
+    Register-ScheduledTask -TaskName 'CreateCluster' -Action $action -Trigger $trigger -Settings $settings -User $adminUsername -Password $adminPassword -RunLevel Highest -Force
+    Start-ScheduledTask -TaskName 'CreateCluster'
+
+    Write-Host "Cluster creation started as $adminUsername. Waiting..."
+    $maxWait = 600
+    $elapsed = 0
+    do {
+        Start-Sleep -Seconds 10
+        $elapsed += 10
+        $taskState = (Get-ScheduledTask -TaskName 'CreateCluster').State
+        Write-Host "  Task state: $taskState (${elapsed}s)"
+    } while ($taskState -eq 'Running' -and $elapsed -lt $maxWait)
+
+    # Check result
+    if (Test-Path "$setupDir\result.txt") {
+        $result = Get-Content "$setupDir\result.txt"
+        if ($result -ne 'SUCCESS') {
+            if (Test-Path "$setupDir\cluster-creation.log") {
+                Get-Content "$setupDir\cluster-creation.log" | Select-Object -Last 20
+            }
+            throw "Cluster creation failed."
+        }
+    } else {
+        throw "Cluster creation timed out or did not produce a result."
+    }
+
+    if (Test-Path "$setupDir\cluster-creation.log") {
+        Get-Content "$setupDir\cluster-creation.log" | Select-Object -Last 15
+    }
+
+    Unregister-ScheduledTask -TaskName 'CreateCluster' -Confirm:$false -ErrorAction SilentlyContinue
+
     Write-Host "Failover cluster '$clusterName' created successfully."
-    Get-Cluster | Format-List *
-    Get-ClusterNode | Format-Table Name, State
 }
 catch {
     Write-Error "Failed to create cluster: $($_.Exception.Message)"
+    Unregister-ScheduledTask -TaskName 'CreateCluster' -Confirm:$false -ErrorAction SilentlyContinue
     throw
 }
 
