@@ -26,6 +26,9 @@ try {
     Write-Host "Installing Az.AksArc module..."
     Install-Module -Name Az.AksArc -Repository PSGallery -Force -Confirm:$false
 
+    Write-Host "Installing ArcHci module..."
+    Install-Module -Name ArcHci -Repository PSGallery -Force -Confirm:$false -AcceptLicense
+
     # Firewall rules for MOC
     Write-Host "Configuring firewall rules..."
     netsh int ipv4 add ex tcp 45000 1 store=persistent

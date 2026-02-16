@@ -138,7 +138,7 @@ $node1 = "$vmNamePrefix-1"
 
 $clusterScripts = [ordered]@{
     "$scriptLocation/create-cluster.ps1" = "create-cluster.ps1 -nodeCount $nodeCount -vmNamePrefix ""$vmNamePrefix"" -clusterName ""$clusterName"" -adminUsername ""$userName"" -adminPassword ""$password"""
-    "$scriptLocation/install-moc.ps1"    = "install-moc.ps1 -nodeCount $nodeCount -vmNamePrefix ""$vmNamePrefix"""
+    "$scriptLocation/install-moc.ps1"    = "install-moc.ps1 -nodeCount $nodeCount -vmNamePrefix ""$vmNamePrefix"" -adminUsername ""$userName"" -adminPassword ""$password"""
 }
 
 foreach ($script in $clusterScripts.GetEnumerator()) {

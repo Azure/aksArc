@@ -49,6 +49,7 @@ try {
 `$ErrorActionPreference = 'Stop'
 Start-Transcript -Path '$setupDir\cluster-creation.log' -Force
 try {
+    Set-Item WSMan:\localhost\Client\TrustedHosts -Value '*' -Force
     `$nodes = @($nodesStr)
     Write-Host "Creating AD-less failover cluster as `$env:USERNAME..."
 
@@ -57,31 +58,50 @@ try {
         Test-WSMan -ComputerName `$node -ErrorAction Stop
     }
 
-    New-Cluster -Name '$clusterName' -Node `$nodes -StaticAddress '$clusterIP' -AdministrativeAccessPoint DNS -NoStorage -Force -WarningAction SilentlyContinue
+    # Use node 1 Azure IP for cluster static address (Azure doesn't allow arbitrary IPs)
+    `$node1IP = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object { `$_.IPAddress -like '10.0.*' }).IPAddress
+    Write-Host "Using cluster IP: `$node1IP (node 1 Azure IP)"
+
+    New-Cluster -Name '$clusterName' -Node `$nodes -StaticAddress `$node1IP -AdministrativeAccessPoint DNS -NoStorage -Force -WarningAction SilentlyContinue
     Write-Host "Cluster created!"
 
-    # Configure shared disk as cluster witness
-    Write-Host "Configuring shared disk..."
+    # Add cluster name to hosts file on all nodes for DNS resolution
+    `$hostsEntry = "`$node1IP`t$clusterName"
+    foreach (`$node in `$nodes) {
+        Invoke-Command -ComputerName `$node -ScriptBlock {
+            param(`$entry, `$name)
+            `$f = 'C:\Windows\System32\drivers\etc\hosts'
+            `$c = Get-Content `$f | Where-Object { `$_ -notmatch `$name }
+            `$c += `$entry
+            `$c | Set-Content `$f -Force
+        } -ArgumentList `$hostsEntry, '$clusterName'
+    }
+    Clear-DnsClientCache
+    Write-Host "Added $clusterName to hosts files."
+
+    # Configure shared disk as Cluster Shared Volume (needed for MOC working dir)
+    Write-Host "Configuring shared disk as CSV..."
     `$sharedDisk = Get-Disk | Where-Object { `$_.PartitionStyle -eq 'RAW' -and `$_.Number -gt 0 }
     if (`$sharedDisk) {
         Write-Host "Initializing shared disk (Disk `$(`$sharedDisk.Number))..."
         Initialize-Disk -Number `$sharedDisk.Number -PartitionStyle GPT
         New-Partition -DiskNumber `$sharedDisk.Number -UseMaximumSize -AssignDriveLetter
         `$letter = (Get-Partition -DiskNumber `$sharedDisk.Number | Where-Object Type -ne 'Reserved' | Select-Object -Last 1).DriveLetter
-        Format-Volume -DriveLetter `$letter -FileSystem NTFS -NewFileSystemLabel 'ClusterWitness' -Confirm:`$false
+        Format-Volume -DriveLetter `$letter -FileSystem NTFS -NewFileSystemLabel 'ClusterStorage' -Confirm:`$false
         `$clusterDisk = Get-ClusterAvailableDisk | Add-ClusterDisk
         if (`$clusterDisk) {
-            Set-ClusterQuorum -DiskWitness `$clusterDisk.Name
-            Write-Host "Shared disk set as cluster witness."
+            Add-ClusterSharedVolume -Name `$clusterDisk.Name
+            Write-Host "Shared disk added as CSV at C:\ClusterStorage\Volume1"
         } else {
             Write-Warning "Could not add shared disk to cluster."
         }
     } else {
-        Write-Warning "No shared disk found. Using node majority quorum."
+        Write-Warning "No shared disk found."
     }
 
     Get-Cluster | Format-List Name,Domain
     Get-ClusterNode | Format-Table Name,State -AutoSize
+    Get-ClusterSharedVolume -ErrorAction SilentlyContinue | Format-Table Name,State -AutoSize
     'SUCCESS' | Out-File '$setupDir\result.txt' -Force
 } catch {
     Write-Host "ERROR: `$_"
