@@ -27,7 +27,7 @@ try {
     Install-Module -Name Az.AksArc -Repository PSGallery -Force -Confirm:$false
 
     Write-Host "Installing ArcHci module..."
-    Install-Module -Name ArcHci -Repository PSGallery -Force -Confirm:$false -AcceptLicense
+    Install-Module -Name ArcHci -Repository PSGallery -Force -Confirm:$false
 
     # Firewall rules for MOC
     Write-Host "Configuring firewall rules..."

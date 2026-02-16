@@ -73,7 +73,7 @@ if ($LASTEXITCODE -ne 0) { throw "Failed to create VMs." }
 
 # --- Step 4: Create and link shared disk (multi-node only) ---
 if ($nodeCount -gt 1) {
-    Write-Host "[4/8] Creating shared disk..."
+    Write-Host "[4/9] Creating shared disk..."
     $sharedDiskName = "$vmNamePrefix-shared-disk"
     az deployment group create --resource-group $GroupName `
         --template-file ./configuration/shared-disk-template.json `
@@ -91,12 +91,22 @@ if ($nodeCount -gt 1) {
         if ($LASTEXITCODE -ne 0) { throw "Failed to link shared disk to $currentVM." }
     }
 } else {
-    Write-Host "[4/8] Skipping shared disk (single node)."
+    Write-Host "[4/9] Skipping shared disk (single node)."
 }
 
-# --- Step 5: Enable nested virtualization on all VMs ---
+# --- Step 5: Add secondary IP to node 1 NIC for cluster IP Address resource ---
+if ($nodeCount -gt 1) {
+    Write-Host "[5/9] Adding secondary IP for cluster IP resource..."
+    $nicName = az vm show --resource-group $GroupName --name "$vmNamePrefix-1" --query "networkProfile.networkInterfaces[0].id" -o tsv | Split-Path -Leaf
+    az network nic ip-config create --resource-group $GroupName --nic-name $nicName --name clusterIP --private-ip-address 10.0.0.100
+    if ($LASTEXITCODE -ne 0) { throw "Failed to add secondary IP for cluster." }
+} else {
+    Write-Host "[5/9] Skipping secondary IP (single node)."
+}
+
+# --- Step 6: Enable nested virtualization on all VMs ---
 # NOTE: Standard_E16s_v4 supports nested virt natively, no explicit enabling needed
-Write-Host "[5/8] Nested virtualization enabled (built-in for $vmSize)."
+Write-Host "[6/9] Nested virtualization enabled (built-in for $vmSize)."
 
 # --- Step 6: Run init scripts on all VMs ---
 $gitSource = (git config --get remote.origin.url).Replace("github.com", "raw.githubusercontent.com").Replace("aksArc.git", "aksArc")
@@ -110,7 +120,7 @@ $initScripts = [ordered]@{
     "$scriptLocation/install-prerequisites.ps1" = "install-prerequisites.ps1 -adminUsername $userName -adminPassword $password"
 }
 
-Write-Host "[6/8] Running init scripts on all $nodeCount VM(s)..."
+Write-Host "[7/9] Running init scripts on all $nodeCount VM(s)..."
 for ($i = 1; $i -le $nodeCount; $i++) {
     $currentVM = "$vmNamePrefix-$i"
     Write-Host "  --- $currentVM ---"
@@ -129,12 +139,12 @@ for ($i = 1; $i -le $nodeCount; $i++) {
     }
 }
 
-# --- Step 7: Run clustering scripts on node 1 ---
-Write-Host "[7/8] Running clustering scripts on $vmNamePrefix-1..."
+# --- Step 8: Run clustering scripts on node 1 ---
+Write-Host "[8/9] Running clustering scripts on $vmNamePrefix-1..."
 $node1 = "$vmNamePrefix-1"
 
 $clusterScripts = [ordered]@{
-    "$scriptLocation/create-cluster.ps1" = "create-cluster.ps1 -nodeCount $nodeCount -vmNamePrefix ""$vmNamePrefix"" -clusterName ""$clusterName"" -adminUsername ""$userName"" -adminPassword ""$password"""
+    "$scriptLocation/create-cluster.ps1" = "create-cluster.ps1 -nodeCount $nodeCount -vmNamePrefix ""$vmNamePrefix"" -clusterName ""$clusterName"" -clusterIP ""10.0.0.100"" -adminUsername ""$userName"" -adminPassword ""$password"""
     "$scriptLocation/install-moc.ps1"    = "install-moc.ps1 -nodeCount $nodeCount -vmNamePrefix ""$vmNamePrefix"" -adminUsername ""$userName"" -adminPassword ""$password"""
 }
 
@@ -152,9 +162,9 @@ foreach ($script in $clusterScripts.GetEnumerator()) {
     if ($LASTEXITCODE -ne 0) { throw "Failed to run $scriptBaseName on $node1." }
 }
 
-# --- Step 8: Done ---
+# --- Step 9: Done ---
 Write-Host ""
-Write-Host "[8/8] Phase 1 complete!"
+Write-Host "[9/9] Phase 1 complete!"
 Write-Host ""
 Write-Host "Next steps:"
 Write-Host "  1. Wait for MOC install to finish (scheduled task on $node1)"
