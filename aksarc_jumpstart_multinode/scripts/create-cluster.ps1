@@ -2,7 +2,9 @@ param(
     [int]$nodeCount = 1,
     [string]$vmNamePrefix = "jumpstartVM",
     [string]$clusterName = "jumpstart-cluster",
-    [string]$clusterIP = "172.16.0.200"
+    [string]$clusterIP = "172.16.0.200",
+    [string]$adminUsername = "aksadmin",
+    [string]$adminPassword = ""
 )
 
 # Create an AD-less failover cluster across all nodes.
@@ -18,6 +20,18 @@ try {
         $nodes += "$vmNamePrefix-$i"
     }
     Write-Host "Cluster nodes: $($nodes -join ', ')"
+
+    # Setup credentials for cross-node access
+    if ($adminPassword) {
+        $secPassword = ConvertTo-SecureString $adminPassword -AsPlainText -Force
+        $cred = New-Object System.Management.Automation.PSCredential("$env:COMPUTERNAME\$adminUsername", $secPassword)
+
+        # Ensure WinRM trust for all nodes
+        foreach ($node in $nodes) {
+            Write-Host "Adding $node to TrustedHosts and storing credentials..."
+            cmdkey /add:$node /user:$adminUsername /pass:$adminPassword
+        }
+    }
 
     # Wait for all nodes to be reachable
     foreach ($node in $nodes) {

@@ -110,7 +110,7 @@ $initScripts = [ordered]@{
     "$scriptLocation/initializedisk.ps1"        = "initializedisk.ps1"
     "$scriptLocation/install-features.ps1"      = "install-features.ps1"
     "$scriptLocation/configure-networking.ps1"  = "configure-networking.ps1 -nodeIndex NODE_INDEX -nodeCount $nodeCount"
-    "$scriptLocation/install-prerequisites.ps1" = "install-prerequisites.ps1"
+    "$scriptLocation/install-prerequisites.ps1" = "install-prerequisites.ps1 -adminUsername $userName -adminPassword $password"
 }
 
 Write-Host "[6/8] Running init scripts on all $nodeCount VM(s)..."
@@ -137,7 +137,7 @@ Write-Host "[7/8] Running clustering scripts on $vmNamePrefix-1..."
 $node1 = "$vmNamePrefix-1"
 
 $clusterScripts = [ordered]@{
-    "$scriptLocation/create-cluster.ps1" = "create-cluster.ps1 -nodeCount $nodeCount -vmNamePrefix ""$vmNamePrefix"" -clusterName ""$clusterName"""
+    "$scriptLocation/create-cluster.ps1" = "create-cluster.ps1 -nodeCount $nodeCount -vmNamePrefix ""$vmNamePrefix"" -clusterName ""$clusterName"" -adminUsername ""$userName"" -adminPassword ""$password"""
     "$scriptLocation/install-moc.ps1"    = "install-moc.ps1 -nodeCount $nodeCount -vmNamePrefix ""$vmNamePrefix"""
 }
 
