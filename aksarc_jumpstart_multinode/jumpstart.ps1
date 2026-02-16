@@ -67,7 +67,8 @@ Write-Host "[3/8] Creating $nodeCount VM(s)..."
 az deployment group create --resource-group $GroupName `
     --template-file ./configuration/vm-template.json `
     --parameters vmNamePrefix=$vmNamePrefix nodeCount=$nodeCount adminUsername=$userName adminPassword=$password `
-                 location=$Location vnetName=$vnetName vmSize=$vmSize subnetName=$subnetName localDiskSizeGB=$localDiskSizeGB
+                 location=$Location vnetName=$vnetName vmSize=$vmSize subnetName=$subnetName localDiskSizeGB=$localDiskSizeGB `
+                 availabilityZone=$availabilityZone
 if ($LASTEXITCODE -ne 0) { throw "Failed to create VMs." }
 
 # --- Step 4: Create and link shared disk (multi-node only) ---
@@ -94,12 +95,8 @@ if ($nodeCount -gt 1) {
 }
 
 # --- Step 5: Enable nested virtualization on all VMs ---
-Write-Host "[5/8] Enabling nested virtualization..."
-for ($i = 1; $i -le $nodeCount; $i++) {
-    $currentVM = "$vmNamePrefix-$i"
-    az vm update --resource-group $GroupName --name $currentVM --set additionalCapabilities.enableNestedVirtualization=true
-    if ($LASTEXITCODE -ne 0) { Write-Warning "Failed to enable nested virt on $currentVM (may already be enabled)." }
-}
+# NOTE: Standard_E16s_v4 supports nested virt natively, no explicit enabling needed
+Write-Host "[5/8] Nested virtualization enabled (built-in for $vmSize)."
 
 # --- Step 6: Run init scripts on all VMs ---
 $gitSource = (git config --get remote.origin.url).Replace("github.com", "raw.githubusercontent.com").Replace("aksArc.git", "aksArc")
@@ -160,6 +157,5 @@ Write-Host ""
 Write-Host "[8/8] Phase 1 complete!"
 Write-Host ""
 Write-Host "Next steps:"
-Write-Host "  1. Log into $node1 via Bastion/RDP"
-Write-Host "  2. Wait for MOC install to finish (RunOnce on boot)"
-Write-Host "  3. Run: .\deployaksarc.ps1 -Location $Location -subscription $subscriptionId"
+Write-Host "  1. Wait for MOC install to finish (scheduled task on $node1)"
+Write-Host "  2. Run: .\deployaksarc.ps1 -Location $Location -subscription $subscriptionId"
