@@ -19,7 +19,7 @@ try {
     Install-Module -Name MOC -Repository PSGallery -Force -Confirm:$false
 
     Write-Host "Installing Az.AksArc module..."
-    Install-Module -Name Az.AksArc -Repository PSGallery -AcceptLicense -Force
+    Install-Module -Name Az.AksArc -Repository PSGallery -Force -Confirm:$false
 
     # Firewall rules for MOC
     Write-Host "Configuring firewall rules..."
