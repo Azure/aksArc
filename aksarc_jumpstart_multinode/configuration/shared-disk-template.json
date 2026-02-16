@@ -1,0 +1,59 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "eastus2"
+    },
+    "diskName": {
+      "type": "string",
+      "defaultValue": "jumpstart-shared-disk"
+    },
+    "diskSizeGB": {
+      "type": "int",
+      "defaultValue": 256
+    },
+    "maxShares": {
+      "type": "int",
+      "defaultValue": 1,
+      "metadata": {
+        "description": "Number of VMs that can concurrently access the shared disk. Should match nodeCount."
+      }
+    },
+    "availabilityZone": {
+      "type": "string",
+      "defaultValue": "1",
+      "metadata": {
+        "description": "Availability zone for Premium SSD v2. Required for shared disk support."
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Compute/disks",
+      "apiVersion": "2023-10-02",
+      "name": "[parameters('diskName')]",
+      "location": "[parameters('location')]",
+      "zones": [
+        "[parameters('availabilityZone')]"
+      ],
+      "sku": {
+        "name": "PremiumV2_LRS"
+      },
+      "properties": {
+        "creationData": {
+          "createOption": "Empty"
+        },
+        "diskSizeGB": "[parameters('diskSizeGB')]",
+        "maxShares": "[parameters('maxShares')]"
+      }
+    }
+  ],
+  "outputs": {
+    "diskId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Compute/disks', parameters('diskName'))]"
+    }
+  }
+}
