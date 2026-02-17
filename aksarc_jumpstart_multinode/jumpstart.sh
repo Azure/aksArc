@@ -130,8 +130,8 @@ echo "[7/8] Running clustering scripts on $VM_NAME_PREFIX-1..."
 NODE1="$VM_NAME_PREFIX-1"
 
 CLUSTER_SCRIPTS=(
-    "create-cluster.ps1|create-cluster.ps1 -nodeCount $NODE_COUNT -vmNamePrefix \"$VM_NAME_PREFIX\" -clusterName \"$CLUSTER_NAME\" -adminUsername \"$USERNAME\" -adminPassword \"$PASSWORD\""
-    "install-moc.ps1|install-moc.ps1 -nodeCount $NODE_COUNT -vmNamePrefix \"$VM_NAME_PREFIX\" -cloudServiceCidr \"10.0.0.100/24\" -adminUsername \"$USERNAME\" -adminPassword \"$PASSWORD\""
+    "create-cluster.ps1|create-cluster.ps1 -nodeCount $NODE_COUNT -vmNamePrefix \"$VM_NAME_PREFIX\" -clusterName \"$CLUSTER_NAME\""
+    "install-moc.ps1|install-moc.ps1 -nodeCount $NODE_COUNT -vmNamePrefix \"$VM_NAME_PREFIX\""
 )
 
 for entry in "${CLUSTER_SCRIPTS[@]}"; do

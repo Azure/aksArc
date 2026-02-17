@@ -1,7 +1,6 @@
 param(
     [int]$nodeCount = 1,
     [string]$vmNamePrefix = "jumpstartVM",
-    [string]$cloudServiceCidr = "",
     [string]$catalog = "aks-hci-asz-stable-catalogs-int",
     [string]$ring = "monthly",
     [string]$adminUsername = "aksadmin",
@@ -29,12 +28,6 @@ try {
     }
 
     # Build the MOC install script
-    $mocConfigParams = "-workingDir '$workingDir' -catalog '$catalog' -ring '$ring'"
-    if ($nodeCount -gt 1 -and $cloudServiceCidr) {
-        # Use cloudServiceCidr to trigger V1 flow which creates its own cluster group + IP resource
-        $mocConfigParams += " -cloudServiceCidr '$cloudServiceCidr'"
-    }
-
     $scriptContent = @"
 `$ErrorActionPreference = 'Stop'
 Start-Transcript -Path 'C:\ClusterSetup\install-moc.log' -Force
@@ -42,8 +35,8 @@ try {
     Set-Item WSMan:\localhost\Client\TrustedHosts -Value '*' -Force
     Import-Module Moc -WarningAction SilentlyContinue
     New-Item -Path '$workingDir' -ItemType Directory -Force | Out-Null
-    Write-Host 'Setting MOC config...'
-    Set-MocConfig $mocConfigParams
+    Write-Host 'Setting MOC config (workingDir: $workingDir)...'
+    Set-MocConfig -workingDir '$workingDir' -catalog '$catalog' -ring '$ring'
     Write-Host 'Installing MOC...'
     Install-Moc
     Write-Host 'MOC installation completed.'
