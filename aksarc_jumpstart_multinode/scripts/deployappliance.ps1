@@ -22,7 +22,7 @@ try {
     New-Item -Path $setupDir -ItemType Directory -Force | Out-Null
 
     $scriptContent = @"
-`$ErrorActionPreference = 'Stop'
+`$ErrorActionPreference = 'Continue'
 Start-Transcript -Path '$setupDir\deployappliance-inner.log' -Force
 try {
     `$VerbosePreference = 'Continue'
@@ -38,22 +38,22 @@ try {
     `$configFilePath = '$workDirectory\hci-appliance.yaml'
 
     Write-Host 'Logging into Azure with managed identity...'
-    az login --identity
+    az login --identity 2>&1
     if (`$LASTEXITCODE -ne 0) { throw 'Failed to login to Azure.' }
 
-    az account set -s '$subscription'
+    az account set -s '$subscription' 2>&1
     if (`$LASTEXITCODE -ne 0) { throw 'Failed to set subscription.' }
 
     Write-Host 'Preparing Arc appliance...'
-    az arcappliance prepare hci --config-file `$configFilePath
+    az arcappliance prepare hci --config-file `$configFilePath 2>&1
     if (`$LASTEXITCODE -ne 0) { throw 'Failed to prepare Arc appliance.' }
 
     Write-Host 'Deploying Arc appliance...'
-    az arcappliance deploy hci --config-file `$configFilePath --outfile '$workDirectory\kubeconfig'
+    az arcappliance deploy hci --config-file `$configFilePath --outfile '$workDirectory\kubeconfig' 2>&1
     if (`$LASTEXITCODE -ne 0) { throw 'Failed to deploy Arc appliance.' }
 
     Write-Host 'Creating Arc appliance...'
-    az arcappliance create hci --config-file `$configFilePath --kubeconfig '$workDirectory\kubeconfig'
+    az arcappliance create hci --config-file `$configFilePath --kubeconfig '$workDirectory\kubeconfig' 2>&1
     if (`$LASTEXITCODE -ne 0) { throw 'Failed to create Arc appliance.' }
 
     Write-Host 'Arc appliance deployment completed.'

@@ -65,7 +65,7 @@ $branch = (git branch --show-current)
 $scriptLocation = "$gitSource/refs/heads/$branch/aksarc_jumpstart_multinode/scripts"
 
 $scriptToExecute = [ordered]@{
-    "$scriptLocation/installazmodules.ps1"      = "installazmodules.ps1 -arcHciVersion ""$arcHciVersion"""
+    "$scriptLocation/installazmodules.ps1"      = "installazmodules.ps1 -arcHciVersion ""$arcHciVersion"" -adminUsername ""$userName"" -adminPassword ""$password"""
     "$scriptLocation/deployappliance.ps1"       = "deployappliance.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -location ""$Location"" -subscription ""$subscription"" -adminUsername ""$userName"" -adminPassword ""$password"""
     "$scriptLocation/deployaksarcextension.ps1" = "deployaksarcextension.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -location ""$Location"" -subscription ""$subscription"""
     "$scriptLocation/deployvmssextension.ps1"   = "deployvmssextension.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -location ""$Location"" -subscription ""$subscription"""
