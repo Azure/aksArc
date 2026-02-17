@@ -109,7 +109,7 @@ if ($nodeCount -gt 1) {
 Write-Host "[6/9] Nested virtualization enabled (built-in for $vmSize)."
 
 # --- Step 6: Run init scripts on all VMs ---
-$gitSource = (git config --get remote.origin.url).Replace("github.com", "raw.githubusercontent.com").Replace("aksArc.git", "aksArc")
+$gitSource = (git config --get remote.origin.url).Replace("github.com", "raw.githubusercontent.com") -replace '\.git$', ''
 $branch = (git branch --show-current)
 $scriptLocation = "$gitSource/refs/heads/$branch/aksarc_jumpstart_multinode/scripts"
 
