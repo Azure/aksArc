@@ -6,7 +6,7 @@ Start-Transcript -Path "$env:LogDirectory\installazmodules.ps1.log" -Append
 
 $VerbosePreference = "Continue"
 Write-Host "Installing ArcHci module v$arcHciVersion..."
-Install-Module -Name ArcHci -Repository PSGallery -AcceptLicense -Force -RequiredVersion $arcHciVersion
+Install-Module -Name ArcHci -Repository PSGallery -Force -Confirm:$false -RequiredVersion $arcHciVersion
 
 Write-Host "Registering Azure resource providers..."
 az provider register --namespace Microsoft.Kubernetes --wait
