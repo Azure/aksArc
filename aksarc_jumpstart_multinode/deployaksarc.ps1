@@ -60,7 +60,7 @@ Write-Host "=== Multi-Node AKS Arc Deployment (Phase 2) ==="
 Write-Host "Primary VM: $primaryVM | Location: $Location"
 Write-Host ""
 
-$gitSource = (git config --get remote.origin.url).Replace("github.com", "raw.githubusercontent.com").Replace("aksArc.git", "aksArc")
+$gitSource = (git config --get remote.origin.url).Replace("github.com", "raw.githubusercontent.com") -replace '\.git$', ''
 $branch = (git branch --show-current)
 $scriptLocation = "$gitSource/refs/heads/$branch/aksarc_jumpstart_multinode/scripts"
 
