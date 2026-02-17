@@ -2,7 +2,6 @@ param(
     [int]$nodeCount = 1,
     [string]$vmNamePrefix = "jumpstartVM",
     [string]$clusterName = "jumpstart-cluster",
-    [string]$clusterIP = "10.0.0.100",
     [string]$adminUsername = "aksadmin",
     [string]$adminPassword = ""
 )
@@ -64,34 +63,6 @@ try {
 
     New-Cluster -Name '$clusterName' -Node `$nodes -StaticAddress `$node1IP -AdministrativeAccessPoint DNS -NoStorage -Force -WarningAction SilentlyContinue
     Write-Host "Cluster created!"
-
-    # Add an IP Address resource to Cluster Group (required by MOC for multi-node)
-    # AD-less clusters use Distributed Network Name which lacks an IP resource
-    Write-Host "Adding Cluster IP Address resource for MOC..."
-    `$ipRes = Add-ClusterResource -Name 'Cluster IP Address' -ResourceType 'IP Address' -Group 'Cluster Group' -ErrorAction Stop
-    `$clusterNet = (Get-ClusterNetwork | Where-Object { `$_.Address -like '10.0.*' } | Select-Object -First 1).Name
-    `$ipRes | Set-ClusterParameter -Multiple @{
-        Address = '$clusterIP'
-        SubnetMask = '255.255.255.0'
-        Network = `$clusterNet
-        EnableDhcp = 0
-    }
-    Start-ClusterResource -Name 'Cluster IP Address' -ErrorAction Continue
-    Write-Host "Cluster IP Address resource: `$((Get-ClusterResource 'Cluster IP Address').State)"
-
-    # Add cluster name to hosts file on all nodes for DNS resolution
-    `$hostsEntry = "$clusterIP`t$clusterName"
-    foreach (`$node in `$nodes) {
-        Invoke-Command -ComputerName `$node -ScriptBlock {
-            param(`$entry, `$name)
-            `$f = 'C:\Windows\System32\drivers\etc\hosts'
-            `$c = Get-Content `$f | Where-Object { `$_ -notmatch `$name }
-            `$c += `$entry
-            `$c | Set-Content `$f -Force
-        } -ArgumentList `$hostsEntry, '$clusterName'
-    }
-    Clear-DnsClientCache
-    Write-Host "Added $clusterName -> $clusterIP to hosts files."
 
     # Configure shared disk as Cluster Shared Volume (needed for MOC working dir)
     Write-Host "Configuring shared disk as CSV..."

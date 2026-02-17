@@ -144,8 +144,8 @@ Write-Host "[8/9] Running clustering scripts on $vmNamePrefix-1..."
 $node1 = "$vmNamePrefix-1"
 
 $clusterScripts = [ordered]@{
-    "$scriptLocation/create-cluster.ps1" = "create-cluster.ps1 -nodeCount $nodeCount -vmNamePrefix ""$vmNamePrefix"" -clusterName ""$clusterName"" -clusterIP ""10.0.0.100"" -adminUsername ""$userName"" -adminPassword ""$password"""
-    "$scriptLocation/install-moc.ps1"    = "install-moc.ps1 -nodeCount $nodeCount -vmNamePrefix ""$vmNamePrefix"" -adminUsername ""$userName"" -adminPassword ""$password"""
+    "$scriptLocation/create-cluster.ps1" = "create-cluster.ps1 -nodeCount $nodeCount -vmNamePrefix ""$vmNamePrefix"" -clusterName ""$clusterName"" -adminUsername ""$userName"" -adminPassword ""$password"""
+    "$scriptLocation/install-moc.ps1"    = "install-moc.ps1 -nodeCount $nodeCount -vmNamePrefix ""$vmNamePrefix"" -cloudServiceCidr ""10.0.0.100/24"" -adminUsername ""$userName"" -adminPassword ""$password"""
 }
 
 foreach ($script in $clusterScripts.GetEnumerator()) {
