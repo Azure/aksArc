@@ -11,6 +11,11 @@ try {
     $aksarcExtName = "hybridaksextension"
     $arcvmExtName = "vmss-hci"
 
+    az login --identity
+    if ($LASTEXITCODE -ne 0) { throw "Failed to login. Exit code: $LASTEXITCODE" }
+    az account set -s $subscription
+    if ($LASTEXITCODE -ne 0) { throw "Failed to set subscription. Exit code: $LASTEXITCODE" }
+
     $ArcApplianceResourceId = az arcappliance show -g $resource_group -n $appliance_name --query id -o tsv
     if ($LASTEXITCODE -ne 0) { throw "Failed to get appliance ID. Exit code: $LASTEXITCODE" }
 
@@ -19,11 +24,6 @@ try {
 
     $ArcvmClusterExtensionResourceId = az k8s-extension show -g $resource_group -c $appliance_name --cluster-type appliances --name $arcvmExtName --query id -o tsv
     if ($LASTEXITCODE -ne 0) { throw "Failed to get VM extension ID. Exit code: $LASTEXITCODE" }
-
-    az login --identity
-    if ($LASTEXITCODE -ne 0) { throw "Failed to login. Exit code: $LASTEXITCODE" }
-    az account set -s $subscription
-    if ($LASTEXITCODE -ne 0) { throw "Failed to set subscription. Exit code: $LASTEXITCODE" }
 
     Write-Host "Creating custom location '$customLocationName'..."
     az customlocation create -g $resource_group -n $customLocationName --namespace "default" --host-resource-id $ArcApplianceResourceId --cluster-extension-ids $AksarcClusterExtensionResourceId $ArcvmClusterExtensionResourceId

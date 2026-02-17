@@ -29,7 +29,13 @@ param (
     [string]$workingDir,
 
     [Parameter()]
-    [string]$arcHciVersion = "1.3.15"
+    [string]$arcHciVersion = "1.3.15",
+
+    [Parameter(Mandatory = $true)]
+    [string]$userName,
+
+    [Parameter(Mandatory = $true)]
+    [string]$password
 )
 
 $ErrorActionPreference = "Stop"
@@ -60,7 +66,7 @@ $scriptLocation = "$gitSource/refs/heads/$branch/aksarc_jumpstart_multinode/scri
 
 $scriptToExecute = [ordered]@{
     "$scriptLocation/installazmodules.ps1"      = "installazmodules.ps1 -arcHciVersion ""$arcHciVersion"""
-    "$scriptLocation/deployappliance.ps1"       = "deployappliance.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -location ""$Location"" -subscription ""$subscription"""
+    "$scriptLocation/deployappliance.ps1"       = "deployappliance.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -location ""$Location"" -subscription ""$subscription"" -adminUsername ""$userName"" -adminPassword ""$password"""
     "$scriptLocation/deployaksarcextension.ps1" = "deployaksarcextension.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -location ""$Location"" -subscription ""$subscription"""
     "$scriptLocation/deployvmssextension.ps1"   = "deployvmssextension.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -location ""$Location"" -subscription ""$subscription"""
     "$scriptLocation/deploycustomlocation.ps1"  = "deploycustomlocation.ps1 -resource_group ""$GroupName"" -appliance_name ""$applianceName"" -customLocationName ""$customLocationName"" -subscription ""$subscription"""
