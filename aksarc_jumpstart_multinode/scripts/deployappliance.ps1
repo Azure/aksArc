@@ -32,8 +32,10 @@ try {
     Import-Module ArcHci -WarningAction SilentlyContinue
     New-ArcHciAksConfigFiles -subscriptionID '$subscription' -location '$location' -resourceGroup '$resource_group' ``
         -resourceName '$appliance_name' -workDirectory '$workDirectory' -vnetName 'appliance-vnet' ``
-        -vSwitchName 'InternalNAT' -gateway '172.16.0.1' -dnsservers '172.16.0.1' -ipaddressprefix '172.16.0.0/16' ``
-        -k8snodeippoolstart '172.16.255.0' -k8snodeippoolend '172.16.255.12' -controlPlaneIP '172.16.255.250'
+        -vSwitchName 'ExternalSwitch' -gateway '10.0.0.1' -dnsservers '168.63.129.16' -ipaddressprefix '10.0.0.0/24' ``
+        -k8snodeippoolstart '10.0.0.10' -k8snodeippoolend '10.0.0.30' ``
+        -vippoolstart '10.0.0.31' -vippoolend '10.0.0.50' ``
+        -controlPlaneIP '10.0.0.60'
 
     `$configFilePath = '$workDirectory\hci-appliance.yaml'
 

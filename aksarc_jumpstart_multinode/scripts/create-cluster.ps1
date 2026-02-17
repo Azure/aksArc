@@ -93,12 +93,6 @@ try {
     Clear-DnsClientCache
     Write-Host "Added $clusterName -> $clusterIP to hosts files."
 
-    # Add DNS zone for cluster name (appliance VM resolves via internal DNS at 172.16.0.1)
-    Write-Host "Adding DNS zone for $clusterName..."
-    Add-DnsServerPrimaryZone -Name '$clusterName' -ZoneFile '$clusterName.dns' -ErrorAction SilentlyContinue
-    Add-DnsServerResourceRecordA -Name '@' -ZoneName '$clusterName' -IPv4Address '$clusterIP' -ErrorAction SilentlyContinue
-    Write-Host "DNS zone for $clusterName created."
-
     # Configure shared disk as Cluster Shared Volume (needed for MOC working dir)
     Write-Host "Configuring shared disk as CSV..."
     `$sharedDisk = Get-Disk | Where-Object { `$_.PartitionStyle -eq 'RAW' -and `$_.Number -gt 0 }

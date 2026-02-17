@@ -10,13 +10,13 @@ Start-Transcript -Path "$env:LogDirectory\deploylnet.ps1.log" -Append
 
 try {
     $ipAllocationMethod = "Static"
-    $vmSwitchName = "InternalNAT"
-    $addressPrefix = "172.16.0.0/16"
-    $dnsServers = "172.16.0.1"
-    $gateway = "172.16.0.1"
+    $vmSwitchName = "ExternalSwitch"
+    $addressPrefix = "10.0.0.0/24"
+    $dnsServers = "168.63.129.16"
+    $gateway = "10.0.0.1"
     $vlan = "0"
-    $ipPoolStart = "172.16.0.10"
-    $ipPoolEnd = "172.16.0.254"
+    $ipPoolStart = "10.0.0.10"
+    $ipPoolEnd = "10.0.0.30"
 
     az login --identity
     if ($LASTEXITCODE -ne 0) { throw "Failed to login. Exit code: $LASTEXITCODE" }
