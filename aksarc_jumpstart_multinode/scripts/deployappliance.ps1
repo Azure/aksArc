@@ -35,7 +35,7 @@ try {
         -vSwitchName 'ExternalSwitch' -gateway '10.0.0.1' -dnsservers '168.63.129.16' -ipaddressprefix '10.0.0.0/24' ``
         -k8snodeippoolstart '10.0.0.10' -k8snodeippoolend '10.0.0.30' ``
         -vippoolstart '10.0.0.31' -vippoolend '10.0.0.50' ``
-        -controlPlaneIP '10.0.0.60'
+        -controlPlaneIP '10.0.0.60' -cloudFqdn '10.0.0.100'
 
     `$configFilePath = '$workDirectory\hci-appliance.yaml'
 
