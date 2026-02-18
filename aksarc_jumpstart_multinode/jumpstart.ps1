@@ -95,14 +95,10 @@ if ($nodeCount -gt 1) {
 }
 
 # --- Step 5: Add secondary IP to node 1 NIC for cluster IP Address resource ---
-if ($nodeCount -gt 1) {
-    Write-Host "[5/9] Adding secondary IP for cluster IP resource..."
-    $nicName = az vm show --resource-group $GroupName --name "$vmNamePrefix-1" --query "networkProfile.networkInterfaces[0].id" -o tsv | Split-Path -Leaf
-    az network nic ip-config create --resource-group $GroupName --nic-name $nicName --name clusterIP --private-ip-address 10.0.0.100
-    if ($LASTEXITCODE -ne 0) { throw "Failed to add secondary IP for cluster." }
-} else {
-    Write-Host "[5/9] Skipping secondary IP (single node)."
-}
+Write-Host "[5/9] Adding secondary IP for cluster IP resource..."
+$nicName = az vm show --resource-group $GroupName --name "$vmNamePrefix-1" --query "networkProfile.networkInterfaces[0].id" -o tsv | Split-Path -Leaf
+az network nic ip-config create --resource-group $GroupName --nic-name $nicName --name clusterIP --private-ip-address 10.0.0.100
+if ($LASTEXITCODE -ne 0) { throw "Failed to add secondary IP for cluster." }
 
 # --- Step 6: Enable nested virtualization on all VMs ---
 # NOTE: Standard_E16s_v4 supports nested virt natively, no explicit enabling needed

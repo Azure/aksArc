@@ -20,12 +20,8 @@ try {
         $nodes += "$vmNamePrefix-$i"
     }
 
-    # Determine working directory: CSV for multi-node, local for single
-    if ($nodeCount -gt 1) {
-        $workingDir = 'C:\ClusterStorage\Volume1\ArcHCI'
-    } else {
-        $workingDir = 'C:\ArcHCI'
-    }
+    # Always use CSV path — MOC requires it when a failover cluster exists
+    $workingDir = 'C:\ClusterStorage\Volume1\ArcHCI'
 
     # Build the MOC install script
     $scriptContent = @"

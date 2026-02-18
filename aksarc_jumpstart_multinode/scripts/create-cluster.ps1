@@ -93,10 +93,11 @@ try {
     Clear-DnsClientCache
     Write-Host "Added $clusterName -> $clusterIP to hosts files."
 
-    # Configure shared disk as Cluster Shared Volume (needed for MOC working dir)
-    Write-Host "Configuring shared disk as CSV..."
+    # Configure Cluster Shared Volume (required for MOC working dir)
+    Write-Host "Configuring CSV..."
     `$sharedDisk = Get-Disk | Where-Object { `$_.PartitionStyle -eq 'RAW' -and `$_.Number -gt 0 }
     if (`$sharedDisk) {
+        # Multi-node: initialize the Azure shared disk and add as CSV
         Write-Host "Initializing shared disk (Disk `$(`$sharedDisk.Number))..."
         Initialize-Disk -Number `$sharedDisk.Number -PartitionStyle GPT
         New-Partition -DiskNumber `$sharedDisk.Number -UseMaximumSize -AssignDriveLetter
@@ -110,7 +111,25 @@ try {
             Write-Warning "Could not add shared disk to cluster."
         }
     } else {
-        Write-Warning "No shared disk found."
+        # Single-node: add the local data disk (already formatted) as CSV
+        Write-Host "No shared disk. Adding local data disk as CSV..."
+        `$dataDisk = Get-Disk | Where-Object { `$_.Number -gt 0 -and `$_.PartitionStyle -ne 'RAW' }
+        if (`$dataDisk) {
+            `$diskNum = `$dataDisk.Number
+            Write-Host "Adding disk `$diskNum to cluster..."
+            `$clusterDisk = Get-ClusterAvailableDisk | Where-Object { `$_.Number -eq `$diskNum } | Add-ClusterDisk
+            if (-not `$clusterDisk) {
+                # If not auto-detected as available, try adding directly
+                `$resName = "Cluster Disk `$diskNum"
+                `$clusterDisk = Add-ClusterResource -Name `$resName -ResourceType 'Physical Disk' -Group 'Available Storage'
+                `$clusterDisk | Set-ClusterParameter -Name DiskIdGuid -Value `$dataDisk.Guid
+            }
+            `$csvName = (Get-ClusterResource | Where-Object ResourceType -eq 'Physical Disk' | Select-Object -First 1).Name
+            Add-ClusterSharedVolume -Name `$csvName
+            Write-Host "Local data disk added as CSV at C:\ClusterStorage\Volume1"
+        } else {
+            Write-Warning "No data disk found for CSV."
+        }
     }
 
     Get-Cluster | Format-List Name,Domain
