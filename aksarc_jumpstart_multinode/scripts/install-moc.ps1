@@ -36,7 +36,7 @@ try {
     Import-Module Moc -WarningAction SilentlyContinue
     New-Item -Path '$workingDir' -ItemType Directory -Force | Out-Null
     Write-Host 'Setting MOC config (workingDir: $workingDir)...'
-    Set-MocConfig -workingDir '$workingDir' -catalog '$catalog' -ring '$ring'
+    Set-MocConfig -workingDir '$workingDir' -catalog '$catalog' -ring '$ring' -cloudServiceIP '10.0.0.100' -skipValidationCheck
     Write-Host 'Installing MOC...'
     Install-Moc
     Write-Host 'MOC installation completed.'
