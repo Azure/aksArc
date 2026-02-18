@@ -111,24 +111,23 @@ try {
             Write-Warning "Could not add shared disk to cluster."
         }
     } else {
-        # Single-node: add the local data disk (already formatted) as CSV
-        Write-Host "No shared disk. Adding local data disk as CSV..."
-        `$dataDisk = Get-Disk | Where-Object { `$_.Number -gt 0 -and `$_.PartitionStyle -ne 'RAW' }
-        if (`$dataDisk) {
-            `$diskNum = `$dataDisk.Number
-            Write-Host "Adding disk `$diskNum to cluster..."
-            `$clusterDisk = Get-ClusterAvailableDisk | Where-Object { `$_.Number -eq `$diskNum } | Add-ClusterDisk
-            if (-not `$clusterDisk) {
-                # If not auto-detected as available, try adding directly
-                `$resName = "Cluster Disk `$diskNum"
-                `$clusterDisk = Add-ClusterResource -Name `$resName -ResourceType 'Physical Disk' -Group 'Available Storage'
-                `$clusterDisk | Set-ClusterParameter -Name DiskIdGuid -Value `$dataDisk.Guid
-            }
-            `$csvName = (Get-ClusterResource | Where-Object ResourceType -eq 'Physical Disk' | Select-Object -First 1).Name
-            Add-ClusterSharedVolume -Name `$csvName
-            Write-Host "Local data disk added as CSV at C:\ClusterStorage\Volume1"
+        # Single-node: create a VHD on the data disk and add as CSV
+        # Cannot use the data disk directly — it has modules and env vars on D:
+        Write-Host "No shared disk. Creating VHD for CSV..."
+        `$vhdPath = 'D:\ClusterStorage.vhdx'
+        New-VHD -Path `$vhdPath -SizeBytes 100GB -Dynamic | Out-Null
+        Mount-VHD -Path `$vhdPath
+        `$vhdDisk = Get-VHD -Path `$vhdPath | Get-Disk
+        Initialize-Disk -Number `$vhdDisk.Number -PartitionStyle GPT
+        New-Partition -DiskNumber `$vhdDisk.Number -UseMaximumSize -AssignDriveLetter
+        `$letter = (Get-Partition -DiskNumber `$vhdDisk.Number | Where-Object Type -ne 'Reserved' | Select-Object -Last 1).DriveLetter
+        Format-Volume -DriveLetter `$letter -FileSystem NTFS -NewFileSystemLabel 'ClusterStorage' -Confirm:`$false
+        `$clusterDisk = Get-ClusterAvailableDisk | Add-ClusterDisk
+        if (`$clusterDisk) {
+            Add-ClusterSharedVolume -Name `$clusterDisk.Name
+            Write-Host "VHD-based CSV created at C:\ClusterStorage\Volume1"
         } else {
-            Write-Warning "No data disk found for CSV."
+            Write-Warning "Could not add VHD disk as CSV."
         }
     }
 
