@@ -12,7 +12,7 @@ try {
     $ipAllocationMethod = "Static"
     $vmSwitchName = "ExternalSwitch"
     $addressPrefix = "10.0.0.0/24"
-    $dnsServers = "168.63.129.16"
+    $dnsServers = "8.8.8.8"
     $gateway = "10.0.0.1"
     $vlan = "0"
     $ipPoolStart = "10.0.0.10"
