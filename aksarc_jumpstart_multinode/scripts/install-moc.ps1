@@ -21,7 +21,10 @@ try {
     }
 
     # Use CSV path if cluster with CSV exists, otherwise local path (single-node without cluster)
-    $clusterExists = [bool](Get-Cluster -ErrorAction SilentlyContinue)
+    $clusterExists = $false
+    if (Get-Command Get-Cluster -ErrorAction SilentlyContinue) {
+        $clusterExists = [bool](Get-Cluster -ErrorAction SilentlyContinue)
+    }
     $workingDir = if ($clusterExists -and (Test-Path 'C:\ClusterStorage\Volume1')) {
         'C:\ClusterStorage\Volume1\ArcHCI'
     } else {
