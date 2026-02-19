@@ -94,15 +94,26 @@ if ($nodeCount -gt 1) {
     Write-Host "[4/9] Skipping shared disk (single node)."
 }
 
-# --- Step 5: Add secondary IP to node 1 NIC for cluster IP Address resource (multi-node only) ---
+# --- Step 5: Add secondary IPs to VM NIC for nested VM communication ---
+Write-Host "[5/9] Adding secondary IPs for nested VMs..."
+$nicName = az vm show --resource-group $GroupName --name "$vmNamePrefix-1" --query "networkProfile.networkInterfaces[0].id" -o tsv | Split-Path -Leaf
+
 if ($nodeCount -gt 1) {
-    Write-Host "[5/9] Adding secondary IP for cluster IP resource..."
-    $nicName = az vm show --resource-group $GroupName --name "$vmNamePrefix-1" --query "networkProfile.networkInterfaces[0].id" -o tsv | Split-Path -Leaf
-    az network nic ip-config create --resource-group $GroupName --nic-name $nicName --name clusterIP --private-ip-address 10.0.0.100
-    if ($LASTEXITCODE -ne 0) { throw "Failed to add secondary IP for cluster." }
-} else {
-    Write-Host "[5/9] Skipping secondary IP (single node)."
+    # Cluster IP for multi-node
+    az network nic ip-config create --resource-group $GroupName --nic-name $nicName --name clusterIP --private-ip-address 10.0.0.100 -o none
 }
+
+# k8s node IPs (10.0.0.10-30) — nested VMs need these IPs assigned to the Azure NIC
+for ($i = 10; $i -le 30; $i++) {
+    az network nic ip-config create --resource-group $GroupName --nic-name $nicName --name "k8snode$i" --private-ip-address "10.0.0.$i" -o none
+}
+# VIP pool IPs (10.0.0.31-50)
+for ($i = 31; $i -le 50; $i++) {
+    az network nic ip-config create --resource-group $GroupName --nic-name $nicName --name "vip$i" --private-ip-address "10.0.0.$i" -o none
+}
+# Control plane IP
+az network nic ip-config create --resource-group $GroupName --nic-name $nicName --name controlPlaneIP --private-ip-address 10.0.0.60 -o none
+Write-Host "    Added secondary IPs (10.0.0.10-60) for nested VM networking."
 
 # --- Step 6: Enable nested virtualization on all VMs ---
 # NOTE: Standard_E16s_v4 supports nested virt natively, no explicit enabling needed
