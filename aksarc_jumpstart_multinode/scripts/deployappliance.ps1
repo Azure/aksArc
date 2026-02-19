@@ -29,7 +29,8 @@ try {
     md '$workDirectory' -ErrorAction SilentlyContinue
 
     # Determine MOC cloud agent endpoint — cluster IP if cluster exists, else node IP
-    `$cluster = Get-Cluster -ErrorAction SilentlyContinue
+    `$cluster = `$null
+    if (Get-Command Get-Cluster -ErrorAction SilentlyContinue) { `$cluster = Get-Cluster -ErrorAction SilentlyContinue }
     if (`$cluster) {
         `$cloudFqdn = '10.0.0.100'
     } else {
