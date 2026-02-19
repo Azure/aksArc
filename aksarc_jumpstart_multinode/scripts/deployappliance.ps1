@@ -28,6 +28,15 @@ try {
     `$VerbosePreference = 'Continue'
     md '$workDirectory' -ErrorAction SilentlyContinue
 
+    # Determine MOC cloud agent endpoint — cluster IP if cluster exists, else node IP
+    `$cluster = Get-Cluster -ErrorAction SilentlyContinue
+    if (`$cluster) {
+        `$cloudFqdn = '10.0.0.100'
+    } else {
+        `$cloudFqdn = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object { `$_.IPAddress -like '10.0.0.*' -and `$_.PrefixOrigin -ne 'WellKnown' } | Select-Object -First 1).IPAddress
+    }
+    Write-Host "Using cloudFqdn: `$cloudFqdn"
+
     Write-Host 'Creating Arc HCI AKS configuration files...'
     Import-Module ArcHci -WarningAction SilentlyContinue
     New-ArcHciAksConfigFiles -subscriptionID '$subscription' -location '$location' -resourceGroup '$resource_group' ``
@@ -35,7 +44,7 @@ try {
         -vSwitchName 'ExternalSwitch' -gateway '10.0.0.1' -dnsservers '168.63.129.16' -ipaddressprefix '10.0.0.0/24' ``
         -k8snodeippoolstart '10.0.0.10' -k8snodeippoolend '10.0.0.30' ``
         -vippoolstart '10.0.0.31' -vippoolend '10.0.0.50' ``
-        -controlPlaneIP '10.0.0.60' -cloudFqdn '10.0.0.100'
+        -controlPlaneIP '10.0.0.60' -cloudFqdn `$cloudFqdn
 
     `$configFilePath = '$workDirectory\hci-appliance.yaml'
 

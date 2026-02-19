@@ -111,24 +111,12 @@ try {
             Write-Warning "Could not add shared disk to cluster."
         }
     } else {
-        # Single-node: create a VHD on the data disk and add as CSV
-        # Cannot use the data disk directly — it has modules and env vars on D:
-        Write-Host "No shared disk. Creating VHD for CSV..."
-        `$vhdPath = 'D:\ClusterStorage.vhdx'
-        New-VHD -Path `$vhdPath -SizeBytes 100GB -Dynamic | Out-Null
-        Mount-VHD -Path `$vhdPath
-        `$vhdDisk = Get-VHD -Path `$vhdPath | Get-Disk
-        Initialize-Disk -Number `$vhdDisk.Number -PartitionStyle GPT
-        New-Partition -DiskNumber `$vhdDisk.Number -UseMaximumSize -AssignDriveLetter
-        `$letter = (Get-Partition -DiskNumber `$vhdDisk.Number | Where-Object Type -ne 'Reserved' | Select-Object -Last 1).DriveLetter
-        Format-Volume -DriveLetter `$letter -FileSystem NTFS -NewFileSystemLabel 'ClusterStorage' -Confirm:`$false
-        `$clusterDisk = Get-ClusterAvailableDisk | Add-ClusterDisk
-        if (`$clusterDisk) {
-            Add-ClusterSharedVolume -Name `$clusterDisk.Name
-            Write-Host "VHD-based CSV created at C:\ClusterStorage\Volume1"
-        } else {
-            Write-Warning "Could not add VHD disk as CSV."
-        }
+        # Single-node: no shared disk available, create SMB share for MOC workingDir
+        Write-Host "No shared disk. Creating SMB share for MOC working directory..."
+        `$sharePath = 'C:\ArcHCI'
+        New-Item -Path `$sharePath -ItemType Directory -Force | Out-Null
+        New-SmbShare -Name ArcHCI -Path `$sharePath -FullAccess Everyone -ErrorAction SilentlyContinue
+        Write-Host "SMB share created: \\`$env:COMPUTERNAME\ArcHCI -> `$sharePath"
     }
 
     Get-Cluster | Format-List Name,Domain

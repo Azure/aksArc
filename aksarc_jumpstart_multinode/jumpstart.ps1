@@ -94,11 +94,15 @@ if ($nodeCount -gt 1) {
     Write-Host "[4/9] Skipping shared disk (single node)."
 }
 
-# --- Step 5: Add secondary IP to node 1 NIC for cluster IP Address resource ---
-Write-Host "[5/9] Adding secondary IP for cluster IP resource..."
-$nicName = az vm show --resource-group $GroupName --name "$vmNamePrefix-1" --query "networkProfile.networkInterfaces[0].id" -o tsv | Split-Path -Leaf
-az network nic ip-config create --resource-group $GroupName --nic-name $nicName --name clusterIP --private-ip-address 10.0.0.100
-if ($LASTEXITCODE -ne 0) { throw "Failed to add secondary IP for cluster." }
+# --- Step 5: Add secondary IP to node 1 NIC for cluster IP Address resource (multi-node only) ---
+if ($nodeCount -gt 1) {
+    Write-Host "[5/9] Adding secondary IP for cluster IP resource..."
+    $nicName = az vm show --resource-group $GroupName --name "$vmNamePrefix-1" --query "networkProfile.networkInterfaces[0].id" -o tsv | Split-Path -Leaf
+    az network nic ip-config create --resource-group $GroupName --nic-name $nicName --name clusterIP --private-ip-address 10.0.0.100
+    if ($LASTEXITCODE -ne 0) { throw "Failed to add secondary IP for cluster." }
+} else {
+    Write-Host "[5/9] Skipping secondary IP (single node)."
+}
 
 # --- Step 6: Enable nested virtualization on all VMs ---
 # NOTE: Standard_E16s_v4 supports nested virt natively, no explicit enabling needed
@@ -111,7 +115,7 @@ $scriptLocation = "$gitSource/refs/heads/$branch/aksarc_jumpstart_multinode/scri
 
 $initScripts = [ordered]@{
     "$scriptLocation/initializedisk.ps1"        = "initializedisk.ps1"
-    "$scriptLocation/install-features.ps1"      = "install-features.ps1"
+    "$scriptLocation/install-features.ps1"      = "install-features.ps1 -nodeCount $nodeCount"
     "$scriptLocation/configure-networking.ps1"  = "configure-networking.ps1 -nodeIndex NODE_INDEX -nodeCount $nodeCount"
     "$scriptLocation/install-prerequisites.ps1" = "install-prerequisites.ps1 -adminUsername $userName -adminPassword $password"
 }
@@ -135,13 +139,20 @@ for ($i = 1; $i -le $nodeCount; $i++) {
     }
 }
 
-# --- Step 8: Run clustering scripts on node 1 ---
-Write-Host "[8/9] Running clustering scripts on $vmNamePrefix-1..."
+# --- Step 8: Run clustering and MOC scripts on node 1 ---
 $node1 = "$vmNamePrefix-1"
 
-$clusterScripts = [ordered]@{
-    "$scriptLocation/create-cluster.ps1" = "create-cluster.ps1 -nodeCount $nodeCount -vmNamePrefix ""$vmNamePrefix"" -clusterName ""$clusterName"" -clusterIP ""10.0.0.100"" -adminUsername ""$userName"" -adminPassword ""$password"""
-    "$scriptLocation/install-moc.ps1"    = "install-moc.ps1 -nodeCount $nodeCount -vmNamePrefix ""$vmNamePrefix"" -adminUsername ""$userName"" -adminPassword ""$password"""
+if ($nodeCount -gt 1) {
+    Write-Host "[8/9] Running clustering + MOC scripts on $node1..."
+    $clusterScripts = [ordered]@{
+        "$scriptLocation/create-cluster.ps1" = "create-cluster.ps1 -nodeCount $nodeCount -vmNamePrefix ""$vmNamePrefix"" -clusterName ""$clusterName"" -clusterIP ""10.0.0.100"" -adminUsername ""$userName"" -adminPassword ""$password"""
+        "$scriptLocation/install-moc.ps1"    = "install-moc.ps1 -nodeCount $nodeCount -vmNamePrefix ""$vmNamePrefix"" -adminUsername ""$userName"" -adminPassword ""$password"""
+    }
+} else {
+    Write-Host "[8/9] Running MOC install on $node1 (single-node, no cluster)..."
+    $clusterScripts = [ordered]@{
+        "$scriptLocation/install-moc.ps1" = "install-moc.ps1 -nodeCount $nodeCount -vmNamePrefix ""$vmNamePrefix"" -adminUsername ""$userName"" -adminPassword ""$password"""
+    }
 }
 
 foreach ($script in $clusterScripts.GetEnumerator()) {

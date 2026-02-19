@@ -20,10 +20,20 @@ try {
         $nodes += "$vmNamePrefix-$i"
     }
 
-    # Always use CSV path — MOC requires it when a failover cluster exists
-    $workingDir = 'C:\ClusterStorage\Volume1\ArcHCI'
+    # Use CSV path if cluster with CSV exists, otherwise local path (single-node without cluster)
+    $clusterExists = [bool](Get-Cluster -ErrorAction SilentlyContinue)
+    $workingDir = if ($clusterExists -and (Test-Path 'C:\ClusterStorage\Volume1')) {
+        'C:\ClusterStorage\Volume1\ArcHCI'
+    } else {
+        "$env:WorkingDir\ArcHCI"
+    }
 
-    # Build the MOC install script
+    # Build the MOC install script — cloudServiceIP only for multi-node with cluster IP
+    $mocConfigParams = "-workingDir '$workingDir' -catalog '$catalog' -ring '$ring'"
+    if ($clusterExists) {
+        $mocConfigParams += " -cloudServiceIP '10.0.0.100' -skipValidationCheck"
+    }
+
     $scriptContent = @"
 `$ErrorActionPreference = 'Stop'
 Start-Transcript -Path 'C:\ClusterSetup\install-moc.log' -Force
@@ -32,7 +42,7 @@ try {
     Import-Module Moc -WarningAction SilentlyContinue
     New-Item -Path '$workingDir' -ItemType Directory -Force | Out-Null
     Write-Host 'Setting MOC config (workingDir: $workingDir)...'
-    Set-MocConfig -workingDir '$workingDir' -catalog '$catalog' -ring '$ring' -cloudServiceIP '10.0.0.100' -skipValidationCheck
+    Set-MocConfig $mocConfigParams
     Write-Host 'Installing MOC...'
     Install-Moc
     Write-Host 'MOC installation completed.'
