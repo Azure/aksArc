@@ -37,105 +37,72 @@ $executionStatus = @{
   ExitCode = 0
 }
 
-# Create Resource Group
-az group create --name $GroupName --location $Location
-if ($LASTEXITCODE -ne 0) {
-  $executionStatus.Status = "Failure"
-  $executionStatus.FailedStep = "CreateResourceGroup"
-  $executionStatus.ErrorMessage = "Failed to create resource group '$GroupName' in location '$Location'. Azure CLI command failed with exit code $LASTEXITCODE"
-  $executionStatus.ExitCode = $LASTEXITCODE
+# Print the execution status block (used on success and failure).
+function Write-ExecutionStatus {
   $executionStatus.EndTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
   Write-Host "`n===== EXECUTION STATUS ====="
   Write-Host "Status: $($executionStatus.Status)"
-  Write-Host "Failed Step: $($executionStatus.FailedStep)"
-  Write-Host "Error Message: $($executionStatus.ErrorMessage)"
+  if ($executionStatus.Status -eq "Failure") {
+    Write-Host "Failed Step: $($executionStatus.FailedStep)"
+    Write-Host "Error Message: $($executionStatus.ErrorMessage)"
+  }
   Write-Host "Exit Code: $($executionStatus.ExitCode)"
+  Write-Host "Completed Steps: $($executionStatus.CompletedSteps -join ', ')"
   Write-Host "Start Time: $($executionStatus.StartTime)"
   Write-Host "End Time: $($executionStatus.EndTime)"
   Write-Host "============================"
-  exit $LASTEXITCODE
+}
+
+# Record a failed step, print status, and exit with the given code.
+function Invoke-StepFailure {
+  param(
+    [Parameter(Mandatory = $true)] [string] $StepName,
+    [Parameter(Mandatory = $true)] [string] $ErrorText,
+    [Parameter()] [int] $ExitCode = 1
+  )
+  $executionStatus.Status = "Failure"
+  $executionStatus.FailedStep = $StepName
+  $executionStatus.ErrorMessage = $ErrorText
+  $executionStatus.ExitCode = $ExitCode
+  Write-ExecutionStatus
+  exit $ExitCode
+}
+
+# Create Resource Group
+az group create --name $GroupName --location $Location
+if ($LASTEXITCODE -ne 0) {
+  Invoke-StepFailure -StepName "CreateResourceGroup" -ExitCode $LASTEXITCODE `
+    -ErrorText "Failed to create resource group '$GroupName' in location '$Location'. Azure CLI command failed with exit code $LASTEXITCODE"
 }
 $executionStatus.CompletedSteps += "CreateResourceGroup"
 
 # Create Vnet and VM
 az deployment group create --resource-group $GroupName --template-file ./configuration/vnet-template.json --parameters vnetName=$vnetName location=$Location subnetName=$subnetName
 if ($LASTEXITCODE -ne 0) {
-  $executionStatus.Status = "Failure"
-  $executionStatus.FailedStep = "CreateVirtualNetwork"
-  $executionStatus.ErrorMessage = "Failed to create virtual network '$vnetName' and subnet '$subnetName'. Azure CLI command failed with exit code $LASTEXITCODE"
-  $executionStatus.ExitCode = $LASTEXITCODE
-  $executionStatus.EndTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-  Write-Host "`n===== EXECUTION STATUS ====="
-  Write-Host "Status: $($executionStatus.Status)"
-  Write-Host "Failed Step: $($executionStatus.FailedStep)"
-  Write-Host "Error Message: $($executionStatus.ErrorMessage)"
-  Write-Host "Exit Code: $($executionStatus.ExitCode)"
-  Write-Host "Completed Steps: $($executionStatus.CompletedSteps -join ', ')"
-  Write-Host "Start Time: $($executionStatus.StartTime)"
-  Write-Host "End Time: $($executionStatus.EndTime)"
-  Write-Host "============================"
-  exit $LASTEXITCODE
+  Invoke-StepFailure -StepName "CreateVirtualNetwork" -ExitCode $LASTEXITCODE `
+    -ErrorText "Failed to create virtual network '$vnetName' and subnet '$subnetName'. Azure CLI command failed with exit code $LASTEXITCODE"
 }
 $executionStatus.CompletedSteps += "CreateVirtualNetwork"
 
 az deployment group create --resource-group $GroupName --template-file ./configuration/vm-template.json --parameters adminUsername=$userName adminPassword=$password vmName=$vmName location=$Location vnetName=$vnetName vmSize="Standard_E16s_v4" subnetName=$subnetName
 if ($LASTEXITCODE -ne 0) {
-  $executionStatus.Status = "Failure"
-  $executionStatus.FailedStep = "CreateVirtualMachine"
-  $executionStatus.ErrorMessage = "Failed to create virtual machine '$vmName'. Azure CLI command failed with exit code $LASTEXITCODE"
-  $executionStatus.ExitCode = $LASTEXITCODE
-  $executionStatus.EndTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-  Write-Host "`n===== EXECUTION STATUS ====="
-  Write-Host "Status: $($executionStatus.Status)"
-  Write-Host "Failed Step: $($executionStatus.FailedStep)"
-  Write-Host "Error Message: $($executionStatus.ErrorMessage)"
-  Write-Host "Exit Code: $($executionStatus.ExitCode)"
-  Write-Host "Completed Steps: $($executionStatus.CompletedSteps -join ', ')"
-  Write-Host "Start Time: $($executionStatus.StartTime)"
-  Write-Host "End Time: $($executionStatus.EndTime)"
-  Write-Host "============================"
-  exit $LASTEXITCODE
+  Invoke-StepFailure -StepName "CreateVirtualMachine" -ExitCode $LASTEXITCODE `
+    -ErrorText "Failed to create virtual machine '$vmName'. Azure CLI command failed with exit code $LASTEXITCODE"
 }
 $executionStatus.CompletedSteps += "CreateVirtualMachine"
 
 # Assign Managed Identity and Contributor Role to VM
 az vm identity assign --resource-group $GroupName --name $vmName
 if ($LASTEXITCODE -ne 0) {
-  $executionStatus.Status = "Failure"
-  $executionStatus.FailedStep = "AssignManagedIdentity"
-  $executionStatus.ErrorMessage = "Failed to assign managed identity to VM '$vmName'. Azure CLI command failed with exit code $LASTEXITCODE"
-  $executionStatus.ExitCode = $LASTEXITCODE
-  $executionStatus.EndTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-  Write-Host "`n===== EXECUTION STATUS ====="
-  Write-Host "Status: $($executionStatus.Status)"
-  Write-Host "Failed Step: $($executionStatus.FailedStep)"
-  Write-Host "Error Message: $($executionStatus.ErrorMessage)"
-  Write-Host "Exit Code: $($executionStatus.ExitCode)"
-  Write-Host "Completed Steps: $($executionStatus.CompletedSteps -join ', ')"
-  Write-Host "Start Time: $($executionStatus.StartTime)"
-  Write-Host "End Time: $($executionStatus.EndTime)"
-  Write-Host "============================"
-  exit $LASTEXITCODE
+  Invoke-StepFailure -StepName "AssignManagedIdentity" -ExitCode $LASTEXITCODE `
+    -ErrorText "Failed to assign managed identity to VM '$vmName'. Azure CLI command failed with exit code $LASTEXITCODE"
 }
 $executionStatus.CompletedSteps += "AssignManagedIdentity"
 $principalId = az vm show --resource-group $GroupName --name $vmName --query identity.principalId -o tsv
 az role assignment create --assignee $principalId --role Contributor --scope /subscriptions/$subscriptionId
 if ($LASTEXITCODE -ne 0) {
-  $executionStatus.Status = "Failure"
-  $executionStatus.FailedStep = "AssignContributorRole"
-  $executionStatus.ErrorMessage = "Failed to assign Contributor role to VM identity. Azure CLI command failed with exit code $LASTEXITCODE"
-  $executionStatus.ExitCode = $LASTEXITCODE
-  $executionStatus.EndTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-  Write-Host "`n===== EXECUTION STATUS ====="
-  Write-Host "Status: $($executionStatus.Status)"
-  Write-Host "Failed Step: $($executionStatus.FailedStep)"
-  Write-Host "Error Message: $($executionStatus.ErrorMessage)"
-  Write-Host "Exit Code: $($executionStatus.ExitCode)"
-  Write-Host "Completed Steps: $($executionStatus.CompletedSteps -join ', ')"
-  Write-Host "Start Time: $($executionStatus.StartTime)"
-  Write-Host "End Time: $($executionStatus.EndTime)"
-  Write-Host "============================"
-  exit $LASTEXITCODE
+  Invoke-StepFailure -StepName "AssignContributorRole" -ExitCode $LASTEXITCODE `
+    -ErrorText "Failed to assign Contributor role to VM identity. Azure CLI command failed with exit code $LASTEXITCODE"
 }
 $executionStatus.CompletedSteps += "AssignContributorRole"
 
@@ -143,21 +110,8 @@ $executionStatus.CompletedSteps += "AssignContributorRole"
 # Enable Nested Virtualization
 az vm update   --resource-group $GroupName   --name $vmName --set additionalCapabilities.enableNestedVirtualization=true
 if ($LASTEXITCODE -ne 0) {
-  $executionStatus.Status = "Failure"
-  $executionStatus.FailedStep = "EnableNestedVirtualization"
-  $executionStatus.ErrorMessage = "Failed to enable nested virtualization on VM '$vmName'. Azure CLI command failed with exit code $LASTEXITCODE"
-  $executionStatus.ExitCode = $LASTEXITCODE
-  $executionStatus.EndTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-  Write-Host "`n===== EXECUTION STATUS ====="
-  Write-Host "Status: $($executionStatus.Status)"
-  Write-Host "Failed Step: $($executionStatus.FailedStep)"
-  Write-Host "Error Message: $($executionStatus.ErrorMessage)"
-  Write-Host "Exit Code: $($executionStatus.ExitCode)"
-  Write-Host "Completed Steps: $($executionStatus.CompletedSteps -join ', ')"
-  Write-Host "Start Time: $($executionStatus.StartTime)"
-  Write-Host "End Time: $($executionStatus.EndTime)"
-  Write-Host "============================"
-  exit $LASTEXITCODE
+  Invoke-StepFailure -StepName "EnableNestedVirtualization" -ExitCode $LASTEXITCODE `
+    -ErrorText "Failed to enable nested virtualization on VM '$vmName'. Azure CLI command failed with exit code $LASTEXITCODE"
 }
 $executionStatus.CompletedSteps += "EnableNestedVirtualization"
 
@@ -182,43 +136,17 @@ foreach ($script in $scriptToExecute.GetEnumerator()) {
   try {
     az deployment group create --name $deploymentName --resource-group $GroupName --template-file ./configuration/executescript-template.json --parameters location=$Location vmName=$vmName scriptFileUri=$scriptUrl commandToExecute=$commandToExecute
     if ($LASTEXITCODE -ne 0) {
-      $executionStatus.Status = "Failure"
-      $executionStatus.FailedStep = "ExecuteScript_$scriptName"
-      $executionStatus.ErrorMessage = "Failed to execute script '$scriptName' on VM '$vmName'. Azure CLI command failed with exit code $LASTEXITCODE"
-      $executionStatus.ExitCode = $LASTEXITCODE
-      $executionStatus.EndTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-      Write-Host "`n===== EXECUTION STATUS ====="
-      Write-Host "Status: $($executionStatus.Status)"
-      Write-Host "Failed Step: $($executionStatus.FailedStep)"
-      Write-Host "Error Message: $($executionStatus.ErrorMessage)"
-      Write-Host "Exit Code: $($executionStatus.ExitCode)"
-      Write-Host "Completed Steps: $($executionStatus.CompletedSteps -join ', ')"
-      Write-Host "Start Time: $($executionStatus.StartTime)"
-      Write-Host "End Time: $($executionStatus.EndTime)"
-      Write-Host "============================"
-      throw "Script execution failed: $($executionStatus.ErrorMessage)"
+      Invoke-StepFailure -StepName "ExecuteScript_$scriptName" -ExitCode $LASTEXITCODE `
+        -ErrorText "Failed to execute script '$scriptName' on VM '$vmName'. Azure CLI command failed with exit code $LASTEXITCODE"
     }
     $executionStatus.CompletedSteps += "ExecuteScript_$scriptName"
   }
   catch {
-    $executionStatus.Status = "Failure"
-    $executionStatus.FailedStep = "ExecuteScript_$scriptName"
-    $executionStatus.ErrorMessage = "An error occurred during script execution: $_"
-    $executionStatus.ExitCode = 1
-    $executionStatus.EndTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    Write-Host "`n===== EXECUTION STATUS ====="
-    Write-Host "Status: $($executionStatus.Status)"
-    Write-Host "Failed Step: $($executionStatus.FailedStep)"
-    Write-Host "Error Message: $($executionStatus.ErrorMessage)"
-    Write-Host "Exit Code: $($executionStatus.ExitCode)"
-    Write-Host "Completed Steps: $($executionStatus.CompletedSteps -join ', ')"
-    Write-Host "Start Time: $($executionStatus.StartTime)"
-    Write-Host "End Time: $($executionStatus.EndTime)"
-    Write-Host "============================"
     Write-Error "An error occurred during AKS Arc cluster deployment: $_"
     Write-Error "Exception details: $($_.Exception.Message)"
     Write-Error "Stack trace: $($_.ScriptStackTrace)"
-    throw
+    Invoke-StepFailure -StepName "ExecuteScript_$scriptName" `
+      -ErrorText "An error occurred during script execution: $_"
   }
 }
 
@@ -226,11 +154,4 @@ Write-Host "Login to the VM using Bastion or RDP. Wait for MOC install to finish
 
 # Final execution status - Success
 $executionStatus.Status = "Success"
-$executionStatus.EndTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-Write-Host "`n===== EXECUTION STATUS ====="
-Write-Host "Status: $($executionStatus.Status)"
-Write-Host "Exit Code: $($executionStatus.ExitCode)"
-Write-Host "Completed Steps: $($executionStatus.CompletedSteps -join ', ')"
-Write-Host "Start Time: $($executionStatus.StartTime)"
-Write-Host "End Time: $($executionStatus.EndTime)"
-Write-Host "============================"
+Write-ExecutionStatus
