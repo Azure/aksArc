@@ -25,47 +25,9 @@ param (
     [string] $workingDir
 )
 
-# Initialize execution status tracking
-$executionStatus = @{
-  Status = "InProgress"
-  Script = "deployaksarc.ps1"
-  StartTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-  CompletedSteps = @()
-  FailedStep = $null
-  ErrorMessage = ""
-  ExitCode = 0
-}
-
-# Print the execution status block (used on success and failure).
-function Write-ExecutionStatus {
-  $executionStatus.EndTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-  Write-Host "`n===== EXECUTION STATUS ====="
-  Write-Host "Status: $($executionStatus.Status)"
-  if ($executionStatus.Status -eq "Failure") {
-    Write-Host "Failed Step: $($executionStatus.FailedStep)"
-    Write-Host "Error Message: $($executionStatus.ErrorMessage)"
-  }
-  Write-Host "Exit Code: $($executionStatus.ExitCode)"
-  Write-Host "Completed Steps: $($executionStatus.CompletedSteps -join ', ')"
-  Write-Host "Start Time: $($executionStatus.StartTime)"
-  Write-Host "End Time: $($executionStatus.EndTime)"
-  Write-Host "============================"
-}
-
-# Record a failed step, print status, and exit with the given code.
-function Invoke-StepFailure {
-  param(
-    [Parameter(Mandatory = $true)] [string] $StepName,
-    [Parameter(Mandatory = $true)] [string] $ErrorText,
-    [Parameter()] [int] $ExitCode = 1
-  )
-  $executionStatus.Status = "Failure"
-  $executionStatus.FailedStep = $StepName
-  $executionStatus.ErrorMessage = $ErrorText
-  $executionStatus.ExitCode = $ExitCode
-  Write-ExecutionStatus
-  exit $ExitCode
-}
+# Initialize execution status tracking via shared helpers
+. "$PSScriptRoot/status-reporting.ps1"
+Initialize-ExecutionStatus -ScriptName 'deployaksarc.ps1'
 
 if ([string]::IsNullOrEmpty($workingDir)) {
     $workingDir = "E:\AKSArc"
@@ -107,29 +69,17 @@ foreach ($script in $scriptToExecute.GetEnumerator()) {
     $scriptUrl = $script.Key
     $scriptName = $script.Value
     $scriptBaseName = $scriptName.Split(" ")[0]
-
-    $deploymentName = "executescript-$($vmName)-$($scriptBaseName.Replace('.ps1',''))"
-    $commandToExecute = "powershell.exe -ExecutionPolicy Unrestricted -File $scriptName"
-    Write-Host "Executing $commandToExecute  from $scriptUrl on VM $vmName ..."
-    try {
-        az deployment group create --name $deploymentName --resource-group $GroupName --template-file ./configuration/executescript-template.json --parameters location=$Location vmName=$vmName scriptFileUri=$scriptUrl commandToExecute=$commandToExecute # --debug
-        if ($LASTEXITCODE -ne 0) {
-            Invoke-StepFailure -StepName "ExecuteScript_$scriptBaseName" -ExitCode $LASTEXITCODE `
-                -ErrorText "Failed to execute script '$scriptName' on VM '$vmName'. Azure CLI command failed with exit code $LASTEXITCODE"
-        }
-        $executionStatus.CompletedSteps += "ExecuteScript_$scriptBaseName"
-    }
-    catch {
-        Write-Error "An error occurred during AKS Arc cluster deployment: $_"
-        Write-Error "Exception details: $($_.Exception.Message)"
-        Write-Error "Stack trace: $($_.ScriptStackTrace)"
-        Invoke-StepFailure -StepName "ExecuteScript_$scriptBaseName" `
-            -ErrorText "An error occurred during AKS Arc cluster deployment: $_"
-    }
+    Invoke-VmScriptDeployment `
+        -StepName       "ExecuteScript_$scriptBaseName" `
+        -ResourceGroup  $GroupName `
+        -Location       $Location `
+        -VmName         $vmName `
+        -ScriptFileUri  $scriptUrl `
+        -InnerScript    $scriptName
 }
 
 Write-Host "Setup is ready for AKS Arc deployment"
 
 # Final execution status - Success
-$executionStatus.Status = "Success"
+$script:ExecutionStatus.Status = "Success"
 Write-ExecutionStatus

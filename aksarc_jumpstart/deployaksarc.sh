@@ -15,14 +15,10 @@ VM_NAME="jumpstartVM"
 SUBNET_NAME="jumpstartSubnet"
 WORKING_DIR="E:\\AKSArc"
 
-# Initialize execution status tracking
-EXECUTION_STATUS="InProgress"
-SCRIPT_NAME="deployaksarc.sh"
-START_TIME=$(date +'%Y-%m-%d %H:%M:%S')
-COMPLETED_STEPS=()
-FAILED_STEP=""
-ERROR_MESSAGE=""
-EXIT_CODE=0
+# Source shared status reporting helpers (also handles ARM extension failure
+# detection via post-deployment instance view inspection).
+source "$(dirname "$0")/status-reporting.sh"
+init_execution_status "deployaksarc.sh"
 
 # Function to print usage
 usage() {
@@ -48,38 +44,6 @@ usage() {
 # Function to log messages
 log() {
     echo "[$(date +'%Y-%m-%d %H:%M:%S')] $1"
-}
-
-# Function to print execution status
-print_execution_status() {
-    local end_time=$(date +'%Y-%m-%d %H:%M:%S')
-    echo ""
-    echo "===== EXECUTION STATUS ====="
-    echo "Status: $EXECUTION_STATUS"
-    if [[ "$EXECUTION_STATUS" == "Failure" ]]; then
-        echo "Failed Step: $FAILED_STEP"
-        echo "Error Message: $ERROR_MESSAGE"
-    fi
-    echo "Exit Code: $EXIT_CODE"
-    echo "Completed Steps: ${COMPLETED_STEPS[*]}"
-    echo "Start Time: $START_TIME"
-    echo "End Time: $end_time"
-    echo "============================"
-}
-
-# Function to handle errors
-handle_error() {
-    local step_name="$1"
-    local error_msg="$2"
-    local exit_code="${3:-1}"
-    
-    EXECUTION_STATUS="Failure"
-    FAILED_STEP="$step_name"
-    ERROR_MESSAGE="$error_msg"
-    EXIT_CODE="$exit_code"
-    
-    print_execution_status
-    exit "$exit_code"
 }
 
 # Function to check if command exists
@@ -209,10 +173,8 @@ log "  Subscription ID: $SUBSCRIPTION_ID"
 
 # Set the subscription context
 log "Setting Azure subscription context..."
-az account set --subscription "$SUBSCRIPTION_ID"
-if [[ $? -ne 0 ]]; then
-    handle_error "SetSubscription" "Failed to set subscription context to '$SUBSCRIPTION_ID'"
-fi
+az account set --subscription "$SUBSCRIPTION_ID" \
+    || handle_error "SetSubscription" "Failed to set subscription context to '$SUBSCRIPTION_ID'" $?
 
 # Get git repository information
 log "Getting git repository information..."
@@ -225,40 +187,27 @@ log "Script location: $SCRIPT_LOCATION"
 # Check for required template file
 EXEC_TEMPLATE="./configuration/executescript-template.json"
 if [[ ! -f "$EXEC_TEMPLATE" ]]; then
-    echo "Error: Execute script template not found: $EXEC_TEMPLATE"
-    echo "Please ensure all required ARM templates are present in the configuration directory"
-    exit 1
+    handle_error "PreflightChecks" "Execute script template not found: $EXEC_TEMPLATE -- ensure all required ARM templates are present in the configuration directory"
 fi
 
 # Execute deployment scripts on VM in sequence
 log "Executing AKS Arc deployment scripts on VM..."
 
-# Define script execution order and details
+# Wrapper that combines script_name + script_params into the InnerScript form
+# expected by invoke_vm_script_deployment.
 execute_script() {
     local script_name="$1"
     local script_params="$2"
     local script_url="${SCRIPT_LOCATION}/${script_name}"
-    local deployment_name="executescript-${VM_NAME}-${script_name%.*}"
-    local command_to_execute="powershell.exe -ExecutionPolicy Unrestricted -File ${script_name} ${script_params}"
-    
-    log "Executing ${script_name%.*} from $script_url on VM $VM_NAME..."
-    
-    az deployment group create \
-        --name "$deployment_name" \
-        --resource-group "$GROUP_NAME" \
-        --template-file "$EXEC_TEMPLATE" \
-        --parameters \
-            location="$LOCATION" \
-            vmName="$VM_NAME" \
-            scriptFileUri="$script_url" \
-            commandToExecute="$command_to_execute"
-    
-    if [[ $? -ne 0 ]]; then
-        local error_details="Failed to execute script '${script_name}' on VM '$VM_NAME'. This may be due to: MOC not being properly installed, network connectivity issues, Azure resource quota limitations, or previous deployment steps not completed."
-        handle_error "ExecuteScript_${script_name%.*}" "$error_details"
-    fi
-    
-    COMPLETED_STEPS+=("ExecuteScript_${script_name%.*}")
+    local inner_script="${script_name} ${script_params}"
+    invoke_vm_script_deployment \
+        "ExecuteScript_${script_name%.*}" \
+        "$GROUP_NAME" \
+        "$LOCATION" \
+        "$VM_NAME" \
+        "$script_url" \
+        "$inner_script" \
+        "$EXEC_TEMPLATE"
     log "Successfully completed: ${script_name%.*}"
 }
 
