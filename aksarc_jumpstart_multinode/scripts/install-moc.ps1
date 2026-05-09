@@ -34,7 +34,9 @@ try {
     # Build the MOC install script — cloudServiceIP only for multi-node with cluster IP
     $mocConfigParams = "-workingDir '$workingDir' -catalog '$catalog' -ring '$ring'"
     if ($clusterExists) {
-        $mocConfigParams += " -cloudServiceIP '10.0.0.100' -skipValidationCheck"
+        # Note: cloudServiceIP MUST differ from the failover cluster IP (10.0.0.100).
+        # Both must be present as secondary IPs on the host NIC (added in jumpstart.ps1).
+        $mocConfigParams += " -cloudServiceIP '10.0.0.101' -skipValidationCheck"
     }
 
     $scriptContent = @"

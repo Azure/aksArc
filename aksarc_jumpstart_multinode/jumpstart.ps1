@@ -99,8 +99,10 @@ Write-Host "[5/9] Adding secondary IPs for nested VMs..."
 $nicName = az vm show --resource-group $GroupName --name "$vmNamePrefix-1" --query "networkProfile.networkInterfaces[0].id" -o tsv | Split-Path -Leaf
 
 if ($nodeCount -gt 1) {
-    # Cluster IP for multi-node
+    # Cluster IP for multi-node failover cluster
     az network nic ip-config create --resource-group $GroupName --nic-name $nicName --name clusterIP --private-ip-address 10.0.0.100 -o none
+    # MOC cloudServiceIP — must be distinct from the cluster IP
+    az network nic ip-config create --resource-group $GroupName --nic-name $nicName --name mocCloudServiceIP --private-ip-address 10.0.0.101 -o none
 }
 
 # k8s node IPs (10.0.0.10-30) — nested VMs need these IPs assigned to the Azure NIC
