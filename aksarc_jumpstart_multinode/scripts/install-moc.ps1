@@ -36,7 +36,8 @@ try {
     if ($clusterExists) {
         # Note: cloudServiceIP MUST differ from the failover cluster IP (10.0.0.100).
         # Both must be present as secondary IPs on the host NIC (added in jumpstart.ps1).
-        $mocConfigParams += " -cloudServiceIP '10.0.0.101' -skipValidationCheck"
+        # cloudFqdn must be set to the IP itself for AD-less clusters (no DNS domain).
+        $mocConfigParams += " -cloudServiceIP '10.0.0.101' -cloudFqdn '10.0.0.101' -skipValidationCheck"
     }
 
     $scriptContent = @"
