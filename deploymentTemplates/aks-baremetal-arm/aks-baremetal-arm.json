@@ -1,0 +1,345 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "description": "AKS Arc on Bare Metal Linux — Cluster Creation ARM Template. Creates an AKS Arc cluster on a bare metal Linux edge machine that is already in the Provisioned state. Achieves parity with the portal UX creation flow."
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "eastus",
+      "allowedValues": ["eastus"],
+      "metadata": {
+        "description": "Azure region. Must match the edge machine region."
+      }
+    },
+    "clusterName": {
+      "type": "string",
+      "defaultValue": "my-aks-on-baremetal-cluster",
+      "metadata": {
+        "description": "Name for the AKS Arc cluster."
+      }
+    },
+    "kubernetesVersion": {
+      "type": "string",
+      "defaultValue": "1.34.3-20260204",
+      "metadata": {
+        "description": "Kubernetes version (e.g., 1.34.3-20260204)."
+      }
+    },
+    "controlPlaneIp": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Static IP for the Kubernetes API server. Leave empty for auto-assignment."
+      }
+    },
+    "enableAzureRbac": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Enable Azure RBAC for Kubernetes authorization."
+      }
+    },
+    "adminGroupObjectIds": {
+      "type": "array",
+      "metadata": {
+        "description": "Entra ID group Object IDs for cluster admin access."
+      }
+    },
+    "sshPublicKey": {
+      "type": "string",
+      "metadata": {
+        "description": "SSH public key for node access (e.g., contents of ~/.ssh/id_rsa.pub). Required by the AksArc-Operator webhook."
+      }
+    },
+    "enableAzurePolicy": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Auto-enable Azure Policy extension."
+      }
+    },
+    "enableContainerMonitoring": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Auto-enable Container Monitoring extension."
+      }
+    },
+    "logAnalyticsWorkspaceId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Log Analytics workspace resource ID. Required if enableContainerMonitoring is true."
+      }
+    },
+    "tags": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Azure resource tags applied to all created resources."
+      }
+    },
+    "edgeMachineName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the existing EdgeMachine resource (must be in Provisioned state)."
+      }
+    },
+    "devicePoolName": {
+      "type": "string",
+      "defaultValue": "[parameters('edgeMachineName')]",
+      "metadata": {
+        "description": "Name for the DevicePool resource. Defaults to the edge machine name."
+      }
+    },
+    "customLocationName": {
+      "type": "string",
+      "defaultValue": "[parameters('edgeMachineName')]",
+      "metadata": {
+        "description": "Name for the CustomLocation created by HCI RP during DevicePool provisioning."
+      }
+    }
+  },
+  "variables": {
+    "controlPlaneCount": 1,
+    "podCidr": "10.244.0.0/16",
+    "lnetName": "[format('{0}-lnet', parameters('clusterName'))]",
+    "lnetAddressPrefix": "10.0.0.0/24",
+    "lnetGateway": "10.0.0.1",
+    "lnetIpPoolStart": "10.0.0.2",
+    "lnetIpPoolEnd": "10.0.0.10",
+    "lnetVmSwitchName": "PlaceholderSwitch",
+    "edgeMachineResourceId": "[resourceId('Microsoft.AzureStackHCI/EdgeMachines', parameters('edgeMachineName'))]",
+    "customLocationResourceId": "[resourceId('Microsoft.ExtendedLocation/customLocations', parameters('customLocationName'))]",
+    "mergedTags": "[union(parameters('tags'), createObject('aks-arc-cluster', parameters('clusterName'), 'purpose', 'aks-arc-bmlinux'))]",
+    "connectedClusterName": "[parameters('clusterName')]",
+    "devicePoolManagerRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'adc3c795-c41e-4a89-a478-0b321783324c')]",
+    "edgeMachineContributorRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '1a6f9009-515c-4455-b170-143e4c9ce229')]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.AzureStackHCI/devicePools",
+      "apiVersion": "2024-11-01-preview",
+      "name": "[parameters('devicePoolName')]",
+      "location": "[parameters('location')]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "devices": [
+          {
+            "deviceResourceId": "[variables('edgeMachineResourceId')]"
+          }
+        ],
+        "customLocationName": "[parameters('customLocationName')]"
+      },
+      "tags": "[variables('mergedTags')]"
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "name": "[guid(resourceId('Microsoft.AzureStackHCI/devicePools', parameters('devicePoolName')), 'dpManager', variables('devicePoolManagerRoleId'))]",
+      "scope": "[format('Microsoft.AzureStackHCI/devicePools/{0}', parameters('devicePoolName'))]",
+      "dependsOn": [
+        "[resourceId('Microsoft.AzureStackHCI/devicePools', parameters('devicePoolName'))]"
+      ],
+      "properties": {
+        "roleDefinitionId": "[variables('devicePoolManagerRoleId')]",
+        "principalId": "[reference(resourceId('Microsoft.AzureStackHCI/devicePools', parameters('devicePoolName')), '2024-11-01-preview', 'full').identity.principalId]",
+        "principalType": "ServicePrincipal",
+        "description": "DevicePool MSI needs Device Pool Manager role for CAPE operations"
+      }
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "name": "[guid(variables('edgeMachineResourceId'), 'emContributor', variables('edgeMachineContributorRoleId'))]",
+      "scope": "[format('Microsoft.AzureStackHCI/EdgeMachines/{0}', parameters('edgeMachineName'))]",
+      "dependsOn": [
+        "[resourceId('Microsoft.AzureStackHCI/devicePools', parameters('devicePoolName'))]"
+      ],
+      "properties": {
+        "roleDefinitionId": "[variables('edgeMachineContributorRoleId')]",
+        "principalId": "[reference(resourceId('Microsoft.AzureStackHCI/devicePools', parameters('devicePoolName')), '2024-11-01-preview', 'full').identity.principalId]",
+        "principalType": "ServicePrincipal",
+        "description": "DevicePool MSI needs Edge Machine Contributor role for CAPE lifecycle operations"
+      }
+    },
+    {
+      "type": "Microsoft.AzureStackHCI/logicalNetworks",
+      "apiVersion": "2024-01-01",
+      "name": "[variables('lnetName')]",
+      "location": "[parameters('location')]",
+      "extendedLocation": {
+        "type": "CustomLocation",
+        "name": "[variables('customLocationResourceId')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.AzureStackHCI/devicePools', parameters('devicePoolName'))]"
+      ],
+      "properties": {
+        "subnets": [
+          {
+            "name": "default",
+            "properties": {
+              "addressPrefix": "[variables('lnetAddressPrefix')]",
+              "ipAllocationMethod": "Static",
+              "ipPools": [
+                {
+                  "start": "[variables('lnetIpPoolStart')]",
+                  "end": "[variables('lnetIpPoolEnd')]"
+                }
+              ],
+              "routeTable": {
+                "properties": {
+                  "routes": [
+                    {
+                      "name": "default",
+                      "properties": {
+                        "addressPrefix": "0.0.0.0/0",
+                        "nextHopIpAddress": "[variables('lnetGateway')]"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        "vmSwitchName": "[variables('lnetVmSwitchName')]"
+      },
+      "tags": "[variables('mergedTags')]"
+    },
+    {
+      "type": "Microsoft.Kubernetes/connectedClusters",
+      "apiVersion": "2024-01-01",
+      "name": "[variables('connectedClusterName')]",
+      "location": "[parameters('location')]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "kind": "ProvisionedCluster",
+      "dependsOn": [
+        "[resourceId('Microsoft.AzureStackHCI/logicalNetworks', variables('lnetName'))]"
+      ],
+      "properties": {
+        "agentPublicKeyCertificate": "",
+        "aadProfile": {
+          "enableAzureRBAC": "[parameters('enableAzureRbac')]",
+          "adminGroupObjectIDs": "[parameters('adminGroupObjectIds')]"
+        }
+      },
+      "tags": "[variables('mergedTags')]"
+    },
+    {
+      "type": "Microsoft.HybridContainerService/provisionedClusterInstances",
+      "apiVersion": "2024-09-01-preview",
+      "name": "default",
+      "scope": "[format('Microsoft.Kubernetes/connectedClusters/{0}', variables('connectedClusterName'))]",
+      "extendedLocation": {
+        "type": "CustomLocation",
+        "name": "[variables('customLocationResourceId')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Kubernetes/connectedClusters', variables('connectedClusterName'))]"
+      ],
+      "properties": {
+        "kubernetesVersion": "[parameters('kubernetesVersion')]",
+        "controlPlane": "[if(empty(parameters('controlPlaneIp')), createObject('count', variables('controlPlaneCount')), createObject('count', variables('controlPlaneCount'), 'controlPlaneEndpoint', createObject('hostIP', parameters('controlPlaneIp'))))]",
+        "networkProfile": {
+          "podCidr": "[variables('podCidr')]",
+          "loadBalancerProfile": {
+            "count": 0
+          }
+        },
+        "cloudProviderProfile": {
+          "infraNetworkProfile": {
+            "vnetSubnetIds": [
+              "[resourceId('Microsoft.AzureStackHCI/logicalNetworks', variables('lnetName'))]"
+            ]
+          }
+        },
+        "agentPoolProfiles": [],
+        "linuxProfile": {
+          "ssh": {
+            "publicKeys": [
+              {
+                "keyData": "[parameters('sshPublicKey')]"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "condition": "[parameters('enableAzurePolicy')]",
+      "type": "Microsoft.KubernetesConfiguration/extensions",
+      "apiVersion": "2023-05-01",
+      "name": "azure-policy",
+      "scope": "[format('Microsoft.Kubernetes/connectedClusters/{0}', variables('connectedClusterName'))]",
+      "dependsOn": [
+        "[extensionResourceId(resourceId('Microsoft.Kubernetes/connectedClusters', variables('connectedClusterName')), 'Microsoft.HybridContainerService/provisionedClusterInstances', 'default')]"
+      ],
+      "properties": {
+        "extensionType": "microsoft.policyinsights",
+        "autoUpgradeMinorVersion": true
+      }
+    },
+    {
+      "condition": "[and(parameters('enableContainerMonitoring'), not(empty(parameters('logAnalyticsWorkspaceId'))))]",
+      "type": "Microsoft.KubernetesConfiguration/extensions",
+      "apiVersion": "2023-05-01",
+      "name": "azuremonitor-containers",
+      "scope": "[format('Microsoft.Kubernetes/connectedClusters/{0}', variables('connectedClusterName'))]",
+      "dependsOn": [
+        "[extensionResourceId(resourceId('Microsoft.Kubernetes/connectedClusters', variables('connectedClusterName')), 'Microsoft.HybridContainerService/provisionedClusterInstances', 'default')]"
+      ],
+      "properties": {
+        "extensionType": "microsoft.azuremonitor.containers",
+        "autoUpgradeMinorVersion": true,
+        "configurationSettings": {
+          "logAnalyticsWorkspaceResourceID": "[parameters('logAnalyticsWorkspaceId')]"
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "connectedClusterId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Kubernetes/connectedClusters', variables('connectedClusterName'))]",
+      "metadata": {
+        "description": "Resource ID of the Connected Cluster."
+      }
+    },
+    "provisionedClusterId": {
+      "type": "string",
+      "value": "[extensionResourceId(resourceId('Microsoft.Kubernetes/connectedClusters', variables('connectedClusterName')), 'Microsoft.HybridContainerService/provisionedClusterInstances', 'default')]",
+      "metadata": {
+        "description": "Resource ID of the Provisioned Cluster Instance."
+      }
+    },
+    "devicePoolId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.AzureStackHCI/devicePools', parameters('devicePoolName'))]",
+      "metadata": {
+        "description": "Resource ID of the DevicePool."
+      }
+    },
+    "customLocationId": {
+      "type": "string",
+      "value": "[variables('customLocationResourceId')]",
+      "metadata": {
+        "description": "Resource ID of the CustomLocation (created by HCI RP)."
+      }
+    },
+    "devicePoolPrincipalId": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.AzureStackHCI/devicePools', parameters('devicePoolName')), '2024-11-01-preview', 'full').identity.principalId]",
+      "metadata": {
+        "description": "DevicePool Managed Identity principal ID."
+      }
+    }
+  }
+}
