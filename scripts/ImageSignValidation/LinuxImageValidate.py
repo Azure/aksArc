@@ -5,6 +5,16 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
+# Resolve trusted paths relative to this script's own directory rather than the
+# caller's current working directory. This prevents an attacker who controls the
+# launch directory from planting a malicious `notation` binary (or cert/policy
+# files) that would run as the script user and fake successful signature
+# verification. Mirrors the $PSScriptRoot pattern used by WindowsImageValidate.ps1.
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+NOTATION = os.path.join(SCRIPT_DIR, "notation")
+CA_CERT = os.path.join(SCRIPT_DIR, "ca.crt")
+TSA_CERT = os.path.join(SCRIPT_DIR, "tsa.crt")
+
 def run_command(command):
     try:
         subprocess.run(command, check=True, capture_output=True, text=True)
@@ -30,22 +40,23 @@ def verify_image(image):
     }
 
     trust_json = json.dumps(trust_data)
-    with open("trust.json", "w") as f:
+    trust_path = os.path.join(SCRIPT_DIR, "trust.json")
+    with open(trust_path, "w") as f:
         f.write(trust_json)
 
-    run_command(["./notation", "policy", "import", "trust.json", "--force"])
-    run_command(["./notation", "policy", "show"])
-    result = run_command(["./notation", "verify", image, "--verbose"])
+    run_command([NOTATION, "policy", "import", trust_path, "--force"])
+    run_command([NOTATION, "policy", "show"])
+    result = run_command([NOTATION, "verify", image, "--verbose"])
     if not result:
-        run_command(["./notation", "inspect", image, "--verbose"])
-    os.remove("trust.json")
+        run_command([NOTATION, "inspect", image, "--verbose"])
+    os.remove(trust_path)
     return result
 
-def ensure_certs(cert_type, store, cert_name):
-    result = subprocess.run(["./notation", "cert", "ls", "--type", cert_type, "--store", store, cert_name], capture_output=True, text=True, check=True)
+def ensure_certs(cert_type, store, cert_name, cert_path):
+    result = subprocess.run([NOTATION, "cert", "ls", "--type", cert_type, "--store", store, cert_name], capture_output=True, text=True, check=True)
     if not result.stdout.strip():
-        run_command(["./notation", "cert", "add", "--type", cert_type, "--store", store, cert_name])
-        run_command(["./notation", "cert", "ls", "--type", cert_type])
+        run_command([NOTATION, "cert", "add", "--type", cert_type, "--store", store, cert_path])
+        run_command([NOTATION, "cert", "ls", "--type", cert_type])
 
 def get_crictl_images_with_none_tag():
     # Run the crictl command and capture the output
@@ -63,8 +74,8 @@ def get_crictl_images_with_none_tag():
 
 def ensure_trust():
     tool_name = "notation"
-    ensure_certs("ca", "supplychain", "ca.crt")
-    ensure_certs("tsa", "esrp", "tsa.crt")
+    ensure_certs("ca", "supplychain", "ca.crt", CA_CERT)
+    ensure_certs("tsa", "esrp", "tsa.crt", TSA_CERT)
 
     images = get_crictl_images_with_none_tag()
     failed_images = []
