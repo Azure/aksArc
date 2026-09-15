@@ -160,4 +160,4 @@ export clusterName="$(hostname)-cluster"
 az aksarc show -g "$resourceGroup" -n "$clusterName"
 az aksarc show -g "$resourceGroup" -n "$clusterName"  --query "properties.provisioningState" -o tsv 
 
-echo "### Successfully created AKS bare metal cluster in Azure resourceGroup=$resourceGroup, clusterName=$clusterName, subscriptionId=$subscriptonId, tenantId=$tenantId"
+echo "### Successfully created AKS bare metal cluster in Azure resourceGroup=$resourceGroup, clusterName=$clusterName, subscriptionId=$subscriptionId, tenantId=$tenantId"
