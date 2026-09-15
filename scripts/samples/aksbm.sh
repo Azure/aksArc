@@ -149,19 +149,14 @@ az extension add --name connectedk8s
 az extension add --name connectedmachine
 
 echo "### Installing AKS Arc CLI extension"
-az extension add \
-  --source https://hybridaksstorage.z13.web.core.windows.net/HybridAKS/CLI/aksarc-2.0.0b21-py3-none-any.whl \
-  --yes
+az extension add --source https://hybridaksstorage.z13.web.core.windows.net/HybridAKS/CLI/aksarc-2.0.0b21-py3-none-any.whl --yes
 az extension show --name aksarc --query version -o tsv
 
 echo "### Provision AKS bare metal cluster using the resource group and Arc server machine name"
-az aksarc deploy \
-  -g "$resourceGroup" \
-  --arc-machine-names $(hostname) \
-  -y
+az aksarc deploy -g "$resourceGroup" --arc-machine-names $(hostname) -y
 
 echo "### Show AKS bare metal resource properties and provisioning status"
 export clusterName="$(hostname)-cluster"
 az aksarc show -g "$resourceGroup" -n "$clusterName"  --query "properties.provisioningState" -o tsv 
 
-echo "### Successfully created AKS bare metal cluster"
+echo "### Successfully created AKS bare metal cluster in Azure resourceGroup=$resourceGroup, clusterName=$clusterName using subscriptionId=$subscriptonId and tenantId=$tenantId"
