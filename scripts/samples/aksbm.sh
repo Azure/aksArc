@@ -77,7 +77,8 @@ fi
 
 echo "### Azure CLI is installed. Logging in to Azure using the subscription and tenant id"
 if ! az account show &> /dev/null; then
-		echo "### Logging into Azure using subscription $subscriptionId and tenantid $tenantId."
+		echo "### Logging into Azure with device code flow using subscription $subscriptionId and tenantid $tenantId."
+		echo "### If device code flow needs exception follow https://eng.ms/docs/microsoft-security/ciso-organization/iamprotect/enterprise-iam/productivity-environment/tsgs/devicecodeflowdcfrestrictions"
         az login -s "$subscriptionId" -t "$tenantId" --use-device-code
 fi
 # Check if Azure CLI is logged in without printing output to the terminal
