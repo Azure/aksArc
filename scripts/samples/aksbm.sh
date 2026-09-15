@@ -157,7 +157,7 @@ az aksarc deploy -g "$resourceGroup" --arc-machine-names $(hostname) -y
 
 echo "### Show AKS bare metal resource properties and provisioning status"
 export clusterName="$(hostname)-cluster"
-az aksarc show -g "$resourceGroup" -n "$clusterName"
+# az aksarc show -g "$resourceGroup" -n "$clusterName"
 az aksarc show -g "$resourceGroup" -n "$clusterName"  --query "properties.provisioningState" -o tsv 
 
 echo "### Successfully created AKS bare metal cluster in Azure resourceGroup=$resourceGroup, clusterName=$clusterName, subscriptionId=$subscriptionId, tenantId=$tenantId"
