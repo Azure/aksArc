@@ -76,11 +76,14 @@ if ! command -v az &> /dev/null; then
 fi
 
 echo "### Azure CLI is installed. Logging in to Azure using the subscription and tenant id"
-az login -s "$subscriptionId" -t "$tenantId" 
+if ! az account show &> /dev/null; then
+		echo "### Logging into Azure using subscription $subscriptionId and tenantid $tenantId."
+        az login -s "$subscriptionId" -t "$tenantId"
+fi
 # Check if Azure CLI is logged in without printing output to the terminal
 if az account show &> /dev/null; then
     echo "### Azure login is active and successful."
-#     az account show
+    az account show
 else
     echo "### Error: Not logged in. Please run 'az login'."
     exit 1
