@@ -82,7 +82,7 @@ if ! az account show &> /dev/null; then
 fi
 # Check if Azure CLI is logged in without printing output to the terminal
 if az account show &> /dev/null; then
-    echo "### Azure login is active and successful."
+    echo "### Azure login is active and successful using following context."
     az account show
 else
     echo "### Error: Not logged in. Please run 'az login'."
@@ -116,7 +116,7 @@ else
 fi
 
 if ! command -v azcmagent show &> /dev/null; then
-    echo "### Running Arc enabled Server connect to Azure command"
+    echo "### Running Arc enabled Server connect to Azure command using resourceGroup=$resourceGroup, subscription=$subscriptionId, tenantId=$tenantId and location=$location"
     sudo azcmagent connect --resource-group "$resourceGroup" --tenant-id "$tenantId" --location "$location" --subscription-id "$subscriptionId" --cloud "$cloud" --enable-automatic-upgrade;
 else
     export agentStatus="";
@@ -128,7 +128,7 @@ else
     done < <(azcmagent show)
 
     if [[ "$agentStatus" != "Connected" ]]; then
-        echo "### Running Arc enabled Server connect to Azure command"
+        echo "### Running Arc enabled Server connect to Azure command using resourceGroup=$resourceGroup, subscription=$subscriptionId, tenantId=$tenantId and location=$location""
         sudo azcmagent connect --resource-group "$resourceGroup" --tenant-id "$tenantId" --location "$location" --subscription-id "$subscriptionId" --cloud "$cloud" --enable-automatic-upgrade;
     fi
 fi
@@ -152,11 +152,12 @@ echo "### Installing AKS Arc CLI extension"
 az extension add --source https://hybridaksstorage.z13.web.core.windows.net/HybridAKS/CLI/aksarc-2.0.0b21-py3-none-any.whl --yes
 az extension show --name aksarc --query version -o tsv
 
-echo "### Provision AKS bare metal cluster using the resource group and Arc server machine name"
+echo "### Provision AKS bare metal cluster using resourceGroup=$resourceGroup, and arcMachineName=$(hostname)"
 az aksarc deploy -g "$resourceGroup" --arc-machine-names $(hostname) -y
 
 echo "### Show AKS bare metal resource properties and provisioning status"
 export clusterName="$(hostname)-cluster"
+az aksarc show -g "$resourceGroup" -n "$clusterName"
 az aksarc show -g "$resourceGroup" -n "$clusterName"  --query "properties.provisioningState" -o tsv 
 
 echo "### Successfully created AKS bare metal cluster in Azure resourceGroup=$resourceGroup, clusterName=$clusterName using subscriptionId=$subscriptonId and tenantId=$tenantId"
