@@ -25,7 +25,7 @@ usage() {
     echo "  -t <tenant-id>     Specify the tenant ID to use"
     echo "  -h                    Display this help message"
 	echo "Example1: curl -sSL https://aka.ms/aksbm | bash -s -- -s subscription-id -t tenant-id"
-	echo "Example2: wget https://aka.ms/aksbm -O aksbm.sh; ./aksbm.sh -s subscription-id -t tenant-id"
+	echo "Example2: wget https://aka.ms/aksbm -O aksbm.sh; chmod +x aksbm.sh; ./aksbm.sh -s subscription-id -t tenant-id"
 }
 
 goto() {
