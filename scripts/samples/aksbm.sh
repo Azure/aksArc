@@ -24,6 +24,8 @@ usage() {
     echo "  -s <subscription-id>     Specify the subscription to use"
     echo "  -t <tenant-id>     Specify the tenant ID to use"
     echo "  -h                    Display this help message"
+	echo "Example1: curl -sSL https://aka.ms/aksbm | bash -s -- -s subscription-id -t tenant-id"
+	echo "Example2: wget https://aka.ms/aksbm -O aksbm.sh; ./aksbm.sh -s subscription-id -t tenant-id"
 }
 
 goto() {
@@ -78,8 +80,8 @@ fi
 echo "### Azure CLI is installed. Logging in to Azure using the subscription and tenant id"
 if ! az account show &> /dev/null; then
 		echo "### Logging into Azure with device code flow using subscription $subscriptionId and tenantid $tenantId."
-		echo "### If device code flow needs exception follow https://eng.ms/docs/microsoft-security/ciso-organization/iamprotect/enterprise-iam/productivity-environment/tsgs/devicecodeflowdcfrestrictions"
-        az login -s "$subscriptionId" -t "$tenantId" --use-device-code
+		echo "### Device code flow needs exception https://eng.ms/docs/microsoft-security/ciso-organization/iamprotect/enterprise-iam/productivity-environment/tsgs/devicecodeflowdcfrestrictions"
+        az login -s "$subscriptionId" -t "$tenantId"
 fi
 # Check if Azure CLI is logged in without printing output to the terminal
 if az account show &> /dev/null; then
@@ -149,8 +151,8 @@ echo "### Add Azure Arc CLI extensions"
 az extension add --name connectedk8s
 az extension add --name connectedmachine
 
-echo "### Installing AKS Arc CLI extension"
-az extension add --source https://hybridaksstorage.z13.web.core.windows.net/HybridAKS/CLI/aksarc-2.0.0b21-py3-none-any.whl --yes
+echo "### Upgrading AKS Arc CLI extension"
+az extension add --name aksarc --upgrade
 az extension show --name aksarc --query version -o tsv
 
 echo "### Provision AKS bare metal cluster with resourceGroup=$resourceGroup, and arcMachineName=$(hostname)"
