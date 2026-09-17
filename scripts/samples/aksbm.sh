@@ -24,6 +24,8 @@ usage() {
     echo "  -s <subscription-id>     Specify the subscription to use"
     echo "  -t <tenant-id>     Specify the tenant ID to use"
     echo "  -h                    Display this help message"
+	echo "Example1: curl -sSL https://aka.ms/aksbm | bash -s -- -s subscription-id -t tenant-id"
+	echo "Example2: wget https://aka.ms/aksbm -O aksbm.sh; chmod +x aksbm.sh; ./aksbm.sh -s subscription-id -t tenant-id"
 }
 
 goto() {
@@ -76,11 +78,15 @@ if ! command -v az &> /dev/null; then
 fi
 
 echo "### Azure CLI is installed. Logging in to Azure using the subscription and tenant id"
-az login -s "$subscriptionId" -t "$tenantId" 
+if ! az account show &> /dev/null; then
+		echo "### Logging into Azure with device code flow using subscription $subscriptionId and tenantid $tenantId."
+		echo "### Device code flow needs exception https://eng.ms/docs/microsoft-security/ciso-organization/iamprotect/enterprise-iam/productivity-environment/tsgs/devicecodeflowdcfrestrictions"
+        az login -s "$subscriptionId" -t "$tenantId"
+fi
 # Check if Azure CLI is logged in without printing output to the terminal
 if az account show &> /dev/null; then
-    echo "### Azure login is active and successful."
-#     az account show
+    echo "### Azure login is active and successful using following context."
+    az account show
 else
     echo "### Error: Not logged in. Please run 'az login'."
     exit 1
@@ -113,7 +119,7 @@ else
 fi
 
 if ! command -v azcmagent show &> /dev/null; then
-    echo "### Running Arc enabled Server connect to Azure command"
+    echo "### Running Arc enabled Server connect to Azure command with resourceGroup=$resourceGroup, subscription=$subscriptionId, tenantId=$tenantId, location=$location"
     sudo azcmagent connect --resource-group "$resourceGroup" --tenant-id "$tenantId" --location "$location" --subscription-id "$subscriptionId" --cloud "$cloud" --enable-automatic-upgrade;
 else
     export agentStatus="";
@@ -125,7 +131,7 @@ else
     done < <(azcmagent show)
 
     if [[ "$agentStatus" != "Connected" ]]; then
-        echo "### Running Arc enabled Server connect to Azure command"
+        echo "### Running Arc enabled Server connect to Azure command with resourceGroup=$resourceGroup, subscription=$subscriptionId, tenantId=$tenantId, location=$location"
         sudo azcmagent connect --resource-group "$resourceGroup" --tenant-id "$tenantId" --location "$location" --subscription-id "$subscriptionId" --cloud "$cloud" --enable-automatic-upgrade;
     fi
 fi
@@ -145,20 +151,17 @@ echo "### Add Azure Arc CLI extensions"
 az extension add --name connectedk8s
 az extension add --name connectedmachine
 
-echo "### Installing AKS Arc CLI extension"
-az extension add \
-  --source https://hybridaksstorage.z13.web.core.windows.net/HybridAKS/CLI/aksarc-2.0.0b21-py3-none-any.whl \
-  --yes
+echo "### Upgrading AKS Arc CLI extension"
+az extension add --source https://hybridaksstorage.z13.web.core.windows.net/HybridAKS/CLI/aksarc-2.0.0b21-py3-none-any.whl --yes
+# az extension add --name aksarc --upgrade
 az extension show --name aksarc --query version -o tsv
 
-echo "### Provision AKS bare metal cluster using the resource group and Arc server machine name"
-az aksarc deploy \
-  -g "$resourceGroup" \
-  --arc-machine-names $(hostname) \
-  -y
+echo "### Provision AKS bare metal cluster with resourceGroup=$resourceGroup, and arcMachineName=$(hostname)"
+az aksarc deploy -g "$resourceGroup" --arc-machine-names $(hostname) -y
 
 echo "### Show AKS bare metal resource properties and provisioning status"
 export clusterName="$(hostname)-cluster"
+# az aksarc show -g "$resourceGroup" -n "$clusterName"
 az aksarc show -g "$resourceGroup" -n "$clusterName"  --query "properties.provisioningState" -o tsv 
 
-echo "### Successfully created AKS bare metal cluster"
+echo "### Successfully created AKS bare metal cluster in Azure resourceGroup=$resourceGroup, clusterName=$clusterName, subscriptionId=$subscriptionId, tenantId=$tenantId"
