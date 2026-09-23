@@ -157,7 +157,11 @@ az extension add --name aksarc --upgrade --allow-preview True
 az extension show --name aksarc --query version -o tsv
 
 echo "### Provision AKS bare metal cluster with resourceGroup=$resourceGroup, and arcMachineName=$(hostname)"
-az aksarc deploy -g "$resourceGroup" --arc-machine-names $(hostname) -y
+if [[ "$tenantId" == "72f988bf-86f1-41af-91ab-2d7cd011db47" ]]; then
+   az aksarc deploy -g "$resourceGroup" --arc-machine-names $(hostname) --hci-rp-object-id f57be460-ae5d-444a-9317-bbfa416ab4b9 -y
+else
+   az aksarc deploy -g "$resourceGroup" --arc-machine-names $(hostname) -y
+fi
 
 echo "### Show AKS bare metal resource properties and provisioning status"
 export clusterName="$(hostname)-cluster"
