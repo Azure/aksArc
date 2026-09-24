@@ -73,15 +73,17 @@ fi
 if ! command -v az &> /dev/null; then
     echo "### Error: Azure CLI (az) is not installed."
     echo "### Downloading and installing Azure CLI"
-    curl -fsSL 'https://azurecliprod.blob.core.windows.net/$root/deb_install.sh' | sudo bash
-#    echo "Please install it by visiting: https://learn.microsoft.com/en-us/cli/azure/install-azure-cli"
+    if ! command -v curl -fsSL 'https://azurecliprod.blob.core.windows.net/$root/deb_install.sh' | sudo bash &> /dev/null; then
+	    echo "Please install it by visiting: https://learn.microsoft.com/en-us/cli/azure/install-azure-cli"
+		exit 1
+	fi
 fi
 
 echo "### Azure CLI is installed. Logging in to Azure using the subscription and tenant id"
 if ! az account show &> /dev/null; then
 		echo "### Logging into Azure with device code flow using subscription $subscriptionId and tenantid $tenantId."
 		echo "### Device code flow needs exception https://eng.ms/docs/microsoft-security/ciso-organization/iamprotect/enterprise-iam/productivity-environment/tsgs/devicecodeflowdcfrestrictions"
-        az login -s "$subscriptionId" -t "$tenantId"
+        az login -s "$subscriptionId" -t "$tenantId" --use-device-id
 fi
 # Check if Azure CLI is logged in without printing output to the terminal
 if az account show &> /dev/null; then
