@@ -73,8 +73,9 @@ fi
 if ! command -v az &> /dev/null; then
     echo "### Error: Azure CLI (az) is not installed."
     echo "### Downloading and installing Azure CLI"
+	echo "### Please refer: https://learn.microsoft.com/en-us/cli/azure/install-azure-cli"
     if ! command -v curl -fsSL 'https://azurecliprod.blob.core.windows.net/$root/deb_install.sh' | sudo bash &> /dev/null; then
-	    echo "Please install it by visiting: https://learn.microsoft.com/en-us/cli/azure/install-azure-cli"
+	    echo "### Please install it by visiting: https://learn.microsoft.com/en-us/cli/azure/install-azure-cli"
 		exit 1
 	fi
 fi
@@ -131,6 +132,7 @@ if ! command -v azcmagent show &> /dev/null; then
     sudo azcmagent connect --resource-group "$resourceGroup" --tenant-id "$tenantId" --location "$location" --subscription-id "$subscriptionId" --cloud "$cloud" --enable-automatic-upgrade;
     if [ $? -ne 0 ]; then
     	echo "### Arc enable machine failed. Please refer to https://learn.microsoft.com/en-us/azure/azure-arc/servers/quick-enable-hybrid-vm"
+		exit 1
 	fi
 else
     export agentStatus="";
