@@ -84,6 +84,10 @@ if ! az account show &> /dev/null; then
 		echo "### Logging into Azure with device code flow using subscription $subscriptionId and tenantid $tenantId."
 		echo "### Device code flow needs exception https://eng.ms/docs/microsoft-security/ciso-organization/iamprotect/enterprise-iam/productivity-environment/tsgs/devicecodeflowdcfrestrictions"
         az login -s "$subscriptionId" -t "$tenantId" --use-device-code
+		if [ $? -ne 0 ]; then
+    		echo "### az login failed. Please refer to https://learn.microsoft.com/en-us/cli/azure/authenticate-azure-cli-interactively?view=azure-cli-latest"
+			exit 1
+		fi
 fi
 # Check if Azure CLI is logged in without printing output to the terminal
 if az account show &> /dev/null; then
@@ -123,6 +127,9 @@ fi
 if ! command -v azcmagent show &> /dev/null; then
     echo "### Running Arc enabled Server connect to Azure command with resourceGroup=$resourceGroup, subscription=$subscriptionId, tenantId=$tenantId, location=$location"
     sudo azcmagent connect --resource-group "$resourceGroup" --tenant-id "$tenantId" --location "$location" --subscription-id "$subscriptionId" --cloud "$cloud" --enable-automatic-upgrade;
+    if [ $? -ne 0 ]; then
+    	echo "### Arc enable machine failed. Please refer to https://learn.microsoft.com/en-us/azure/azure-arc/servers/quick-enable-hybrid-vm"
+	fi
 else
     export agentStatus="";
     while IFS=':' read -r field1 field2; do
@@ -163,6 +170,10 @@ if [[ "$tenantId" == "72f988bf-86f1-41af-91ab-2d7cd011db47" ]]; then
    az aksarc deploy -g "$resourceGroup" --arc-machine-names $(hostname) --hci-rp-object-id f57be460-ae5d-444a-9317-bbfa416ab4b9 -y
 else
    az aksarc deploy -g "$resourceGroup" --arc-machine-names $(hostname) -y
+fi
+if [ $? -ne 0 ]; then
+   	echo "### AKS bare metal provisioning failed. Please refer to https://learn.microsoft.com/en-us/azure/aks-hybrid-edge/bare-metal/aks-bare-metal-overview"
+	exit 1
 fi
 
 echo "### Show AKS bare metal resource properties and provisioning status"
