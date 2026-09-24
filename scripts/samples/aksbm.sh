@@ -81,7 +81,8 @@ fi
 
 echo "### Azure CLI is installed. Logging in to Azure using the subscription and tenant id"
 if ! az account show &> /dev/null; then
-		echo "### Logging into Azure with device code flow using subscription $subscriptionId and tenantid $tenantId."
+		echo "### Logging into Azure with device code flow using subscription $subscriptionId and tenantid $tenantId." 
+		echo "### Please refer to https://learn.microsoft.com/en-us/cli/azure/authenticate-azure-cli-interactively?view=azure-cli-latest"
 		echo "### Device code flow needs exception https://eng.ms/docs/microsoft-security/ciso-organization/iamprotect/enterprise-iam/productivity-environment/tsgs/devicecodeflowdcfrestrictions"
         az login -s "$subscriptionId" -t "$tenantId" --use-device-code
 		if [ $? -ne 0 ]; then
@@ -125,7 +126,8 @@ else
 fi
 
 if ! command -v azcmagent show &> /dev/null; then
-    echo "### Running Arc enabled Server connect to Azure command with resourceGroup=$resourceGroup, subscription=$subscriptionId, tenantId=$tenantId, location=$location"
+    echo "### Running Arc enabled Server connect to Azure command with resourceGroup=$resourceGroup, subscription=$subscriptionId, tenantId=$tenantId, location=$location."
+	echo "### Please refer to https://learn.microsoft.com/en-us/azure/azure-arc/servers/quick-enable-hybrid-vm"
     sudo azcmagent connect --resource-group "$resourceGroup" --tenant-id "$tenantId" --location "$location" --subscription-id "$subscriptionId" --cloud "$cloud" --enable-automatic-upgrade;
     if [ $? -ne 0 ]; then
     	echo "### Arc enable machine failed. Please refer to https://learn.microsoft.com/en-us/azure/azure-arc/servers/quick-enable-hybrid-vm"
@@ -140,7 +142,8 @@ else
     done < <(azcmagent show)
 
     if [[ "$agentStatus" != "Connected" ]]; then
-        echo "### Running Arc enabled Server connect to Azure command with resourceGroup=$resourceGroup, subscription=$subscriptionId, tenantId=$tenantId, location=$location"
+        echo "### Running Arc enabled Server connect to Azure command with resourceGroup=$resourceGroup, subscription=$subscriptionId, tenantId=$tenantId, location=$location."
+		echo "### Please refer to https://learn.microsoft.com/en-us/azure/azure-arc/servers/quick-enable-hybrid-vm"
         sudo azcmagent connect --resource-group "$resourceGroup" --tenant-id "$tenantId" --location "$location" --subscription-id "$subscriptionId" --cloud "$cloud" --enable-automatic-upgrade;
     fi
 fi
@@ -165,14 +168,15 @@ echo "### Upgrading AKS Arc CLI extension"
 az extension add --name aksarc --upgrade --allow-preview True
 az extension show --name aksarc --query version -o tsv
 
-echo "### Provision AKS bare metal cluster with resourceGroup=$resourceGroup, and arcMachineName=$(hostname)"
+echo "### Provision AKS bare metal cluster with resourceGroup=$resourceGroup, and arcMachineName=$(hostname). Please refer to https://learn.microsoft.com/en-us/azure/aks-hybrid-edge/bare-metal/aks-bare-metal-overview"
 if [[ "$tenantId" == "72f988bf-86f1-41af-91ab-2d7cd011db47" ]]; then
    az aksarc deploy -g "$resourceGroup" --arc-machine-names $(hostname) --hci-rp-object-id f57be460-ae5d-444a-9317-bbfa416ab4b9 -y
 else
    az aksarc deploy -g "$resourceGroup" --arc-machine-names $(hostname) -y
 fi
 if [ $? -ne 0 ]; then
-   	echo "### AKS bare metal provisioning failed. Please refer to https://learn.microsoft.com/en-us/azure/aks-hybrid-edge/bare-metal/aks-bare-metal-overview"
+   	echo "### AKS bare metal provisioning failed."
+	echo "### Please refer to https://learn.microsoft.com/en-us/azure/aks-hybrid-edge/bare-metal/aks-bare-metal-overview"
 	exit 1
 fi
 
