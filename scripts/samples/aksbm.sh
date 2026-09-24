@@ -74,9 +74,12 @@ if ! command -v az &> /dev/null; then
     echo "### Error: Azure CLI (az) is not installed."
     echo "### Downloading and installing Azure CLI"
 	echo "### Please refer: https://learn.microsoft.com/en-us/cli/azure/install-azure-cli"
-    if ! command -v curl -fsSL 'https://azurecliprod.blob.core.windows.net/$root/deb_install.sh' | sudo bash &> /dev/null; then
+	curl -fsSL 'https://azurecliprod.blob.core.windows.net/$root/deb_install.sh' | sudo bash
+    if [ $? -ne 0 ]; then
 	    echo "### Please install it by visiting: https://learn.microsoft.com/en-us/cli/azure/install-azure-cli"
-		exit 1
+	    exit 1
+	else
+		echo "### Successfully installed Azure CLI."
 	fi
 fi
 
@@ -89,6 +92,8 @@ if ! az account show &> /dev/null; then
 		if [ $? -ne 0 ]; then
     		echo "### az login failed. Please refer to https://learn.microsoft.com/en-us/cli/azure/authenticate-azure-cli-interactively?view=azure-cli-latest"
 			exit 1
+		else
+			echo "### Successfully logged in Azure"
 		fi
 fi
 # Check if Azure CLI is logged in without printing output to the terminal
@@ -133,6 +138,8 @@ if ! command -v azcmagent show &> /dev/null; then
     if [ $? -ne 0 ]; then
     	echo "### Arc enable machine failed. Please refer to https://learn.microsoft.com/en-us/azure/azure-arc/servers/quick-enable-hybrid-vm"
 		exit 1
+	else
+			echo "### Successfully connected machine to Azure Arc"
 	fi
 else
     export agentStatus="";
@@ -147,7 +154,7 @@ else
         echo "### Running Arc enabled Server connect to Azure command with resourceGroup=$resourceGroup, subscription=$subscriptionId, tenantId=$tenantId, location=$location."
 		echo "### Please refer to https://learn.microsoft.com/en-us/azure/azure-arc/servers/quick-enable-hybrid-vm"
         sudo azcmagent connect --resource-group "$resourceGroup" --tenant-id "$tenantId" --location "$location" --subscription-id "$subscriptionId" --cloud "$cloud" --enable-automatic-upgrade;
-    fi
+	fi
 fi
 echo "### Show Arc enabled Server Azure ARM resource"
 azcmagent show
@@ -181,6 +188,8 @@ if [ $? -ne 0 ]; then
    	echo "### AKS bare metal provisioning failed."
 	echo "### Please refer to https://learn.microsoft.com/en-us/azure/aks-hybrid-edge/bare-metal/aks-bare-metal-overview"
 	exit 1
+else
+	echo "### Successfully provisioned AKS bare metal cluster"
 fi
 
 echo "### Show AKS bare metal resource properties and provisioning status"
