@@ -1,7 +1,7 @@
 // ============================================================================
-// AKS Arc on Bare Metal Linux — Cluster Creation Bicep Template
+// AKS Hybrid and Edge on Bare Metal Linux — Cluster Creation Bicep Template
 //
-// Creates an AKS Arc cluster on a bare metal Linux edge machine that is
+// Creates an AKS Hybrid and Edge cluster on a bare metal Linux edge machine that is
 // already in the "Provisioned" state. Achieves parity with the portal UX
 // creation flow.
 //
@@ -34,7 +34,7 @@
 @description('Azure region. Must match the edge machine region.')
 param location string
 
-@description('Name for the AKS Arc cluster.')
+@description('Name for the AKS Hybrid and Edge cluster.')
 param clusterName string
 
 @description('Kubernetes version (e.g., "1.33.3")')
@@ -234,7 +234,7 @@ resource logicalNetwork 'Microsoft.AzureStackHCI/logicalNetworks@2024-09-01-prev
 // Resource 5: Connected Cluster (Arc identity)
 //
 // The Connected Cluster is the Arc identity for the AKS cluster. It is
-// created with kind=ProvisionedCluster so AKS Arc recognizes it.
+// created with kind=ProvisionedCluster so AKS Hybrid and Edge recognizes it.
 // ============================================================================
 
 resource connectedCluster 'Microsoft.Kubernetes/connectedClusters@2024-01-01' = {

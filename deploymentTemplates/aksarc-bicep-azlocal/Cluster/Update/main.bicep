@@ -7,7 +7,7 @@ param connectedClusterName string
 // Logical network
 param logicalNetworkName string
 
-// Aks Arc cluster
+// AKS Hybrid and Edge cluster
 param sshPublicKey string
 param controlPlaneHostIP string
 param kubernetesVersion string

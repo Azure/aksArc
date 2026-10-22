@@ -1,6 +1,6 @@
 ## Overview
 
-This folder contains various scripts that help with deployment and management of AKS Arc.
+This folder contains various scripts that help with deployment and management of AKS Hybrid and Edge.
 
 | Script | Description |
 |-|-|

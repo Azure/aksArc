@@ -154,7 +154,7 @@ echo "### Add Azure Arc CLI extensions"
 az extension add --name connectedk8s
 az extension add --name connectedmachine
 
-echo "### Upgrading AKS Arc CLI extension"
+echo "### Upgrading AKS Hybrid and Edge CLI extension"
 # az extension add --source https://hybridaksstorage.z13.web.core.windows.net/HybridAKS/CLI/aksarc-2.0.0b21-py3-none-any.whl --yes
 az extension add --name aksarc --upgrade --allow-preview True
 az extension show --name aksarc --query version -o tsv

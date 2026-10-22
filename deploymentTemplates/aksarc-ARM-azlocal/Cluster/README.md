@@ -1,16 +1,16 @@
-# ARM template to deploy an AKS Arc Kubernetes cluster
+# ARM template to deploy an AKS Hybrid and Edge Kubernetes cluster
 
-This template deploys an AKS Arc Kubernetes cluster with workload identity federation enabled.
+This template deploys an AKS Hybrid and Edge Kubernetes cluster with workload identity federation enabled.
 
 ## Folder Structure
 
 - **CreateWithExistingLnet/**: Deploy a cluster using an existing logical network
 - **CreateWithoutExistingLnet/**: Deploy a cluster and create a new logical network
-- **Update/**: Update an existing Aks Arc cluster's configuration
+- **Update/**: Update an existing AKS Hybrid and Edge cluster's configuration
 
 ## Instructions
 
-Update azuredeploy.parameters.json with Aks Arc cluster name, ssh public key, and ARM IDs of vnet and custom location.
+Update azuredeploy.parameters.json with AKS Hybrid and Edge cluster name, ssh public key, and ARM IDs of vnet and custom location.
 
 ## Deploy
 
@@ -22,7 +22,7 @@ az deployment group create -g $resourceGroup --template-file azuredeploy.json -p
 
 ## Update Existing Cluster
 
-The **Update/** folder contains a template to update an existing AKS Arc cluster. ARM template updates use PUT operations which require the complete resource specification.
+The **Update/** folder contains a template to update an existing AKS Hybrid and Edge cluster. ARM template updates use PUT operations which require the complete resource specification.
 
 ### Updatable Fields
 

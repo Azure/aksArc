@@ -32,16 +32,16 @@ try {
         throw "Failed to get logical network ID. Exit code: $LASTEXITCODE"
     }
 
-    Write-Host "Creating AKS Arc cluster..."
+    Write-Host "Creating AKS Hybrid and Edge cluster..."
     az aksarc create --name $aksArcClusterName --resource-group $resource_group --custom-location $clId --vnet-ids $lnetId --generate-ssh-keys
     if ($LASTEXITCODE -ne 0) {
-        throw "Failed to create AKS Arc cluster. Exit code: $LASTEXITCODE"
+        throw "Failed to create AKS Hybrid and Edge cluster. Exit code: $LASTEXITCODE"
     }
 
-    Write-Host "AKS Arc cluster deployment completed successfully."
+    Write-Host "AKS Hybrid and Edge cluster deployment completed successfully."
 }
 catch {
-    Write-Error "An error occurred during AKS Arc cluster deployment: $_"
+    Write-Error "An error occurred during AKS Hybrid and Edge cluster deployment: $_"
     Write-Error "Exception details: $($_.Exception.Message)"
     Write-Error "Stack trace: $($_.ScriptStackTrace)"
     throw

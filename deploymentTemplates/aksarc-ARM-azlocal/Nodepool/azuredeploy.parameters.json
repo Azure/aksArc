@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "connectedClusterName": {
-      "value": "TODO: AKS Arc Cluster Name"
+      "value": "TODO: AKS Hybrid and Edge Cluster Name"
     },
     "agentName": {
       "value": "TODO: Node Pool Name"

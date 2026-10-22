@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# AKS Arc Jump Start - Main deployment script (Bash version)
+# AKS Hybrid and Edge Jump Start - Main deployment script (Bash version)
 # Converts aksarc_jumpstart from PowerShell to Bash
 
 set -e  # Exit on error
@@ -147,7 +147,7 @@ fi
 validate_prerequisites
 check_azure_login
 
-log "Starting AKS Arc Jump Start deployment..."
+log "Starting AKS Hybrid and Edge Jump Start deployment..."
 log "Configuration:"
 log "  Resource Group: $GROUP_NAME"
 log "  Location: $LOCATION"
@@ -309,7 +309,7 @@ log ""
 log "Next steps:"
 log "1. Login to the VM using Bastion or RDP"
 log "2. Wait for MOC install to finish (should take 2-3 minutes)"
-log "3. Run the AKS Arc deployment script:"
+log "3. Run the AKS Hybrid and Edge deployment script:"
 log "   ./deployaksarc.sh -s $SUBSCRIPTION_ID -g $GROUP_NAME -l $LOCATION -v $VNET_NAME -m $VM_NAME -n $SUBNET_NAME"
 log ""
 log "VM Connection Details:"

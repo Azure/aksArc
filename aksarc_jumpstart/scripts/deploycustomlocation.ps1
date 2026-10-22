@@ -17,10 +17,10 @@ try {
         throw "Failed to get Arc Appliance resource ID. Exit code: $LASTEXITCODE"
     }
 
-    Write-Host "Getting AKS Arc cluster extension resource ID..."
+    Write-Host "Getting AKS Hybrid and Edge cluster extension resource ID..."
     $AksarcClusterExtensionResourceId = az k8s-extension show -g $resource_group -c $appliance_name --cluster-type appliances --name $aksarcExtName --query id -o tsv
     if ($LASTEXITCODE -ne 0) {
-        throw "Failed to get AKS Arc cluster extension resource ID. Exit code: $LASTEXITCODE"
+        throw "Failed to get AKS Hybrid and Edge cluster extension resource ID. Exit code: $LASTEXITCODE"
     }
 
     Write-Host "Getting Arc VM cluster extension resource ID..."

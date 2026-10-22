@@ -4,7 +4,7 @@ param connectedClusterName string
 // Logical network
 param logicalNetworkName string
 
-// Aks Arc cluster
+// AKS Hybrid and Edge cluster
 param sshPublicKey string
 param controlPlaneHostIP string
 param kubernetesVersion string
@@ -34,7 +34,7 @@ resource connectedCluster 'Microsoft.Kubernetes/ConnectedClusters@2024-01-01' ex
   name: connectedClusterName
 }
 
-// Update the Aks Arc cluster instance.
+// Update the AKS Hybrid and Edge cluster instance.
 resource provisionedClusterInstance 'Microsoft.HybridContainerService/provisionedClusterInstances@2024-01-01' = {
   name: 'default'
   scope: connectedCluster

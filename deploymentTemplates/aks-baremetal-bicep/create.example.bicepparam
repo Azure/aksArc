@@ -1,5 +1,5 @@
 // ============================================================================
-// AKS Arc on Bare Metal Linux — Example Parameters
+// AKS Hybrid and Edge on Bare Metal Linux — Example Parameters
 //
 // Copy this file, fill in your values, and deploy:
 //   az deployment group create -g <RG> --parameters cluster-create.bicepparam

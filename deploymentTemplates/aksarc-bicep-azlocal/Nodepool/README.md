@@ -1,10 +1,10 @@
-# Bicep template to deploy/update an AKS Arc node pool
+# Bicep template to deploy/update an AKS Hybrid and Edge node pool
 
-This template is to deploy a new node pool on an existing AKS Arc cluster or can be used to update an existing nodepool.
+This template is to deploy a new node pool on an existing AKS Hybrid and Edge cluster or can be used to update an existing nodepool.
 
 ## Prerequisites
 
-In order to deploy this template, there must be an operational AKS Arc cluster.
+In order to deploy this template, there must be an operational AKS Hybrid and Edge cluster.
 
 ## Deploy New Node Pool
 
@@ -69,4 +69,4 @@ param nodeTaints = ['workload=special:PreferNoSchedule']
 
 For more details please look through:
 - [Bicep documentation](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/)
-- [AKS Arc documentation](https://learn.microsoft.com/en-us/azure/aks/hybrid/)
+- [AKS Hybrid and Edge documentation](https://learn.microsoft.com/en-us/azure/aks/hybrid/)
