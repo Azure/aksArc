@@ -17,8 +17,8 @@ param vipPoolEnd = '<TODO>'
 param nextHopIpAddress = '<TODO>'
 param vlan = 0 // TODO: add your vlan.
 
-// Aks Arc cluster
-param connectedClusterName = 'bicepConnectedCluster' // TODO: add your Aks Arc cluster name.
+// AKS Hybrid and Edge cluster
+param connectedClusterName = 'bicepConnectedCluster' // TODO: add your AKS Hybrid and Edge cluster name.
 param sshPublicKey = '<TODO>' // Full public key copied from the .pub file.
 param controlPlaneHostIP = '<TODO>'
 param kubernetesVersion = '<TODO>'

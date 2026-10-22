@@ -38,7 +38,7 @@ try {
         throw "Failed to set Azure subscription. Exit code: $LASTEXITCODE"
     }
 
-    Write-Host "Creating k8s-extension for AKS Arc..."
+    Write-Host "Creating k8s-extension for AKS Hybrid and Edge..."
     az k8s-extension create -g $resource_group -c $appliance_name --cluster-type appliances --name $aksarcExtName `
       --extension-type Microsoft.HybridAKSOperator --config-file $aksExtensionConfigFilePath `
       --release-train $release_train --version $aksarcversion --auto-upgrade-minor-version $false
@@ -47,10 +47,10 @@ try {
         throw "Failed to create k8s-extension. Exit code: $LASTEXITCODE"
     }
 
-    Write-Host "AKS Arc extension deployment completed successfully."
+    Write-Host "AKS Hybrid and Edge extension deployment completed successfully."
 }
 catch {
-    Write-Error "An error occurred during AKS Arc extension deployment: $_"
+    Write-Error "An error occurred during AKS Hybrid and Edge extension deployment: $_"
     Write-Error "Exception details: $($_.Exception.Message)"
     Write-Error "Stack trace: $($_.ScriptStackTrace)"
     throw

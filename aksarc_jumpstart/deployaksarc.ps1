@@ -76,11 +76,11 @@ foreach ($script in $scriptToExecute.GetEnumerator()) {
         }
     }
     catch {
-        Write-Error "An error occurred during AKS Arc cluster deployment: $_"
+        Write-Error "An error occurred during AKS Hybrid and Edge cluster deployment: $_"
         Write-Error "Exception details: $($_.Exception.Message)"
         Write-Error "Stack trace: $($_.ScriptStackTrace)"
         throw
     }
 }
 
-Write-Host "Setup is ready for AKS Arc deployment"
+Write-Host "Setup is ready for AKS Hybrid and Edge deployment"

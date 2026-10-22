@@ -1,4 +1,4 @@
-# AKS enabled by Azure Arc Jump Start
+# AKS Hybrid and Edge Jump Start
 
 ## IMPORTANT NOTICE
 
@@ -85,7 +85,7 @@ chmod +x jumpstart.sh deployaksarc.sh
   --location "eastus" \
   --vm-name "aksarc-demo-vm"
 
-# After VM setup is complete, deploy AKS Arc components
+# After VM setup is complete, deploy AKS Hybrid and Edge components
 ./deployaksarc.sh \
   --subscription "12345678-1234-1234-1234-123456789012" \
   --group-name "aksarc-demo-rg" \
@@ -104,7 +104,7 @@ az login --use-device-code
 # Deploy infrastructure
 powershell .\jumpstart.ps1 -userName "azureuser" -password "YourSecurePassword123!" -subscription "12345678-1234-1234-1234-123456789012" -GroupName "aksarc-demo-rg" -Location "eastus" -VMName "aksarc-demo-vm"
 
-# Deploy AKS Arc components
+# Deploy AKS Hybrid and Edge components
 powershell .\deployaksarc.ps1 -subscription "12345678-1234-1234-1234-123456789012" -GroupName "aksarc-demo-rg" -Location "eastus" -VMName "aksarc-demo-vm"
 ```
 
@@ -138,7 +138,7 @@ chmod +x jumpstart.sh deployaksarc.sh
 # This was done because Install-Moc has to be done directly or via CredSSP.
 # Wait for it to complete. It should only take 2-3 minutes.
 
-# Step 5: Deploy AKS Arc components
+# Step 5: Deploy AKS Hybrid and Edge components
 ./deployaksarc.sh \
   --subscription <subscriptionid> \
   --group-name <resource-group-name> \
@@ -164,7 +164,7 @@ powershell .\jumpstart.ps1 -userName <username> -password <password> -subscripti
 # MOC install will start automatically in PowerShell.
 # Wait for it to complete. It should only take 2-3 minutes.
 
-# Step 4: Deploy AKS Arc components
+# Step 4: Deploy AKS Hybrid and Edge components
 powershell .\deployaksarc.ps1 -subscription <subscriptionid> -GroupName <resourcegroup> -Location <location> -vNetName <vnetname> -VMName <vmname> -subnetName <subnetname>
 ```
 
@@ -172,7 +172,7 @@ powershell .\deployaksarc.ps1 -subscription <subscriptionid> -GroupName <resourc
 
 After successful deployment, you can:
 
-1. **Verify the AKS Arc cluster**:
+1. **Verify the AKS Hybrid and Edge cluster**:
 
    ```bash
    az connectedk8s show --resource-group <resource-group> --name <cluster-name>
@@ -193,7 +193,7 @@ After successful deployment, you can:
    az connectedk8s proxy --resource-group <resource-group> --name <cluster-name>
    ```
 
-4. **Connect using kubectl** to manage your AKS Arc cluster
+4. **Connect using kubectl** to manage your AKS Hybrid and Edge cluster
 
 ## Cleanup
 

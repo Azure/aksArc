@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# AKS Arc Deployment Script - Bash version
-# This is a continuation of jumpstart.sh to deploy AKS Arc specific components
+# AKS Hybrid and Edge Deployment Script - Bash version
+# This is a continuation of jumpstart.sh to deploy AKS Hybrid and Edge specific components
 # At this point, MOC is expected to be installed on the VM
 
 set -e  # Exit on error
@@ -27,7 +27,7 @@ usage() {
     echo "  -n, --subnet-name <name>         Subnet name (default: $SUBNET_NAME)"
     echo "  -a, --appliance-name <name>      Appliance name (default: \${VM_NAME}-appliance)"
     echo "  -c, --custom-location <name>     Custom location name (default: \${APPLIANCE_NAME}-cl)"
-    echo "  -k, --aks-cluster <name>         AKS Arc cluster name (default: generated)"
+    echo "  -k, --aks-cluster <name>         AKS Hybrid and Edge cluster name (default: generated)"
     echo "  -w, --working-dir <path>         Working directory (default: $WORKING_DIR)"
     echo "  -h, --help                       Show this help message"
     echo ""
@@ -154,7 +154,7 @@ fi
 validate_prerequisites
 check_azure_login
 
-log "Starting AKS Arc deployment..."
+log "Starting AKS Hybrid and Edge deployment..."
 log "Configuration:"
 log "  Resource Group: $GROUP_NAME"
 log "  Location: $LOCATION"
@@ -162,7 +162,7 @@ log "  VM Name: $VM_NAME"
 log "  Appliance Name: $APPLIANCE_NAME"
 log "  Custom Location: $CUSTOM_LOCATION_NAME"
 log "  ARC Logical Network: $ARC_LNET_NAME"
-log "  AKS Arc Cluster: $AKS_ARC_CLUSTER_NAME"
+log "  AKS Hybrid and Edge Cluster: $AKS_ARC_CLUSTER_NAME"
 log "  Working Directory: $WORKING_DIR"
 log "  Subscription ID: $SUBSCRIPTION_ID"
 
@@ -191,7 +191,7 @@ if [[ ! -f "$EXEC_TEMPLATE" ]]; then
 fi
 
 # Execute deployment scripts on VM in sequence
-log "Executing AKS Arc deployment scripts on VM..."
+log "Executing AKS Hybrid and Edge deployment scripts on VM..."
 
 # Define script execution order and details
 execute_script() {
@@ -240,17 +240,17 @@ execute_script "deploylnet.ps1" "-resource_group \"$GROUP_NAME\" -lnetName \"$AR
 
 execute_script "deployaksarccluster.ps1" "-resource_group \"$GROUP_NAME\" -aksArcClusterName \"$AKS_ARC_CLUSTER_NAME\" -lnetName \"$ARC_LNET_NAME\" -customLocationName \"$CUSTOM_LOCATION_NAME\" -subscription \"$SUBSCRIPTION_ID\""
 
-log "AKS Arc deployment completed successfully!"
+log "AKS Hybrid and Edge deployment completed successfully!"
 log ""
 log "Deployment Summary:"
 log "  Resource Group: $GROUP_NAME"
 log "  Appliance Name: $APPLIANCE_NAME"
 log "  Custom Location: $CUSTOM_LOCATION_NAME"
 log "  Logical Network: $ARC_LNET_NAME"
-log "  AKS Arc Cluster: $AKS_ARC_CLUSTER_NAME"
+log "  AKS Hybrid and Edge Cluster: $AKS_ARC_CLUSTER_NAME"
 log ""
 log "Next Steps:"
-log "1. Verify the AKS Arc cluster is running:"
+log "1. Verify the AKS Hybrid and Edge cluster is running:"
 log "   az connectedk8s show --resource-group $GROUP_NAME --name $AKS_ARC_CLUSTER_NAME"
 log ""
 log "2. [OPTIONAL] Enable Microsoft Entra ID (Azure AD) with Kubernetes RBAC:"
@@ -261,4 +261,4 @@ log "   az connectedk8s proxy --resource-group $GROUP_NAME --name $AKS_ARC_CLUST
 log ""
 log "4. Connect to the cluster using kubectl"
 log ""
-log "Setup is ready for AKS Arc workload deployment!"
+log "Setup is ready for AKS Hybrid and Edge workload deployment!"

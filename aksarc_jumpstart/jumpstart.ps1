@@ -81,7 +81,7 @@ foreach ($script in $scriptToExecute.GetEnumerator()) {
     az deployment group create --name $deploymentName --resource-group $GroupName --template-file ./configuration/executescript-template.json --parameters location=$Location vmName=$vmName scriptFileUri=$scriptUrl commandToExecute=$commandToExecute
   }
   catch {
-    Write-Error "An error occurred during AKS Arc cluster deployment: $_"
+    Write-Error "An error occurred during AKS Hybrid and Edge cluster deployment: $_"
     Write-Error "Exception details: $($_.Exception.Message)"
     Write-Error "Stack trace: $($_.ScriptStackTrace)"
     throw

@@ -15,7 +15,7 @@ param vipPoolStart string
 param vipPoolEnd string
 param nextHopIpAddress string
 
-// Aks Arc cluster
+// AKS Hybrid and Edge cluster
 param connectedClusterName string
 param sshPublicKey string
 param controlPlaneHostIP string

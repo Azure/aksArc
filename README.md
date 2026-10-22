@@ -1,6 +1,6 @@
-# Welcome to the AKS enabled by Arc repo
+# Welcome to the AKS Hybrid and Edge repo
 
-Azure Kubernetes Service (AKS) enabled by Azure Arc is a managed Kubernetes service that you can use to deploy and manage containerized applications on-premises, in datacenters, or at edge locations such as retail stores or manufacturing plants. See [What is AKS enabled by Arc?](https://learn.microsoft.com/azure/aks/aksarc/aks-overview) for more information.
+Azure Kubernetes Service (AKS) Hybrid and Edge is a managed Kubernetes service that you can use to deploy and manage containerized applications on-premises, in datacenters, or at edge locations such as retail stores or manufacturing plants. See [What is AKS Hybrid and Edge?](https://learn.microsoft.com/azure/aks/aksarc/aks-overview) for more information.
 
 To learn more about the Azure adaptive cloud check out this [blog post](https://azure.microsoft.com/blog/advancing-hybrid-cloud-to-adaptive-cloud-with-azure/).
 
@@ -21,7 +21,7 @@ All AKS versions Microsoft ships for edge or datacenter deployment are part of t
 
 ## What you will find here
 
-This repository is a central place for tracking features and issues with AKS enabled by Arc. This repository is monitored by the product team in order to engage with our community and discuss questions, customer scenarios, or feature requests.
+This repository is a central place for tracking features and issues with AKS Hybrid and Edge. This repository is monitored by the product team in order to engage with our community and discuss questions, customer scenarios, or feature requests.
 
 Support through issues on this repository is provided on a best-effort basis for issues that are reproducible outside of a specific cluster configuration (see Bug Guidance below). To receive urgent support you should file a support request through official Azure support channels as production and urgent support is explicitly out of scope for issues filed in this repository.
 
@@ -30,11 +30,11 @@ Support through issues on this repository is provided on a best-effort basis for
 
 Do not file issues for AKS-Engine, Virtual-Kubelet, Azure Container Instances, or services on this repository unless it is related to that feature/service and functionality with AKS. For other tools, products and services see the Upstream Azure Compute projects page.
 
-## Important AKS Arc links
+## Important AKS Hybrid and Edge links
 
 * Roadmaps
-  * [AKS Arc Product Roadmap](https://github.com/orgs/Azure/projects/751/views/4)
-  * [AKS Arc Feature Roadmap](https://github.com/orgs/Azure/projects/397/views/1)
+  * [AKS Hybrid and Edge Product Roadmap](https://github.com/orgs/Azure/projects/751/views/4)
+  * [AKS Hybrid and Edge Feature Roadmap](https://github.com/orgs/Azure/projects/397/views/1)
 * Release Notes
   * [AKS on Azure Local, version 23H2](https://learn.microsoft.com/en-us/azure/aks/aksarc/aks-whats-new-23h2#features-and-improvements)
   * [AKS on Windows Server/Azure Local, version 22H2](https://github.com/Azure/aksArc/releases)
